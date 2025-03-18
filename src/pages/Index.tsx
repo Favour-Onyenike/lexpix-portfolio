@@ -2,92 +2,188 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Camera, Users, Calendar } from 'lucide-react';
+import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import Layout from '@/components/Layout';
 
 const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative h-[80vh] overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" 
-            alt="Photography hero" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-        </div>
-        
-        <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-6 md:px-10">
+      <section className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
+        <div className="w-full md:w-1/2 pr-0 md:pr-8 mb-10 md:mb-0">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-5xl md:text-7xl font-bold mb-6"
+          >
+            less is more.
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-gray-600 text-lg mb-8"
+          >
+            Capturing moments with minimalist elegance. Professional photography that focuses on what matters most.
+          </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-2xl"
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-              Capturing Life's Precious Moments
-            </h1>
-            <p className="text-lg text-white/90 mb-8">
-              Professional photography services for events, portraits, weddings, and more. Let us create timeless memories for you.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" asChild>
-                <Link to="/gallery">
-                  View Gallery
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" asChild>
-                <Link to="/events">View Events</Link>
-              </Button>
+            <Button 
+              size="lg" 
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8"
+              asChild
+            >
+              <a href="#contact">Get in touch</a>
+            </Button>
+          </motion.div>
+        </div>
+        <div className="w-full md:w-1/2">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="relative"
+          >
+            <div className="bg-yellow-400 rounded-full overflow-hidden aspect-square max-w-xl mx-auto">
+              <img 
+                src="/lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
+                alt="Photographer" 
+                className="w-full h-full object-cover mix-blend-darken"
+              />
             </div>
           </motion.div>
         </div>
       </section>
-      
-      {/* Services Section */}
-      <section className="py-24 px-6 md:px-10 bg-muted/30">
+
+      {/* Featured Projects Section */}
+      <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="text-3xl font-semibold mb-4"
-            >
-              Our Photography Services
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="text-muted-foreground max-w-2xl mx-auto"
-            >
-              We offer a wide range of professional photography services to meet your needs
-            </motion.p>
-          </div>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold mb-12 text-center"
+          >
+            Featured Projects
+          </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Events",
+                description: "Capturing memorable moments from special events and celebrations.",
+                image: "/lovable-uploads/9a5b8dd9-88d8-4ed4-bacf-07c70e1bdffe.png",
+                link: "/events"
+              },
+              {
+                title: "Portrait Series",
+                description: "Professional portraits that capture personality and character in every shot.",
+                image: "/lovable-uploads/6cb9671f-5f66-4a21-9e45-d97a2994a1e5.png",
+                link: "/gallery"
+              },
+              {
+                title: "Places",
+                description: "Stunning photography of landscapes, architecture, and beautiful locations.",
+                image: "/lovable-uploads/9d5ac26c-b0f6-4bcf-8420-4e8745b54848.png",
+                link: "/gallery"
+              }
+            ].map((project, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-black border border-gray-800 rounded-lg overflow-hidden"
+              >
+                <div className="aspect-video overflow-hidden">
+                  <img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                  <p className="text-gray-400 mb-4">{project.description}</p>
+                  <Button 
+                    variant="outline" 
+                    className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
+                    asChild
+                  >
+                    <Link to={project.link}>
+                      Explore →
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { number: "25+", label: "Satisfied Clients" },
+              { number: "20+", label: "Projects Completed" },
+              { number: "3+", label: "Years Experience" },
+              { number: "200", label: "Photos Delivered" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</h3>
+                <p className="text-sm md:text-base">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-16 md:py-24 px-6 md:px-10 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold mb-16 text-center"
+          >
+            Our Services
+          </motion.h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             {[
               {
                 icon: Camera,
-                title: "Portrait Photography",
-                description: "Professional portraits for individuals, families, and corporate use."
+                title: "Photography",
+                description: "Professional photography services for all your needs"
               },
               {
-                icon: Users,
-                title: "Wedding Photography",
-                description: "Capture every special moment of your wedding day with our professional team."
+                icon: Video,
+                title: "Video Editing",
+                description: "Professional video editing and post-production services"
               },
               {
-                icon: Calendar,
-                title: "Event Photography",
-                description: "Full event coverage with professional equipment and experienced photographers."
+                icon: Palette,
+                title: "Graphic Design",
+                description: "Creative design solutions for your brand and marketing needs"
               }
             ].map((service, index) => (
               <motion.div
@@ -96,47 +192,102 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+                className="flex flex-col items-center text-center"
               >
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <service.icon className="h-6 w-6 text-primary" />
+                <div className="w-20 h-20 bg-black rounded-md flex items-center justify-center mb-4">
+                  <service.icon className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-xl font-medium mb-2">{service.title}</h3>
-                <p className="text-muted-foreground">{service.description}</p>
+                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                <p className="text-gray-600">{service.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
-      
-      {/* CTA Section */}
-      <section className="py-24 px-6 md:px-10 relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <img 
-            src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
-            alt="Photography equipment"
-            className="w-full h-full object-cover opacity-10"
-          />
-        </div>
-        
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="bg-card border border-border rounded-xl p-8 md:p-12 shadow-lg"
-          >
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-3xl font-semibold mb-4">Ready to Book Your Session?</h2>
-              <p className="text-muted-foreground mb-8">
-                Contact us today to discuss your photography needs and schedule a session. We're here to help you create beautiful memories.
-              </p>
-              <Button size="lg" className="w-full sm:w-auto" asChild>
-                <a href="mailto:contact@photostudio.com">Contact Us Today</a>
-              </Button>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-5">
+              <div className="p-8 md:p-12 col-span-3 border-b md:border-b-0 md:border-r border-gray-200">
+                <div className="mb-2">
+                  <div className="w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center mb-6">
+                    <Camera className="h-6 w-6" />
+                  </div>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Contact Us</h2>
+                <p className="text-gray-600 mb-8">
+                  Feel free to contact us any time. We will get back to you as soon as we can!
+                </p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Input 
+                      type="text" 
+                      placeholder="Name" 
+                      className="border-b border-t-0 border-l-0 border-r-0 rounded-none px-0 focus-visible:ring-0"
+                    />
+                  </div>
+                  <div>
+                    <Input 
+                      type="email" 
+                      placeholder="Email" 
+                      className="border-b border-t-0 border-l-0 border-r-0 rounded-none px-0 focus-visible:ring-0"
+                    />
+                  </div>
+                  <div>
+                    <Input 
+                      type="text" 
+                      placeholder="Message" 
+                      className="border-b border-t-0 border-l-0 border-r-0 rounded-none px-0 focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="pt-4">
+                    <Button 
+                      className="w-full bg-black hover:bg-gray-800 text-white"
+                    >
+                      SEND
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-black text-white p-8 md:p-12 col-span-2">
+                <h3 className="text-2xl font-bold mb-8">Info</h3>
+                <div className="space-y-6">
+                  <div className="flex items-center">
+                    <Mail className="h-5 w-5 mr-4" />
+                    <span>info@photostudio.com</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone className="h-5 w-5 mr-4" />
+                    <span>+24 56 89 146</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Building2 className="h-5 w-5 mr-4" />
+                    <span>14 Greenroad St.</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-5 w-5 mr-4" />
+                    <span>09:00 - 18:00</span>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-4 mt-20 justify-end">
+                  <a href="#" className="text-white hover:text-yellow-400 transition-colors">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-white hover:text-yellow-400 transition-colors">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-white hover:text-yellow-400 transition-colors">
+                    <Twitter className="h-5 w-5" />
+                  </a>
+                </div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </Layout>
