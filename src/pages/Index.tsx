@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Camera } from 'lucide-react';
+import { ArrowRight, Camera, Users, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 
@@ -10,158 +10,96 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background z-10" />
-        <div className="relative h-[80vh] overflow-hidden">
-          <div className="absolute inset-0 bg-black/20" />
+      <section className="relative h-[80vh] overflow-hidden">
+        <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2764&auto=format&fit=crop"
-            alt="Hero" 
-            className="w-full h-full object-cover object-center"
+            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80" 
+            alt="Photography hero" 
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 flex items-center justify-center flex-col p-6 z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-center max-w-3xl"
-            >
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-md">
-                Capturing moments that last forever
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 mb-8 drop-shadow-md max-w-2xl mx-auto">
-                Professional photography services for weddings, events, and portraits
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" asChild className="btn-hover">
-                  <Link to="/gallery">View Gallery</Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild className="bg-white/20 backdrop-blur-sm border-white/40 text-white hover:bg-white/30 btn-hover">
-                  <Link to="/events">Client Events</Link>
-                </Button>
-              </div>
-            </motion.div>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
         </div>
-      </section>
-
-      {/* Featured Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
+        
+        <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-6 md:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl"
           >
-            <h2 className="text-3xl md:text-4xl font-semibold mb-4">Featured Work</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              A selection of our best photography across various occasions and styles
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              Capturing Life's Precious Moments
+            </h1>
+            <p className="text-lg text-white/90 mb-8">
+              Professional photography services for events, portraits, weddings, and more. Let us create timeless memories for you.
             </p>
+            <div className="flex flex-wrap gap-4">
+              <Button size="lg" asChild>
+                <Link to="/gallery">
+                  View Gallery
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" asChild>
+                <Link to="/events">View Events</Link>
+              </Button>
+            </div>
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Weddings",
-                image: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2940&auto=format&fit=crop",
-                description: "Capturing the magic of your special day with elegance and emotion."
-              },
-              {
-                title: "Portraits",
-                image: "https://images.unsplash.com/photo-1611042553484-d61f84d22784?q=80&w=2942&auto=format&fit=crop",
-                description: "Personal portraits that tell your unique story and showcase your personality."
-              },
-              {
-                title: "Events",
-                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2940&auto=format&fit=crop",
-                description: "Documenting the energy and essence of corporate and social gatherings."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group overflow-hidden rounded-lg"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80" />
-                  <div className="absolute bottom-0 left-0 p-6">
-                    <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
-                    <p className="text-white/80 mb-4 max-w-xs">{item.description}</p>
-                    <Button size="sm" variant="outline" asChild className="bg-white/20 backdrop-blur-sm border-white/40 text-white hover:bg-white/30">
-                      <Link to="/gallery">
-                        View Work <ArrowRight size={14} className="ml-1" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button asChild>
-              <Link to="/gallery">
-                Explore Full Gallery <ArrowRight size={16} className="ml-2" />
-              </Link>
-            </Button>
-          </div>
         </div>
       </section>
-
+      
       {/* Services Section */}
-      <section className="py-20 px-6 bg-secondary/50">
+      <section className="py-24 px-6 md:px-10 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-semibold mb-4">Our Services</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Professional photography services tailored to your specific needs
-            </p>
-          </motion.div>
-
+          <div className="text-center mb-16">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="text-3xl font-semibold mb-4"
+            >
+              Our Photography Services
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="text-muted-foreground max-w-2xl mx-auto"
+            >
+              We offer a wide range of professional photography services to meet your needs
+            </motion.p>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 icon: Camera,
-                title: "Professional Shoots",
-                description: "Studio and on-location photography with professional lighting and equipment."
+                title: "Portrait Photography",
+                description: "Professional portraits for individuals, families, and corporate use."
               },
               {
-                icon: Camera,
-                title: "Event Coverage",
-                description: "Comprehensive documentation of weddings, corporate events, and celebrations."
+                icon: Users,
+                title: "Wedding Photography",
+                description: "Capture every special moment of your wedding day with our professional team."
               },
               {
-                icon: Camera,
-                title: "Post-Production",
-                description: "Expert editing, retouching, and delivery of high-resolution digital images."
+                icon: Calendar,
+                title: "Event Photography",
+                description: "Full event coverage with professional equipment and experienced photographers."
               }
             ].map((service, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
                 className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
               >
-                <div className="bg-primary/10 rounded-full p-3 inline-block mb-4">
-                  <service.icon size={24} className="text-primary" />
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <service.icon className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-medium mb-2">{service.title}</h3>
                 <p className="text-muted-foreground">{service.description}</p>
@@ -170,29 +108,33 @@ const Index = () => {
           </div>
         </div>
       </section>
-
+      
       {/* CTA Section */}
-      <section className="py-20 px-6">
+      <section className="py-24 px-6 md:px-10 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <img 
+            src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+            alt="Photography equipment"
+            className="w-full h-full object-cover opacity-10"
+          />
+        </div>
+        
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="bg-primary text-primary-foreground rounded-xl overflow-hidden"
+            viewport={{ once: true }}
+            className="bg-card border border-border rounded-xl p-8 md:p-12 shadow-lg"
           >
-            <div className="relative p-12 md:p-16">
-              <div className="max-w-2xl">
-                <h2 className="text-3xl md:text-4xl font-semibold mb-4">Ready to book your session?</h2>
-                <p className="opacity-90 mb-8">
-                  Let's create memories that will last a lifetime. Contact us to discuss your photography needs and book your session.
-                </p>
-                <Button size="lg" variant="outline" asChild className="border-primary-foreground/40 hover:bg-primary-foreground/10">
-                  <a href="mailto:contact@example.com">
-                    Get in Touch
-                  </a>
-                </Button>
-              </div>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl font-semibold mb-4">Ready to Book Your Session?</h2>
+              <p className="text-muted-foreground mb-8">
+                Contact us today to discuss your photography needs and schedule a session. We're here to help you create beautiful memories.
+              </p>
+              <Button size="lg" className="w-full sm:w-auto" asChild>
+                <a href="mailto:contact@photostudio.com">Contact Us Today</a>
+              </Button>
             </div>
           </motion.div>
         </div>
