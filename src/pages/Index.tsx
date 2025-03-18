@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter } from 'lucide-react';
+import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/Layout';
 
 const Index = () => {
@@ -88,7 +90,7 @@ const Index = () => {
           >
             <Button 
               size="lg" 
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 transition-colors duration-300 hover:bg-yellow-400 hover:text-black"
               asChild
             >
               <a href="#contact">Get in touch</a>
@@ -201,6 +203,36 @@ const Index = () => {
         </div>
       </section>
 
+      {/* About LexPix Section */}
+      <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-5xl font-bold mb-6"
+          >
+            About LexPix
+          </motion.h2>
+          <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
+          >
+            Founded by Voks "Lucas Uzum" in partnership with Larry "Olanrewaju Lawal Rasaq", LexPix is a creative photography and visual 
+            storytelling brand dedicated to capturing life's most meaningful moments. At LexPix, we believe every smile, glance, and milestone 
+            tells a story. With a sharp eye for detail and a passion for bringing memories to life, we create stunning images and dynamic visuals 
+            that preserve emotions in their purest form. Whether through striking photography or compelling videography, our goal is to bring out 
+            the beauty in every scene, turning everyday moments into lasting treasures.
+          </motion.p>
+        </div>
+      </section>
+
       <section className="py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
@@ -250,85 +282,80 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Updated Contact Section */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-5">
-              <div className="p-8 md:p-12 col-span-3 border-b md:border-b-0 md:border-r border-gray-200">
-                <div className="mb-2">
-                  <div className="w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center mb-6">
-                    <Camera className="h-6 w-6" />
-                  </div>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Contact Us</h2>
-                <p className="text-gray-600 mb-8">
-                  Feel free to contact us any time. We will get back to you as soon as we can!
-                </p>
-                
-                <div className="space-y-4">
+          <div className="text-center mb-8">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="text-3xl md:text-4xl font-bold mb-2"
+            >
+              Contact Us
+            </motion.h2>
+            <div className="w-16 h-1 bg-yellow-400 mx-auto mb-6"></div>
+            <p className="text-gray-600">Feel free to contact us any time. We will get back to you as soon as we can!</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white p-8 rounded-lg shadow-sm">
+              <form>
+                <div className="space-y-6">
                   <div>
                     <Input 
                       type="text" 
                       placeholder="Name" 
-                      className="border-b border-t-0 border-l-0 border-r-0 rounded-none px-0 focus-visible:ring-0"
+                      className="border rounded-md p-4 h-14 focus:border-black focus:ring-black"
                     />
                   </div>
                   <div>
                     <Input 
                       type="email" 
                       placeholder="Email" 
-                      className="border-b border-t-0 border-l-0 border-r-0 rounded-none px-0 focus-visible:ring-0"
+                      className="border rounded-md p-4 h-14 focus:border-black focus:ring-black"
                     />
                   </div>
                   <div>
-                    <Input 
-                      type="text" 
+                    <Textarea 
                       placeholder="Message" 
-                      className="border-b border-t-0 border-l-0 border-r-0 rounded-none px-0 focus-visible:ring-0"
+                      className="border rounded-md p-4 min-h-[150px] focus:border-black focus:ring-black"
                     />
                   </div>
-                  <div className="pt-4">
+                  <div>
                     <Button 
-                      className="w-full bg-black hover:bg-yellow-400 hover:text-black transition-colors duration-300 text-white"
+                      className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium h-14"
                     >
-                      SEND
+                      Send
                     </Button>
                   </div>
                 </div>
+              </form>
+            </div>
+            
+            <div className="bg-black text-white p-8 rounded-lg">
+              <h3 className="text-2xl font-bold mb-8">Info</h3>
+              
+              <div className="space-y-6">
+                <div className="flex items-center">
+                  <Mail className="h-5 w-5 mr-4 text-yellow-400" />
+                  <span>lexarenlogistics@gmail.com</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="h-5 w-5 mr-4 text-yellow-400" />
+                  <span>+1 (825) 461-0429</span>
+                </div>
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-4 text-yellow-400" />
+                  <span>New York, NY</span>
+                </div>
               </div>
               
-              <div className="bg-black text-white p-8 md:p-12 col-span-2">
-                <h3 className="text-2xl font-bold mb-8">Info</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center">
-                    <Mail className="h-5 w-5 mr-4" />
-                    <span>info@photostudio.com</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Phone className="h-5 w-5 mr-4" />
-                    <span>+24 56 89 146</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Building2 className="h-5 w-5 mr-4" />
-                    <span>14 Greenroad St.</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="h-5 w-5 mr-4" />
-                    <span>09:00 - 18:00</span>
-                  </div>
-                </div>
-                
-                <div className="flex space-x-4 mt-20 justify-end">
-                  <a href="#" className="text-white hover:text-yellow-400 transition-colors">
-                    <Facebook className="h-5 w-5" />
-                  </a>
-                  <a href="#" className="text-white hover:text-yellow-400 transition-colors">
-                    <Instagram className="h-5 w-5" />
-                  </a>
-                  <a href="#" className="text-white hover:text-yellow-400 transition-colors">
-                    <Twitter className="h-5 w-5" />
-                  </a>
-                </div>
+              <div className="mt-12">
+                <a href="#" className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-900 hover:bg-yellow-400 transition-colors duration-300">
+                  <Instagram className="h-5 w-5 text-white" />
+                </a>
               </div>
             </div>
           </div>
