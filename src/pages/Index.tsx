@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter } from 'lucide-react';
@@ -9,9 +8,61 @@ import { Input } from '@/components/ui/input';
 import Layout from '@/components/Layout';
 
 const Index = () => {
+  const statsRef = useRef(null);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const [counters, setCounters] = useState([0, 0, 0, 0]);
+  
+  const statsData = [
+    { target: 25, label: "Satisfied Clients" },
+    { target: 20, label: "Projects Completed" },
+    { target: 3, label: "Years Experience" },
+    { target: 200, label: "Photos Delivered" }
+  ];
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !statsVisible) {
+          setStatsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+    
+    return () => {
+      if (statsRef.current) {
+        observer.unobserve(statsRef.current);
+      }
+    };
+  }, [statsVisible]);
+  
+  useEffect(() => {
+    if (statsVisible) {
+      const duration = 2000;
+      const interval = 50;
+      let startTimestamp = null;
+      
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        
+        setCounters(statsData.map(stat => Math.floor(progress * stat.target)));
+        
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      
+      window.requestAnimationFrame(step);
+    }
+  }, [statsVisible]);
+
   return (
     <Layout>
-      {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="w-full md:w-1/2 pr-0 md:pr-8 mb-10 md:mb-0">
           <motion.h1 
@@ -62,7 +113,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Projects Section */}
       <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
@@ -130,16 +180,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
+      <section ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { number: "25+", label: "Satisfied Clients" },
-              { number: "20+", label: "Projects Completed" },
-              { number: "3+", label: "Years Experience" },
-              { number: "200", label: "Photos Delivered" }
-            ].map((stat, index) => (
+            {statsData.map((stat, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -147,7 +191,9 @@ const Index = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <h3 className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</h3>
+                <h3 className="text-4xl md:text-5xl font-bold mb-2">
+                  {statsVisible ? counters[index] : 0}{index === 3 ? "+" : index === 2 ? "+" : "+"}
+                </h3>
                 <p className="text-sm md:text-base">{stat.label}</p>
               </motion.div>
             ))}
@@ -155,7 +201,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services Section */}
       <section className="py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
@@ -192,10 +237,10 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="flex flex-col items-center text-center"
+                className="flex flex-col items-center text-center group"
               >
-                <div className="w-20 h-20 bg-black rounded-md flex items-center justify-center mb-4">
-                  <service.icon className="h-10 w-10 text-white" />
+                <div className="w-20 h-20 bg-black rounded-md flex items-center justify-center mb-4 transition-colors duration-300 group-hover:bg-yellow-400">
+                  <service.icon className="h-10 w-10 text-white group-hover:text-black transition-colors duration-300" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
                 <p className="text-gray-600">{service.description}</p>
@@ -205,7 +250,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -245,7 +289,7 @@ const Index = () => {
                   </div>
                   <div className="pt-4">
                     <Button 
-                      className="w-full bg-black hover:bg-gray-800 text-white"
+                      className="w-full bg-black hover:bg-yellow-400 hover:text-black transition-colors duration-300 text-white"
                     >
                       SEND
                     </Button>
