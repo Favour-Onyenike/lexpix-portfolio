@@ -246,7 +246,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
                 <Link to="/gallery" className="text-gray-400 hover:text-white transition-colors">Gallery</Link>
                 <Link to="/events" className="text-gray-400 hover:text-white transition-colors">Events</Link>
-                <a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a>
+                <a href="#contact" onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors">Contact</a>
               </div>
             </div>
             
