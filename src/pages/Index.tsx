@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/Layout';
+import ReviewSection from '@/components/ReviewSection';
 
 const Index = () => {
   const statsRef = useRef(null);
@@ -285,6 +285,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Reviews Section */}
+      <ReviewSection />
 
       {/* Contact Section */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">

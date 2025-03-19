@@ -50,6 +50,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link to="/events" className="text-sm hover:text-primary/80 transition-colors">
                 Events
               </Link>
+              <a href="#contact" className="text-sm hover:text-primary/80 transition-colors">
+                Contact
+              </a>
             </motion.nav>
           )}
           
@@ -61,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className="flex-shrink-0"
           >
             {!isMobile ? (
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" size="sm">
                 <Link to="/login">Admin</Link>
               </Button>
             ) : (
@@ -111,6 +114,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   Events
                 </Link>
+                <a 
+                  href="#contact" 
+                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contact
+                </a>
                 <Link 
                   to="/login" 
                   className="text-sm py-2 hover:text-primary/80 transition-colors"
@@ -150,7 +160,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
                 <Link to="/gallery" className="text-gray-400 hover:text-white transition-colors">Gallery</Link>
                 <Link to="/events" className="text-gray-400 hover:text-white transition-colors">Events</Link>
-                <Link to="/#contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
+                <a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a>
               </div>
             </div>
             
