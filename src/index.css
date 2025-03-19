@@ -44,6 +44,7 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -122,5 +123,24 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Mobile menu animation */
+  .mobile-menu-enter {
+    clip-path: circle(0% at top right);
+  }
+  
+  .mobile-menu-enter-active {
+    clip-path: circle(150% at top right);
+    transition: clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  .mobile-menu-exit {
+    clip-path: circle(150% at top right);
+  }
+  
+  .mobile-menu-exit-active {
+    clip-path: circle(0% at top right);
+    transition: clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }

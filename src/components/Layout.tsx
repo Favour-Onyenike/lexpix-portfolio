@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Mail, Phone, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -13,9 +13,73 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const [activeSection, setActiveSection] = useState('');
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // Handle scrolling to contact section from any page
+  const handleContactClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (location.pathname !== '/') {
+      // If not on homepage, navigate to homepage first then scroll
+      window.location.href = '/#contact';
+    } else {
+      // If on homepage, just scroll to section
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    }
+  };
+
+  // Check active section on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (location.pathname === '/') {
+        const sections = ['hero', 'about', 'stats', 'services', 'projects', 'contact', 'reviews'];
+        const current = sections.find(section => {
+          const element = document.getElementById(section);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            return rect.top <= 100 && rect.bottom >= 100;
+          }
+          return false;
+        });
+        
+        if (current) {
+          setActiveSection(current);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initialize on mount
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
+
+  // Determine if a nav item is active based on route or section
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') {
+      return activeSection === 'hero';
+    }
+    if (path === '/gallery' && location.pathname === '/gallery') {
+      return true;
+    }
+    if (path === '/events' && location.pathname === '/events') {
+      return true;
+    }
+    if (path === '#contact') {
+      return activeSection === 'contact';
+    }
+    return false;
   };
 
   return (
@@ -41,16 +105,37 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="flex items-center space-x-8 justify-center"
             >
-              <Link to="/" className="text-sm hover:text-primary/80 transition-colors">
+              <Link 
+                to="/" 
+                className={`text-sm hover:text-primary/80 transition-colors relative ${
+                  isActive('/') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
+                }`}
+              >
                 Home
               </Link>
-              <Link to="/gallery" className="text-sm hover:text-primary/80 transition-colors">
+              <Link 
+                to="/gallery" 
+                className={`text-sm hover:text-primary/80 transition-colors relative ${
+                  isActive('/gallery') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
+                }`}
+              >
                 Gallery
               </Link>
-              <Link to="/events" className="text-sm hover:text-primary/80 transition-colors">
+              <Link 
+                to="/events" 
+                className={`text-sm hover:text-primary/80 transition-colors relative ${
+                  isActive('/events') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
+                }`}
+              >
                 Events
               </Link>
-              <a href="#contact" className="text-sm hover:text-primary/80 transition-colors">
+              <a 
+                href="#contact" 
+                onClick={handleContactClick}
+                className={`text-sm hover:text-primary/80 transition-colors relative ${
+                  isActive('#contact') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
+                }`}
+              >
                 Contact
               </a>
             </motion.nav>
@@ -70,12 +155,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             ) : (
               <button 
                 onClick={toggleMobileMenu}
-                className="p-2 bg-black border border-yellow-400 rounded-md"
+                className="p-2 bg-white border-2 border-yellow-400 rounded-md"
+                aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
-                  <X className="h-5 w-5 text-white" />
+                  <X className="h-5 w-5 text-black" />
                 ) : (
-                  <Menu className="h-5 w-5 text-white" />
+                  <Menu className="h-5 w-5 text-black" />
                 )}
               </button>
             )}
@@ -86,44 +172,44 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <AnimatePresence>
           {isMobile && mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white w-full overflow-hidden"
+              initial={{ opacity: 0, clipPath: "circle(0% at top right)" }}
+              animate={{ opacity: 1, clipPath: "circle(150% at top right)" }}
+              exit={{ opacity: 0, clipPath: "circle(0% at top right)" }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed inset-0 top-[78px] bg-black z-50 flex flex-col items-center justify-center"
             >
-              <div className="py-4 px-6 flex flex-col space-y-4">
+              <div className="flex flex-col space-y-8 items-center text-center">
                 <Link 
                   to="/" 
-                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
                 </Link>
                 <Link 
                   to="/gallery" 
-                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Gallery
                 </Link>
                 <Link 
                   to="/events" 
-                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Events
                 </Link>
                 <a 
                   href="#contact" 
-                  className="text-sm py-2 hover:text-primary/80 transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={handleContactClick}
+                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
                 >
                   Contact
                 </a>
                 <Link 
                   to="/login" 
-                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-3 rounded-md transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Admin

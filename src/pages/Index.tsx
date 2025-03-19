@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -66,15 +67,15 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
-        <div className="w-full md:w-1/2 pr-0 md:pr-8 mb-10 md:mb-0">
+      <section id="hero" className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
+        <div className="w-full md:w-1/2 pl-0 md:pl-12 pr-0 md:pr-8 mb-10 md:mb-0">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-5xl md:text-7xl font-bold mb-6"
           >
-            less is more.
+            less is more<span className="text-yellow-400">.</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -117,7 +118,7 @@ const Index = () => {
       </section>
 
       {/* About LexPix Section */}
-      <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
+      <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -147,7 +148,7 @@ const Index = () => {
       </section>
 
       {/* Stats Counter Section */}
-      <section ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
+      <section id="stats" ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {statsData.map((stat, index) => (
@@ -169,7 +170,7 @@ const Index = () => {
       </section>
 
       {/* Services Section */}
-      <section className="py-16 md:py-24 px-6 md:px-10 bg-white">
+      <section id="services" className="py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -219,7 +220,7 @@ const Index = () => {
       </section>
 
       {/* Featured Projects Section */}
-      <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
+      <section id="projects" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -367,7 +368,9 @@ const Index = () => {
       </section>
 
       {/* Reviews Section */}
-      <ReviewSection />
+      <section id="reviews">
+        <ReviewSection />
+      </section>
     </Layout>
   );
 };
