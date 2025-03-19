@@ -116,7 +116,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* About LexPix Section - Moved after hero section */}
+      {/* About LexPix Section */}
       <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2 
@@ -286,9 +286,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <ReviewSection />
-
       {/* Contact Section */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
         <div className="max-w-6xl mx-auto">
@@ -368,6 +365,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Reviews Section */}
+      <ReviewSection />
     </Layout>
   );
 };
