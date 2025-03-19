@@ -1,14 +1,23 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Instagram, Mail, Phone } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Instagram, Mail, Phone, Menu, X } from 'lucide-react';
+import { Button } from './ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const isMobile = useIsMobile();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="py-6 px-6 md:px-10 border-b border-border sticky top-0 z-10 glass-panel">
@@ -17,32 +26,102 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="flex-shrink-0"
           >
             <Link to="/" className="text-2xl font-medium tracking-tight">
-              PhotoStudio
+              LexPix<span className="text-yellow-400">.</span>
             </Link>
           </motion.div>
           
-          <motion.nav
+          {/* Desktop Navigation - Center */}
+          {!isMobile && (
+            <motion.nav
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="flex items-center space-x-8 justify-center"
+            >
+              <Link to="/" className="text-sm hover:text-primary/80 transition-colors">
+                Home
+              </Link>
+              <Link to="/gallery" className="text-sm hover:text-primary/80 transition-colors">
+                Gallery
+              </Link>
+              <Link to="/events" className="text-sm hover:text-primary/80 transition-colors">
+                Events
+              </Link>
+            </motion.nav>
+          )}
+          
+          {/* Admin Button - Right */}
+          <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex items-center space-x-8"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex-shrink-0"
           >
-            <Link to="/" className="text-sm hover:text-primary/80 transition-colors">
-              Home
-            </Link>
-            <Link to="/gallery" className="text-sm hover:text-primary/80 transition-colors">
-              Gallery
-            </Link>
-            <Link to="/events" className="text-sm hover:text-primary/80 transition-colors">
-              Events
-            </Link>
-            <Link to="/login" className="text-sm hover:text-primary/80 transition-colors">
-              Admin
-            </Link>
-          </motion.nav>
+            {!isMobile ? (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/login">Admin</Link>
+              </Button>
+            ) : (
+              <button 
+                onClick={toggleMobileMenu}
+                className="p-2 bg-black border border-yellow-400 rounded-md"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5 text-white" />
+                ) : (
+                  <Menu className="h-5 w-5 text-white" />
+                )}
+              </button>
+            )}
+          </motion.div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobile && mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white w-full overflow-hidden"
+            >
+              <div className="py-4 px-6 flex flex-col space-y-4">
+                <Link 
+                  to="/" 
+                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link 
+                  to="/gallery" 
+                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Gallery
+                </Link>
+                <Link 
+                  to="/events" 
+                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Events
+                </Link>
+                <Link 
+                  to="/login" 
+                  className="text-sm py-2 hover:text-primary/80 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="flex-grow">
@@ -61,7 +140,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
-              <h3 className="text-2xl font-bold mb-4">LexPix</h3>
+              <h3 className="text-2xl font-bold mb-4">LexPix<span className="text-yellow-400">.</span></h3>
               <p className="text-gray-400">Capturing moments with minimalist elegance.</p>
             </div>
             

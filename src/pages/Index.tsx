@@ -65,6 +65,7 @@ const Index = () => {
 
   return (
     <Layout>
+      {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="w-full md:w-1/2 pr-0 md:pr-8 mb-10 md:mb-0">
           <motion.h1 
@@ -115,95 +116,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold mb-12 text-center"
-          >
-            Featured Projects
-          </motion.h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Events",
-                description: "Capturing memorable moments from special events and celebrations.",
-                image: "/lovable-uploads/9a5b8dd9-88d8-4ed4-bacf-07c70e1bdffe.png",
-                link: "/events"
-              },
-              {
-                title: "Portrait Series",
-                description: "Professional portraits that capture personality and character in every shot.",
-                image: "/lovable-uploads/6cb9671f-5f66-4a21-9e45-d97a2994a1e5.png",
-                link: "/gallery"
-              },
-              {
-                title: "Places",
-                description: "Stunning photography of landscapes, architecture, and beautiful locations.",
-                image: "/lovable-uploads/9d5ac26c-b0f6-4bcf-8420-4e8745b54848.png",
-                link: "/gallery"
-              }
-            ].map((project, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-black border border-gray-800 rounded-lg overflow-hidden"
-              >
-                <div className="aspect-video overflow-hidden">
-                  <img 
-                    src={project.image} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                  <p className="text-gray-400 mb-4">{project.description}</p>
-                  <Button 
-                    variant="outline" 
-                    className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
-                    asChild
-                  >
-                    <Link to={project.link}>
-                      Explore →
-                    </Link>
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {statsData.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <h3 className="text-4xl md:text-5xl font-bold mb-2">
-                  {statsVisible ? counters[index] : 0}{index === 3 ? "+" : index === 2 ? "+" : "+"}
-                </h3>
-                <p className="text-sm md:text-base">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About LexPix Section */}
+      {/* About LexPix Section - Moved after hero section */}
       <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2 
@@ -233,6 +146,29 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Stats Counter Section */}
+      <section ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {statsData.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-4xl md:text-5xl font-bold mb-2">
+                  {statsVisible ? counters[index] : 0}{index === 3 ? "+" : index === 2 ? "+" : "+"}
+                </h3>
+                <p className="text-sm md:text-base">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
       <section className="py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
@@ -282,7 +218,75 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Updated Contact Section */}
+      {/* Featured Projects Section */}
+      <section className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
+        <div className="max-w-7xl mx-auto">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold mb-12 text-center"
+          >
+            Featured Projects
+          </motion.h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Events",
+                description: "Capturing memorable moments from special events and celebrations.",
+                image: "/lovable-uploads/9a5b8dd9-88d8-4ed4-bacf-07c70e1bdffe.png",
+                link: "/events"
+              },
+              {
+                title: "Portrait Series",
+                description: "Professional portraits that capture personality and character in every shot.",
+                image: "/lovable-uploads/6cb9671f-5f66-4a21-9e45-d97a2994a1e5.png",
+                link: "/gallery"
+              },
+              {
+                title: "Places",
+                description: "Stunning photography of landscapes, architecture, and beautiful locations.",
+                image: "/lovable-uploads/9d5ac26c-b0f6-4bcf-8420-4e8745b54848.png",
+                link: "/gallery"
+              }
+            ].map((project, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-black border border-gray-800 rounded-lg overflow-hidden w-full md:max-w-[95%] mx-auto"
+              >
+                <div className="aspect-video overflow-hidden">
+                  <img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                  <p className="text-gray-400 mb-4">{project.description}</p>
+                  <Button 
+                    variant="outline" 
+                    className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
+                    asChild
+                  >
+                    <Link to={project.link}>
+                      Explore →
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
