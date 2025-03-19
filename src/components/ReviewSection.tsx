@@ -34,7 +34,7 @@ const ReviewSection = () => {
       id: 3,
       name: 'Amanda Rodriguez',
       rating: 5,
-      text: 'Lucas has an incredible eye for detail. The portraits he took of our family are treasures we'll keep forever.',
+      text: 'Lucas has an incredible eye for detail. The portraits he took of our family are treasures we\'ll keep forever.',
       date: '2023-11-05'
     },
     {
