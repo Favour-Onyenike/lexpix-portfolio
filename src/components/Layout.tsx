@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Mail, Phone, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -13,6 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('');
 
   // Close mobile menu when route changes
@@ -29,8 +31,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     e.preventDefault();
     
     if (location.pathname !== '/') {
-      // If not on homepage, navigate to homepage first then scroll
-      window.location.href = '/#contact';
+      // If not on homepage, navigate to homepage then scroll
+      navigate('/', { state: { scrollToContact: true } });
     } else {
       // If on homepage, just scroll to section
       const contactSection = document.getElementById('contact');
@@ -42,6 +44,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       }
     }
   };
+
+  // Check if we need to scroll to contact after navigation
+  useEffect(() => {
+    if (location.pathname === '/' && location.state && (location.state as any).scrollToContact) {
+      // Need to wait a bit for the DOM to be fully loaded
+      setTimeout(() => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          contactSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        // Clear the state so it doesn't scroll again on refresh
+        navigate('/', { replace: true, state: {} });
+      }, 100);
+    }
+  }, [location, navigate]);
 
   // Check active section on scroll
   useEffect(() => {
