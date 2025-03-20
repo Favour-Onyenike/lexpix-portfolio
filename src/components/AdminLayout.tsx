@@ -17,7 +17,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: Grid },
@@ -32,23 +32,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* Mobile header */}
       <header className="md:hidden py-4 px-6 border-b border-border sticky top-0 z-20 bg-background">
         <div className="flex justify-between items-center">
+          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Menu size={20} />
+          </Button>
           <Link to="/" className="text-xl font-medium tracking-tight flex items-center gap-2">
-            <ChevronLeft size={18} />
             LexPix<span className="text-yellow-400">.</span> Admin
           </Link>
-          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </Button>
         </div>
       </header>
 
       {/* Sidebar */}
       <motion.aside 
-        className={`fixed md:static inset-0 bg-background z-10 overflow-y-auto border-r border-border
+        className={`fixed md:static inset-y-0 left-0 bg-background z-10 overflow-y-auto border-r border-border
                     ${sidebarOpen ? 'flex' : 'hidden md:flex'} flex-col w-64 p-6 shadow-lg md:shadow-none`}
         initial={{ x: isMobile ? -320 : 0 }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.3 }}
+        animate={{ x: sidebarOpen || !isMobile ? 0 : -320 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <div className="flex items-center justify-between mb-8">
           <Link to="/" className="text-xl font-medium tracking-tight flex items-center gap-2">
