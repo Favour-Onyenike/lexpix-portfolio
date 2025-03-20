@@ -80,7 +80,7 @@ const ReviewSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="bg-gray-900 p-6 rounded-lg"
+              className="bg-black border border-gray-800 p-6 rounded-lg"
             >
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-semibold text-lg">{review.name}</h3>
