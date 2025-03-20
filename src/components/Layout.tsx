@@ -176,26 +176,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               animate={{ opacity: 1, clipPath: "circle(150% at top right)" }}
               exit={{ opacity: 0, clipPath: "circle(0% at top right)" }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-0 top-[78px] bg-black z-50 flex flex-col items-center justify-center"
+              className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col items-center justify-center"
             >
               <div className="flex flex-col space-y-8 items-center text-center">
                 <Link 
                   to="/" 
-                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
+                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
                 </Link>
                 <Link 
                   to="/gallery" 
-                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
+                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Gallery
                 </Link>
                 <Link 
                   to="/events" 
-                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
+                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Events
@@ -203,7 +203,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <a 
                   href="#contact" 
                   onClick={handleContactClick}
-                  className="text-xl font-medium text-white hover:text-yellow-400 transition-colors py-2"
+                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
                 >
                   Contact
                 </a>

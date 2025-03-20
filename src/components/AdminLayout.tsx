@@ -34,7 +34,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="flex justify-between items-center">
           <Link to="/" className="text-xl font-medium tracking-tight flex items-center gap-2">
             <ChevronLeft size={18} />
-            PhotoStudio Admin
+            LexPix<span className="text-yellow-400">.</span> Admin
           </Link>
           <Button variant="ghost" size="icon" onClick={toggleSidebar}>
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -53,7 +53,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="flex items-center justify-between mb-8">
           <Link to="/" className="text-xl font-medium tracking-tight flex items-center gap-2">
             <ChevronLeft size={18} />
-            PhotoStudio
+            LexPix<span className="text-yellow-400">.</span>
           </Link>
           <Button 
             variant="ghost" 

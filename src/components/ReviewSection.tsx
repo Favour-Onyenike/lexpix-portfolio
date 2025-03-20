@@ -102,41 +102,13 @@ const ReviewSection = () => {
         
         {/* Add Review Form */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="hidden md:block"
-          >
-            <div className="bg-gray-900 p-8 rounded-lg h-full">
-              <h3 className="text-2xl font-bold mb-4">What Our Clients Say</h3>
-              <p className="text-gray-400 mb-4">
-                We value feedback from our clients and strive to deliver exceptional photography services. 
-                Read what others have experienced and share your own story with us.
-              </p>
-              <div className="mt-6">
-                <div className="flex items-center mb-2">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
-                  <p className="text-sm text-gray-300">Authentic client reviews</p>
-                </div>
-                <div className="flex items-center mb-2">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
-                  <p className="text-sm text-gray-300">Unedited testimonials</p>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
-                  <p className="text-sm text-gray-300">Valuable feedback for improvement</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-          
+          {/* Remove "What Our Clients Say" section in desktop mode */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
+            className="col-span-1 md:col-span-2"
           >
             <div>
               <h3 className="text-2xl font-bold mb-6">Add a Review</h3>

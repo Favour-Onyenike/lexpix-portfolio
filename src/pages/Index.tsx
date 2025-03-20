@@ -68,7 +68,7 @@ const Index = () => {
     <Layout>
       {/* Hero Section */}
       <section id="hero" className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
-        <div className="w-full md:w-1/2 pl-0 md:pl-16 pr-0 md:pr-8 mb-10 md:mb-0">
+        <div className="w-full md:w-1/2 pl-0 md:pl-20 pr-0 md:pr-8 mb-10 md:mb-0">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
