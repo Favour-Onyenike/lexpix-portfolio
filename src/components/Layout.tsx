@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +14,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const [activeSection, setActiveSection] = useState('');
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -172,48 +176,73 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <AnimatePresence>
           {isMobile && mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, clipPath: "circle(0% at top right)" }}
-              animate={{ opacity: 1, clipPath: "circle(150% at top right)" }}
-              exit={{ opacity: 0, clipPath: "circle(0% at top right)" }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col items-center justify-center"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "100vh" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col"
             >
-              <div className="flex flex-col space-y-8 items-center text-center">
+              <div className="flex flex-col h-full justify-center items-center space-y-8 p-6">
                 <Link 
                   to="/" 
-                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
+                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
+                  {location.pathname === '/' && activeSection === 'hero' && (
+                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                  )}
                 </Link>
                 <Link 
                   to="/gallery" 
-                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
+                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Gallery
+                  {location.pathname === '/gallery' && (
+                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                  )}
                 </Link>
                 <Link 
                   to="/events" 
-                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
+                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Events
+                  {location.pathname === '/events' && (
+                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                  )}
                 </Link>
                 <a 
                   href="#contact" 
                   onClick={handleContactClick}
-                  className="text-xl font-medium text-black hover:text-yellow-400 transition-colors py-2"
+                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                 >
                   Contact
+                  {location.pathname === '/' && activeSection === 'contact' && (
+                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                  )}
                 </a>
                 <Link 
                   to="/login" 
-                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-3 rounded-md transition-colors"
+                  className="mt-6 bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-4 rounded-md transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Admin
                 </Link>
+              </div>
+              
+              {/* Social links in mobile menu */}
+              <div className="flex justify-center items-center space-x-6 pb-12">
+                <a href="#" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
+                  <Instagram className="h-5 w-5" />
+                </a>
+                <a href="mailto:lexarenlogistics@gmail.com" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
+                  <Mail className="h-5 w-5" />
+                </a>
+                <a href="tel:+18254610429" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
+                  <Phone className="h-5 w-5" />
+                </a>
               </div>
             </motion.div>
           )}
