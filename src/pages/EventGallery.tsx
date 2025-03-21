@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import Layout from '@/components/Layout';
 import ImageGrid, { ImageItem } from '@/components/ImageGrid';
 import { EventItem } from '@/components/EventCard';
+import { getEvent, getEventImages } from '@/services/eventService';
 
 const EventGallery = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -19,12 +20,11 @@ const EventGallery = () => {
   useEffect(() => {
     if (!eventId) return;
     
-    // Fetch event details and images from localStorage
-    const loadEventData = () => {
+    const loadEventData = async () => {
       setIsLoading(true);
       
       try {
-        // Get event details
+        // Try to get event from localStorage first
         const eventsData = localStorage.getItem('eventsData');
         if (eventsData) {
           const parsedEvents = JSON.parse(eventsData);
@@ -33,7 +33,7 @@ const EventGallery = () => {
           if (foundEvent) {
             setEvent(foundEvent);
             
-            // Get event images
+            // Get event images from localStorage
             const eventImagesData = localStorage.getItem(`eventImages_${eventId}`);
             if (eventImagesData) {
               const parsedImages = JSON.parse(eventImagesData);
@@ -43,6 +43,7 @@ const EventGallery = () => {
         }
       } catch (error) {
         console.error('Error loading event data:', error);
+        toast.error('Failed to load event');
       } finally {
         // Add a small delay to simulate loading for smoother animation
         setTimeout(() => {

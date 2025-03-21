@@ -1,34 +1,42 @@
 
 import { useEffect, useState } from 'react';
-import { setupDatabase } from '@/lib/setupDatabase';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 const DatabaseInitializer = () => {
   const [initialized, setInitialized] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
-    const init = async () => {
+    const setupMockDatabase = async () => {
       try {
-        const success = await setupDatabase();
-        if (success) {
-          setInitialized(true);
-          console.log('Database initialized successfully');
+        // Initialize localStorage tables if they don't exist
+        if (!localStorage.getItem('supabase_gallery_images')) {
+          localStorage.setItem('supabase_gallery_images', JSON.stringify([]));
         }
+        
+        if (!localStorage.getItem('supabase_events')) {
+          localStorage.setItem('supabase_events', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('supabase_event_images')) {
+          localStorage.setItem('supabase_event_images', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('supabase_reviews')) {
+          localStorage.setItem('supabase_reviews', JSON.stringify([]));
+        }
+        
+        console.log('Mock database initialized');
+        setInitialized(true);
       } catch (error) {
-        console.error('Failed to initialize database:', error);
-        toast({
-          title: 'Database Initialization Error',
-          description: 'Could not setup the database. Some features may not work correctly.',
-          variant: 'destructive',
-        });
+        console.error('Error setting up mock database:', error);
+        toast.error('Failed to initialize database');
       }
     };
 
-    init();
-  }, [toast]);
+    setupMockDatabase();
+  }, []);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
 export default DatabaseInitializer;

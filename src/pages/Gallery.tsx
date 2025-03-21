@@ -3,24 +3,23 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import ImageGrid, { ImageItem } from '@/components/ImageGrid';
+import { getGalleryImages } from '@/services/galleryService';
+import { toast } from 'sonner';
 
 const Gallery = () => {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch gallery images from localStorage
-    const loadGallery = () => {
+    const loadGallery = async () => {
       setIsLoading(true);
       
       try {
-        const galleryData = localStorage.getItem('galleryData');
-        if (galleryData) {
-          const parsedData = JSON.parse(galleryData);
-          setImages(parsedData.images || []);
-        }
+        const galleryImages = await getGalleryImages();
+        setImages(galleryImages);
       } catch (error) {
         console.error('Error loading gallery:', error);
+        toast.error('Failed to load gallery images');
       } finally {
         // Add a small delay to simulate loading for smoother animation
         setTimeout(() => {
@@ -31,6 +30,22 @@ const Gallery = () => {
     
     loadGallery();
   }, []);
+
+  const handleDownload = (imageId: string) => {
+    const image = images.find(img => img.id === imageId);
+    
+    if (image) {
+      // Create a temporary anchor element
+      const link = document.createElement('a');
+      link.href = image.url;
+      link.download = image.title || `photo-${imageId}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Image download started');
+    }
+  };
 
   return (
     <Layout>
@@ -58,7 +73,10 @@ const Gallery = () => {
               ))}
             </div>
           ) : images.length > 0 ? (
-            <ImageGrid images={images} />
+            <ImageGrid 
+              images={images}
+              onDownload={handleDownload}
+            />
           ) : (
             <div className="text-center py-16">
               <h3 className="text-xl font-medium mb-2">No images yet</h3>

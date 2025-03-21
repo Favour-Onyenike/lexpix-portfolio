@@ -17,14 +17,23 @@ const mapToImageItem = (image: GalleryImage): ImageItem => ({
   url: image.url,
 });
 
-// Upload an image to Supabase Storage
+// Mock gallery data in localStorage
+const initializeLocalGallery = () => {
+  if (!localStorage.getItem('supabase_gallery_images')) {
+    localStorage.setItem('supabase_gallery_images', JSON.stringify([]));
+  }
+};
+
+// Upload an image to storage
 export const uploadImage = async (file: File, folder: string = 'gallery'): Promise<string | null> => {
   try {
+    initializeLocalGallery();
+    
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
     
-    const { error: uploadError, data } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('images')
       .upload(filePath, file, { upsert: true });
     
@@ -47,6 +56,8 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
 // Create a new gallery image
 export const createGalleryImage = async (image: { title: string, url: string }): Promise<GalleryImage | null> => {
   try {
+    initializeLocalGallery();
+    
     const { data, error } = await supabase
       .from('gallery_images')
       .insert([{ title: image.title, url: image.url }])
@@ -54,6 +65,16 @@ export const createGalleryImage = async (image: { title: string, url: string }):
       .single();
     
     if (error) throw error;
+    
+    // Update the galleryData for the UI
+    const galleryData = JSON.parse(localStorage.getItem('galleryData') || '{"images":[]}');
+    galleryData.images.push({
+      id: data.id,
+      title: data.title,
+      url: data.url
+    });
+    localStorage.setItem('galleryData', JSON.stringify(galleryData));
+    
     return data;
   } catch (error) {
     console.error('Error creating gallery image:', error);
@@ -64,13 +85,31 @@ export const createGalleryImage = async (image: { title: string, url: string }):
 // Get all gallery images
 export const getGalleryImages = async (): Promise<ImageItem[]> => {
   try {
+    initializeLocalGallery();
+    
+    // First check if we have data in the localStorage UI cache
+    const galleryData = localStorage.getItem('galleryData');
+    if (galleryData) {
+      const parsedData = JSON.parse(galleryData);
+      if (parsedData.images && parsedData.images.length > 0) {
+        return parsedData.images;
+      }
+    }
+    
+    // If not in UI cache, get from our mock database
     const { data, error } = await supabase
       .from('gallery_images')
       .select('*')
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return (data || []).map(mapToImageItem);
+    
+    const images = (data || []).map(mapToImageItem);
+    
+    // Update the UI cache
+    localStorage.setItem('galleryData', JSON.stringify({ images }));
+    
+    return images;
   } catch (error) {
     console.error('Error fetching gallery images:', error);
     return [];
@@ -80,29 +119,24 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
 // Delete a gallery image
 export const deleteGalleryImage = async (id: string): Promise<boolean> => {
   try {
-    // First, get the image URL to delete from storage
-    const { data: image } = await supabase
-      .from('gallery_images')
-      .select('url')
-      .eq('id', id)
-      .single();
+    initializeLocalGallery();
     
-    if (image?.url) {
-      // Extract path from the URL
-      const urlPath = new URL(image.url).pathname;
-      const storagePath = urlPath.split('/').slice(2).join('/'); // Remove /storage/v1/object/public/
-      
-      // Delete from storage
-      await supabase.storage
-        .from('images')
-        .remove([storagePath]);
-    }
+    // First, update the UI cache
+    const galleryData = JSON.parse(localStorage.getItem('galleryData') || '{"images":[]}');
+    const imageToDelete = galleryData.images.find((img: ImageItem) => img.id === id);
+    galleryData.images = galleryData.images.filter((img: ImageItem) => img.id !== id);
+    localStorage.setItem('galleryData', JSON.stringify(galleryData));
     
-    // Delete from database
+    // Then, delete from our mock database
     const { error } = await supabase
       .from('gallery_images')
       .delete()
       .eq('id', id);
+    
+    // If the image URL is a blob URL, revoke it
+    if (imageToDelete && imageToDelete.url.startsWith('blob:')) {
+      URL.revokeObjectURL(imageToDelete.url);
+    }
     
     if (error) throw error;
     return true;
