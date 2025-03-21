@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { EventItem } from '@/components/EventCard';
 import { ImageItem } from '@/components/ImageGrid';
@@ -192,14 +191,20 @@ export const getEventImages = async (eventId: string): Promise<ImageItem[]> => {
   try {
     initializeEventsTables();
     
-    const { data, error } = await supabase
+    const result = await supabase
       .from('event_images')
       .select()
-      .eq('event_id', eventId)
-      .order('created_at', { ascending: true });
+      .eq('event_id', eventId);
     
-    if (error) throw error;
-    return (data || []).map(mapToImageItem);
+    const data = result.data || [];
+    const sortedData = [...data].sort((a, b) => {
+      if (a.created_at < b.created_at) return -1;
+      if (a.created_at > b.created_at) return 1;
+      return 0;
+    });
+    
+    if (result.error) throw result.error;
+    return sortedData.map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching event images:', error);
     return [];

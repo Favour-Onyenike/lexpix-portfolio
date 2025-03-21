@@ -33,12 +33,13 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
     
-    const { error } = await supabase.storage
+    const result = await supabase.storage
       .from('images')
       .upload(filePath, file);
     
-    if (error) {
-      throw error;
+    // Fixed: Check if result has error property before using it
+    if (result && 'error' in result && result.error) {
+      throw result.error;
     }
     
     // Get the public URL

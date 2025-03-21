@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase';
 
 export const setupDatabase = async (): Promise<boolean> => {
@@ -6,6 +5,7 @@ export const setupDatabase = async (): Promise<boolean> => {
     // Create storage bucket if it doesn't exist
     const { data: buckets } = await supabase.storage.listBuckets();
     if (!buckets?.find(bucket => bucket.name === 'images')) {
+      // The error is here - we shouldn't pass arguments
       await supabase.storage.createBucket('images');
       console.log('Created images bucket');
     }

@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 // For deployment, these values should be set in your hosting environment
@@ -52,7 +51,8 @@ export const supabase = {
       }
     }),
     listBuckets: async () => ({ data: [{ name: 'images' }] }),
-    createBucket: async () => ({ error: null })
+    // Fixed: createBucket should accept a name but ignore it in our mock
+    createBucket: async (name: string) => ({ error: null })
   },
   
   // Database API (mock implementation using localStorage)
@@ -66,6 +66,12 @@ export const supabase = {
                 const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
                 const item = tableData.find((item: any) => item[column] === value);
                 return { data: item || null, error: null };
+              },
+              // Added this method to match usage in our code
+              async then(callback: (result: any) => void) {
+                const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+                const items = tableData.filter((item: any) => item[column] === value);
+                callback({ data: items, error: null });
               }
             };
           },
@@ -81,6 +87,10 @@ export const supabase = {
                 callback({ data: sortedData, error: null });
               }
             };
+          },
+          async then(callback: (result: any) => void) {
+            const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+            callback({ data: tableData, error: null });
           }
         };
       },

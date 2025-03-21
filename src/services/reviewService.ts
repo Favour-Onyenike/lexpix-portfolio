@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 export type Review = {
@@ -14,14 +13,21 @@ export type Review = {
 // Get all published reviews
 export const getPublishedReviews = async (): Promise<Review[]> => {
   try {
-    const { data, error } = await supabase
+    const result = await supabase
       .from('reviews')
       .select('*')
-      .eq('published', true)
-      .order('created_at', { ascending: false });
+      .eq('published', true);
     
-    if (error) throw error;
-    return data || [];
+    // Sort manually after getting the data
+    const data = result.data || [];
+    const sortedData = [...data].sort((a, b) => {
+      if (a.created_at < b.created_at) return 1; // Descending order
+      if (a.created_at > b.created_at) return -1;
+      return 0;
+    });
+    
+    if (result.error) throw result.error;
+    return sortedData;
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return [];
