@@ -24,22 +24,14 @@ const EventGallery = () => {
       setIsLoading(true);
       
       try {
-        // Try to get event from localStorage first
-        const eventsData = localStorage.getItem('eventsData');
-        if (eventsData) {
-          const parsedEvents = JSON.parse(eventsData);
-          const foundEvent = parsedEvents.events.find((e: EventItem) => e.id === eventId);
+        // Fetch event data
+        const eventData = await getEvent(eventId);
+        if (eventData) {
+          setEvent(eventData);
           
-          if (foundEvent) {
-            setEvent(foundEvent);
-            
-            // Get event images from localStorage
-            const eventImagesData = localStorage.getItem(`eventImages_${eventId}`);
-            if (eventImagesData) {
-              const parsedImages = JSON.parse(eventImagesData);
-              setImages(parsedImages.images || []);
-            }
-          }
+          // Fetch event images
+          const eventImages = await getEventImages(eventId);
+          setImages(eventImages);
         }
       } catch (error) {
         console.error('Error loading event data:', error);

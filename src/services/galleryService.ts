@@ -17,7 +17,7 @@ const mapToImageItem = (image: GalleryImage): ImageItem => ({
   url: image.url,
 });
 
-// Mock gallery data in localStorage
+// Initialize gallery table if it doesn't exist
 const initializeLocalGallery = () => {
   if (!localStorage.getItem('supabase_gallery_images')) {
     localStorage.setItem('supabase_gallery_images', JSON.stringify([]));
@@ -33,12 +33,12 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
     
-    const { error: uploadError } = await supabase.storage
+    const { error } = await supabase.storage
       .from('images')
-      .upload(filePath, file, { upsert: true });
+      .upload(filePath, file);
     
-    if (uploadError) {
-      throw uploadError;
+    if (error) {
+      throw error;
     }
     
     // Get the public URL
@@ -65,16 +65,6 @@ export const createGalleryImage = async (image: { title: string, url: string }):
       .single();
     
     if (error) throw error;
-    
-    // Update the galleryData for the UI
-    const galleryData = JSON.parse(localStorage.getItem('galleryData') || '{"images":[]}');
-    galleryData.images.push({
-      id: data.id,
-      title: data.title,
-      url: data.url
-    });
-    localStorage.setItem('galleryData', JSON.stringify(galleryData));
-    
     return data;
   } catch (error) {
     console.error('Error creating gallery image:', error);
@@ -87,29 +77,13 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
   try {
     initializeLocalGallery();
     
-    // First check if we have data in the localStorage UI cache
-    const galleryData = localStorage.getItem('galleryData');
-    if (galleryData) {
-      const parsedData = JSON.parse(galleryData);
-      if (parsedData.images && parsedData.images.length > 0) {
-        return parsedData.images;
-      }
-    }
-    
-    // If not in UI cache, get from our mock database
     const { data, error } = await supabase
       .from('gallery_images')
-      .select('*')
+      .select()
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    
-    const images = (data || []).map(mapToImageItem);
-    
-    // Update the UI cache
-    localStorage.setItem('galleryData', JSON.stringify({ images }));
-    
-    return images;
+    return (data || []).map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching gallery images:', error);
     return [];
@@ -121,24 +95,11 @@ export const deleteGalleryImage = async (id: string): Promise<boolean> => {
   try {
     initializeLocalGallery();
     
-    // First, update the UI cache
-    const galleryData = JSON.parse(localStorage.getItem('galleryData') || '{"images":[]}');
-    const imageToDelete = galleryData.images.find((img: ImageItem) => img.id === id);
-    galleryData.images = galleryData.images.filter((img: ImageItem) => img.id !== id);
-    localStorage.setItem('galleryData', JSON.stringify(galleryData));
-    
-    // Then, delete from our mock database
-    const { error } = await supabase
+    await supabase
       .from('gallery_images')
       .delete()
       .eq('id', id);
     
-    // If the image URL is a blob URL, revoke it
-    if (imageToDelete && imageToDelete.url.startsWith('blob:')) {
-      URL.revokeObjectURL(imageToDelete.url);
-    }
-    
-    if (error) throw error;
     return true;
   } catch (error) {
     console.error('Error deleting gallery image:', error);

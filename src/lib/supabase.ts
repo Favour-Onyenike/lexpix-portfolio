@@ -49,93 +49,106 @@ export const supabase = {
           }
         }
         return { data: files, error: null };
-      },
-      createBucket: async () => ({ error: null })
+      }
     }),
     listBuckets: async () => ({ data: [{ name: 'images' }] }),
     createBucket: async () => ({ error: null })
   },
   
   // Database API (mock implementation using localStorage)
-  from: (table: string) => ({
-    select: (columns = '*') => ({
-      eq: (column: string, value: any) => ({
-        single: async () => {
-          const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
-          const item = tableData.find((item: any) => item[column] === value);
-          return { data: item || null, error: null };
-        },
-        limit: (limit: number) => ({
-          order: (column: string, { ascending }: { ascending: boolean }) => ({
-            range: (from: number, to: number) => ({
-              gte: (column: string, value: number) => ({
-                lt: (column: string, value: number) => ({
-                  contain: (column: string, value: string) => ({
-                    textSearch: (column: string, query: string) => ({
-                      async then(callback: (result: any) => void) {
-                        const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
-                        const filteredData = tableData.filter((item: any) => item[column] === value);
-                        const sortedData = [...filteredData].sort((a, b) => {
-                          return ascending ? a[column] - b[column] : b[column] - a[column];
-                        });
-                        const limitedData = sortedData.slice(0, limit);
-                        callback({ data: limitedData, error: null });
-                      }
-                    })
-                  })
-                })
-              })
-            })
-          })
-        })
-      }),
-      order: (orderColumn: string, { ascending }: { ascending: boolean }) => ({
-        async then(callback: (result: any) => void) {
-          const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
-          const sortedData = [...tableData].sort((a, b) => {
-            if (a[orderColumn] < b[orderColumn]) return ascending ? -1 : 1;
-            if (a[orderColumn] > b[orderColumn]) return ascending ? 1 : -1;
-            return 0;
-          });
-          callback({ data: sortedData, error: null });
-        }
-      })
-    }),
-    insert: (items: any[]) => ({
-      select: () => ({
-        single: async () => {
-          const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
-          const newItems = items.map(item => ({
-            ...item,
-            id: item.id || crypto.randomUUID(),
-            created_at: new Date().toISOString()
-          }));
-          const updatedData = [...tableData, ...newItems];
-          localStorage.setItem(`supabase_${table}`, JSON.stringify(updatedData));
-          return { data: newItems[0], error: null };
-        }
-      })
-    }),
-    delete: () => ({
-      eq: (column: string, value: any) => ({
-        async then(callback: (result: any) => void) {
-          const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
-          const newData = tableData.filter((item: any) => item[column] !== value);
-          localStorage.setItem(`supabase_${table}`, JSON.stringify(newData));
-          callback({ error: null });
-        }
-      })
-    })
-  }),
+  from: (table: string) => {
+    return {
+      select: (columns = '*') => {
+        return {
+          eq: (column: string, value: any) => {
+            return {
+              single: async () => {
+                const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+                const item = tableData.find((item: any) => item[column] === value);
+                return { data: item || null, error: null };
+              }
+            };
+          },
+          order: (orderColumn: string, { ascending }: { ascending: boolean }) => {
+            return {
+              async then(callback: (result: any) => void) {
+                const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+                const sortedData = [...tableData].sort((a, b) => {
+                  if (a[orderColumn] < b[orderColumn]) return ascending ? -1 : 1;
+                  if (a[orderColumn] > b[orderColumn]) return ascending ? 1 : -1;
+                  return 0;
+                });
+                callback({ data: sortedData, error: null });
+              }
+            };
+          }
+        };
+      },
+      insert: (items: any[]) => {
+        return {
+          select: () => {
+            return {
+              single: async () => {
+                const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+                const newItems = items.map(item => ({
+                  ...item,
+                  id: item.id || crypto.randomUUID(),
+                  created_at: new Date().toISOString()
+                }));
+                const updatedData = [...tableData, ...newItems];
+                localStorage.setItem(`supabase_${table}`, JSON.stringify(updatedData));
+                return { data: newItems[0], error: null };
+              }
+            };
+          }
+        };
+      },
+      delete: () => {
+        return {
+          eq: (column: string, value: any) => {
+            return {
+              async then(callback: (result: any) => void) {
+                const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+                const newData = tableData.filter((item: any) => item[column] !== value);
+                localStorage.setItem(`supabase_${table}`, JSON.stringify(newData));
+                callback({ error: null });
+              }
+            };
+          }
+        };
+      },
+      update: (items: any) => {
+        return {
+          eq: (column: string, value: any) => {
+            return {
+              async then(callback: (result: any) => void) {
+                const tableData = JSON.parse(localStorage.getItem(`supabase_${table}`) || '[]');
+                const updatedData = tableData.map((item: any) => {
+                  if (item[column] === value) {
+                    return { ...item, ...items };
+                  }
+                  return item;
+                });
+                localStorage.setItem(`supabase_${table}`, JSON.stringify(updatedData));
+                callback({ error: null, data: items });
+              }
+            };
+          }
+        };
+      }
+    };
+  },
   
   // RPC API (mock implementation)
-  rpc: (functionName: string) => ({
-    async then(callback: (result: any) => void) {
-      // Simply log the function call and return success
-      console.log(`Called RPC function: ${functionName}`);
-      callback({ error: null });
-    }
-  }),
+  rpc: (functionName: string) => {
+    return {
+      async then(callback: (result: any) => void) {
+        // Simply log the function call and return success
+        console.log(`Called RPC function: ${functionName}`);
+        callback({ error: null });
+      }
+    };
+  },
   
   // Auth API (mock implementation with fixed credentials)
   auth: {

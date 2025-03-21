@@ -6,54 +6,28 @@ export const setupDatabase = async (): Promise<boolean> => {
     // Create storage bucket if it doesn't exist
     const { data: buckets } = await supabase.storage.listBuckets();
     if (!buckets?.find(bucket => bucket.name === 'images')) {
-      await supabase.storage.createBucket('images', {
-        public: true,
-        fileSizeLimit: 10485760, // 10MB limit
-      });
+      await supabase.storage.createBucket('images');
       console.log('Created images bucket');
     }
 
-    // Create gallery_images table
-    const { error: galleryError } = await supabase
-      .from('gallery_images')
-      .select('id')
-      .limit(1);
-
-    if (galleryError && galleryError.code === 'PGRST116') {
-      await supabase.rpc('create_gallery_images_table');
+    // Initialize localStorage tables if they don't exist
+    if (!localStorage.getItem('supabase_gallery_images')) {
+      localStorage.setItem('supabase_gallery_images', JSON.stringify([]));
       console.log('Created gallery_images table');
     }
-
-    // Create events table
-    const { error: eventsError } = await supabase
-      .from('events')
-      .select('id')
-      .limit(1);
-
-    if (eventsError && eventsError.code === 'PGRST116') {
-      await supabase.rpc('create_events_table');
+    
+    if (!localStorage.getItem('supabase_events')) {
+      localStorage.setItem('supabase_events', JSON.stringify([]));
       console.log('Created events table');
     }
-
-    // Create event_images table
-    const { error: eventImagesError } = await supabase
-      .from('event_images')
-      .select('id')
-      .limit(1);
-
-    if (eventImagesError && eventImagesError.code === 'PGRST116') {
-      await supabase.rpc('create_event_images_table');
+    
+    if (!localStorage.getItem('supabase_event_images')) {
+      localStorage.setItem('supabase_event_images', JSON.stringify([]));
       console.log('Created event_images table');
     }
-
-    // Create reviews table
-    const { error: reviewsError } = await supabase
-      .from('reviews')
-      .select('id')
-      .limit(1);
-
-    if (reviewsError && reviewsError.code === 'PGRST116') {
-      await supabase.rpc('create_reviews_table');
+    
+    if (!localStorage.getItem('supabase_reviews')) {
+      localStorage.setItem('supabase_reviews', JSON.stringify([]));
       console.log('Created reviews table');
     }
 
@@ -64,8 +38,8 @@ export const setupDatabase = async (): Promise<boolean> => {
   }
 };
 
-// Create SQL functions for Supabase
-// These functions need to be added to your Supabase SQL editor
+// These SQL definitions would be used in a real Supabase setup
+// but are included here for reference only
 export const databaseSetupSQL = `
 -- Function to create gallery_images table
 CREATE OR REPLACE FUNCTION create_gallery_images_table()

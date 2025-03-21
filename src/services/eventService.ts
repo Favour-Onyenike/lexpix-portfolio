@@ -40,12 +40,24 @@ const mapToImageItem = (image: EventImage): ImageItem => ({
   url: image.url,
 });
 
+// Initialize tables if they don't exist
+const initializeEventsTables = () => {
+  if (!localStorage.getItem('supabase_events')) {
+    localStorage.setItem('supabase_events', JSON.stringify([]));
+  }
+  if (!localStorage.getItem('supabase_event_images')) {
+    localStorage.setItem('supabase_event_images', JSON.stringify([]));
+  }
+};
+
 // Get all events
 export const getEvents = async (): Promise<EventItem[]> => {
   try {
+    initializeEventsTables();
+    
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select()
       .order('date', { ascending: false });
     
     if (error) throw error;
@@ -59,9 +71,11 @@ export const getEvents = async (): Promise<EventItem[]> => {
 // Get a specific event
 export const getEvent = async (id: string): Promise<EventItem | null> => {
   try {
+    initializeEventsTables();
+    
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select()
       .eq('id', id)
       .single();
     
@@ -84,28 +98,32 @@ export const createEvent = async (
   eventImages: File[]
 ): Promise<EventItem | null> => {
   try {
+    initializeEventsTables();
+    
     // Upload cover image
     const coverImageUrl = await uploadImage(coverImageFile, 'events/covers');
     if (!coverImageUrl) throw new Error('Failed to upload cover image');
     
     // Create event record
-    const { data: event, error } = await supabase
+    const eventRecord = {
+      title: eventData.title,
+      description: eventData.description || null,
+      date: eventData.date,
+      cover_image: coverImageUrl,
+      image_count: eventImages.length
+    };
+    
+    const { data, error } = await supabase
       .from('events')
-      .insert([{
-        title: eventData.title,
-        description: eventData.description || null,
-        date: eventData.date,
-        cover_image: coverImageUrl,
-        image_count: eventImages.length
-      }])
+      .insert([eventRecord])
       .select()
       .single();
     
     if (error) throw error;
     
     // Upload event images
-    if (event && eventImages.length > 0) {
-      const eventId = event.id;
+    if (data && eventImages.length > 0) {
+      const eventId = data.id;
       
       // Process images in batches of 5 to avoid overwhelming the API
       const batchSize = 5;
@@ -131,16 +149,14 @@ export const createEvent = async (
         
         // Insert event images into the database
         if (validUploads.length > 0) {
-          const { error: insertError } = await supabase
+          await supabase
             .from('event_images')
             .insert(validUploads);
-          
-          if (insertError) throw insertError;
         }
       }
     }
     
-    return event ? mapToEventItem(event) : null;
+    return data ? mapToEventItem(data) : null;
   } catch (error) {
     console.error('Error creating event:', error);
     return null;
@@ -150,48 +166,19 @@ export const createEvent = async (
 // Delete an event
 export const deleteEvent = async (id: string): Promise<boolean> => {
   try {
-    // First, get the event to get the cover image URL
-    const { data: event } = await supabase
-      .from('events')
-      .select('cover_image')
-      .eq('id', id)
-      .single();
+    initializeEventsTables();
     
-    // Get all event images
-    const { data: eventImages } = await supabase
-      .from('event_images')
-      .select('url')
-      .eq('event_id', id);
-    
-    // Delete event from database (will cascade to event_images)
-    const { error } = await supabase
+    // Delete event from database
+    await supabase
       .from('events')
       .delete()
       .eq('id', id);
     
-    if (error) throw error;
-    
-    // Delete images from storage
-    // Cover image
-    if (event?.cover_image) {
-      const coverUrl = new URL(event.cover_image).pathname;
-      const coverPath = coverUrl.split('/').slice(2).join('/');
-      await supabase.storage
-        .from('images')
-        .remove([coverPath]);
-    }
-    
-    // Event images
-    if (eventImages && eventImages.length > 0) {
-      const imagePaths = eventImages.map(img => {
-        const url = new URL(img.url).pathname;
-        return url.split('/').slice(2).join('/');
-      });
-      
-      await supabase.storage
-        .from('images')
-        .remove(imagePaths);
-    }
+    // Also delete associated event images
+    await supabase
+      .from('event_images')
+      .delete()
+      .eq('event_id', id);
     
     return true;
   } catch (error) {
@@ -203,9 +190,11 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 // Get event images
 export const getEventImages = async (eventId: string): Promise<ImageItem[]> => {
   try {
+    initializeEventsTables();
+    
     const { data, error } = await supabase
       .from('event_images')
-      .select('*')
+      .select()
       .eq('event_id', eventId)
       .order('created_at', { ascending: true });
     

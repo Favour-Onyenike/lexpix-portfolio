@@ -3,24 +3,23 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import EventCard, { EventItem } from '@/components/EventCard';
+import { getEvents } from '@/services/eventService';
+import { toast } from 'sonner';
 
 const Events = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch events from localStorage
-    const loadEvents = () => {
+    const loadEvents = async () => {
       setIsLoading(true);
       
       try {
-        const eventsData = localStorage.getItem('eventsData');
-        if (eventsData) {
-          const parsedData = JSON.parse(eventsData);
-          setEvents(parsedData.events || []);
-        }
+        const eventsData = await getEvents();
+        setEvents(eventsData);
       } catch (error) {
         console.error('Error loading events:', error);
+        toast.error('Failed to load events');
       } finally {
         // Add a small delay to simulate loading for smoother animation
         setTimeout(() => {
