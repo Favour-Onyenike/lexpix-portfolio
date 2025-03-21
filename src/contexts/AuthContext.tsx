@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase, getCurrentUser, signIn, signOut } from '@/lib/supabase';
+import { signIn, signOut, isAuthenticated, setAuthenticated } from '@/lib/supabase';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -22,52 +22,23 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuth, setIsAuth] = useState<boolean>(isAuthenticated());
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check auth status on mount and setup auth listener
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const user = await getCurrentUser();
-        setIsAuthenticated(!!user);
-      } catch (error) {
-        console.error('Auth check error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Initial auth check
-    checkUser();
-
-    // Setup auth state change listener
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-      setIsLoading(false);
-    });
-
-    return () => {
-      // Cleanup auth listener on unmount
-      authListener?.subscription.unsubscribe();
-    };
-  }, []);
-
   // Redirect logic for protected routes
   useEffect(() => {
-    if (!isLoading) {
-      const isAdminRoute = location.pathname.startsWith('/admin');
-      
-      if (isAdminRoute && !isAuthenticated && location.pathname !== '/login') {
-        navigate('/login', { replace: true });
-      }
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    
+    if (isAdminRoute && !isAuth && location.pathname !== '/login') {
+      navigate('/login', { replace: true });
     }
-  }, [location.pathname, isAuthenticated, navigate, isLoading]);
+  }, [location.pathname, isAuth, navigate, isLoading]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      setIsLoading(true);
       const { error } = await signIn(email, password);
       
       if (error) {
@@ -75,18 +46,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
       
+      setIsAuth(true);
+      setAuthenticated(true);
       toast.success('Logged in successfully');
       return true;
     } catch (error) {
       console.error('Login error:', error);
       toast.error('An error occurred during login');
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async () => {
     try {
       await signOut();
+      setIsAuth(false);
+      setAuthenticated(false);
       navigate('/login');
       toast.info('Logged out');
     } catch (error) {
@@ -96,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ isAuthenticated: isAuth, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

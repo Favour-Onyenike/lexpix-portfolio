@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminGallery from "./pages/admin/Gallery";
 import AdminEvents from "./pages/admin/Events";
+import AdminReviews from "./pages/admin/Reviews";
 
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/admin" element={<Dashboard />} />
               <Route path="/admin/gallery" element={<AdminGallery />} />
               <Route path="/admin/events" element={<AdminEvents />} />
+              <Route path="/admin/reviews" element={<AdminReviews />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -3,29 +3,44 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Image, CalendarDays, Plus } from 'lucide-react';
+import { Image, CalendarDays, Plus, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  // In a real app, these would come from an API
   const [stats, setStats] = useState({
     totalImages: 0,
-    totalEvents: 0
+    totalEvents: 0,
+    totalReviews: 0
   });
 
   useEffect(() => {
-    // Simulate loading stats
-    const galleryData = localStorage.getItem('galleryData');
-    const eventsData = localStorage.getItem('eventsData');
+    const updateStats = () => {
+      // Get data from localStorage
+      const galleryData = localStorage.getItem('galleryData');
+      const eventsData = localStorage.getItem('eventsData');
+      const reviewsData = localStorage.getItem('reviewsData');
+      
+      const parsedGallery = galleryData ? JSON.parse(galleryData) : { images: [] };
+      const parsedEvents = eventsData ? JSON.parse(eventsData) : { events: [] };
+      const parsedReviews = reviewsData ? JSON.parse(reviewsData) : { reviews: [] };
+      
+      setStats({
+        totalImages: parsedGallery.images?.length || 0,
+        totalEvents: parsedEvents.events?.length || 0,
+        totalReviews: parsedReviews.reviews?.length || 0
+      });
+    };
+
+    // Initial update
+    updateStats();
+
+    // Setup listener for storage changes
+    window.addEventListener('storage', updateStats);
     
-    const parsedGallery = galleryData ? JSON.parse(galleryData) : { images: [] };
-    const parsedEvents = eventsData ? JSON.parse(eventsData) : { events: [] };
-    
-    setStats({
-      totalImages: parsedGallery.images.length,
-      totalEvents: parsedEvents.events.length
-    });
+    return () => {
+      window.removeEventListener('storage', updateStats);
+    };
   }, []);
 
   return (
@@ -36,7 +51,7 @@ const Dashboard = () => {
           <p className="text-muted-foreground">Welcome to your photography admin panel</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -91,6 +106,36 @@ const Dashboard = () => {
                   <Link to="/admin/events">
                     <Plus size={16} className="mr-2" />
                     Create Event
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="space-y-1">
+                  <CardTitle>Reviews</CardTitle>
+                  <CardDescription>Manage customer reviews</CardDescription>
+                </div>
+                <div className="rounded-full bg-primary/10 p-2 text-primary">
+                  <Star size={20} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="mt-2 mb-4">
+                  <div className="text-2xl font-semibold">{stats.totalReviews}</div>
+                  <p className="text-xs text-muted-foreground">Total reviews</p>
+                </div>
+                <Button asChild>
+                  <Link to="/admin/reviews">
+                    <Plus size={16} className="mr-2" />
+                    Manage Reviews
                   </Link>
                 </Button>
               </CardContent>
