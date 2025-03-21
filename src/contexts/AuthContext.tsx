@@ -2,15 +2,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-
-// Fixed credentials
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'admin123';
+import { supabase, getCurrentUser, signIn, signOut } from '@/lib/supabase';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  isLoading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,47 +23,80 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check for saved auth state on mount
+  // Check auth status on mount and setup auth listener
   useEffect(() => {
-    const savedAuth = sessionStorage.getItem('isAuthenticated');
-    if (savedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
+    const checkUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setIsAuthenticated(!!user);
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Initial auth check
+    checkUser();
+
+    // Setup auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    });
+
+    return () => {
+      // Cleanup auth listener on unmount
+      authListener?.subscription.unsubscribe();
+    };
   }, []);
 
   // Redirect logic for protected routes
   useEffect(() => {
-    const isAdminRoute = location.pathname.startsWith('/admin');
-    
-    if (isAdminRoute && !isAuthenticated && location.pathname !== '/login') {
-      navigate('/login', { replace: true });
+    if (!isLoading) {
+      const isAdminRoute = location.pathname.startsWith('/admin');
+      
+      if (isAdminRoute && !isAuthenticated && location.pathname !== '/login') {
+        navigate('/login', { replace: true });
+      }
     }
-  }, [location.pathname, isAuthenticated, navigate]);
+  }, [location.pathname, isAuthenticated, navigate, isLoading]);
 
-  const login = (username: string, password: string): boolean => {
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('isAuthenticated', 'true');
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        toast.error(error.message || 'Invalid credentials');
+        return false;
+      }
+      
       toast.success('Logged in successfully');
       return true;
-    } else {
-      toast.error('Invalid credentials');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('An error occurred during login');
       return false;
     }
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('isAuthenticated');
-    navigate('/login');
-    toast.info('Logged out');
+  const logout = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+      toast.info('Logged out');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Error logging out');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
