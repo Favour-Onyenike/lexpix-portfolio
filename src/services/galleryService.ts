@@ -17,18 +17,9 @@ const mapToImageItem = (image: GalleryImage): ImageItem => ({
   url: image.url,
 });
 
-// Initialize gallery table if it doesn't exist
-const initializeLocalGallery = () => {
-  if (!localStorage.getItem('supabase_gallery_images')) {
-    localStorage.setItem('supabase_gallery_images', JSON.stringify([]));
-  }
-};
-
 // Upload an image to storage
 export const uploadImage = async (file: File, folder: string = 'gallery'): Promise<string | null> => {
   try {
-    initializeLocalGallery();
-    
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
@@ -57,8 +48,6 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
 // Create a new gallery image
 export const createGalleryImage = async (image: { title: string, url: string }): Promise<GalleryImage | null> => {
   try {
-    initializeLocalGallery();
-    
     const { data, error } = await supabase
       .from('gallery_images')
       .insert([{ title: image.title, url: image.url }])
@@ -76,15 +65,20 @@ export const createGalleryImage = async (image: { title: string, url: string }):
 // Get all gallery images
 export const getGalleryImages = async (): Promise<ImageItem[]> => {
   try {
-    initializeLocalGallery();
-    
     const { data, error } = await supabase
       .from('gallery_images')
-      .select()
-      .order('created_at', { ascending: false });
+      .select();
     
     if (error) throw error;
-    return (data || []).map(mapToImageItem);
+    
+    // Sort data manually after getting it
+    const sortedData = [...(data || [])].sort((a, b) => {
+      if (a.created_at < b.created_at) return 1; // Descending order
+      if (a.created_at > b.created_at) return -1;
+      return 0;
+    });
+    
+    return sortedData.map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching gallery images:', error);
     return [];
@@ -94,13 +88,12 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
 // Delete a gallery image
 export const deleteGalleryImage = async (id: string): Promise<boolean> => {
   try {
-    initializeLocalGallery();
-    
-    await supabase
+    const { error } = await supabase
       .from('gallery_images')
       .delete()
       .eq('id', id);
     
+    if (error) throw error;
     return true;
   } catch (error) {
     console.error('Error deleting gallery image:', error);

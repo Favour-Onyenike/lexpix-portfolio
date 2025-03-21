@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { EventItem } from '@/components/EventCard';
 import { ImageItem } from '@/components/ImageGrid';
@@ -39,28 +40,23 @@ const mapToImageItem = (image: EventImage): ImageItem => ({
   url: image.url,
 });
 
-// Initialize tables if they don't exist
-const initializeEventsTables = () => {
-  if (!localStorage.getItem('supabase_events')) {
-    localStorage.setItem('supabase_events', JSON.stringify([]));
-  }
-  if (!localStorage.getItem('supabase_event_images')) {
-    localStorage.setItem('supabase_event_images', JSON.stringify([]));
-  }
-};
-
 // Get all events
 export const getEvents = async (): Promise<EventItem[]> => {
   try {
-    initializeEventsTables();
-    
-    const { data, error } = await supabase
+    const result = await supabase
       .from('events')
-      .select()
-      .order('date', { ascending: false });
+      .select();
     
-    if (error) throw error;
-    return (data || []).map(mapToEventItem);
+    // Sort manually after getting the data
+    const data = result.data || [];
+    const sortedData = [...data].sort((a, b) => {
+      if (a.date < b.date) return 1; // Descending order by date
+      if (a.date > b.date) return -1;
+      return 0;
+    });
+    
+    if (result.error) throw result.error;
+    return sortedData.map(mapToEventItem);
   } catch (error) {
     console.error('Error fetching events:', error);
     return [];
@@ -70,8 +66,6 @@ export const getEvents = async (): Promise<EventItem[]> => {
 // Get a specific event
 export const getEvent = async (id: string): Promise<EventItem | null> => {
   try {
-    initializeEventsTables();
-    
     const { data, error } = await supabase
       .from('events')
       .select()
@@ -97,8 +91,6 @@ export const createEvent = async (
   eventImages: File[]
 ): Promise<EventItem | null> => {
   try {
-    initializeEventsTables();
-    
     // Upload cover image
     const coverImageUrl = await uploadImage(coverImageFile, 'events/covers');
     if (!coverImageUrl) throw new Error('Failed to upload cover image');
@@ -165,13 +157,13 @@ export const createEvent = async (
 // Delete an event
 export const deleteEvent = async (id: string): Promise<boolean> => {
   try {
-    initializeEventsTables();
-    
     // Delete event from database
-    await supabase
+    const { error } = await supabase
       .from('events')
       .delete()
       .eq('id', id);
+    
+    if (error) throw error;
     
     // Also delete associated event images
     await supabase
@@ -189,13 +181,12 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 // Get event images
 export const getEventImages = async (eventId: string): Promise<ImageItem[]> => {
   try {
-    initializeEventsTables();
-    
     const result = await supabase
       .from('event_images')
       .select()
       .eq('event_id', eventId);
     
+    // Sort manually after getting the data
     const data = result.data || [];
     const sortedData = [...data].sort((a, b) => {
       if (a.created_at < b.created_at) return -1;

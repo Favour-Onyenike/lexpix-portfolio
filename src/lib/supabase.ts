@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 
 // For deployment, these values should be set in your hosting environment
@@ -51,7 +52,7 @@ export const supabase = {
       }
     }),
     listBuckets: async () => ({ data: [{ name: 'images' }] }),
-    // Fixed: createBucket should accept a name but ignore it in our mock
+    // Fixed: createBucket should accept a name parameter
     createBucket: async (name: string) => ({ error: null })
   },
   

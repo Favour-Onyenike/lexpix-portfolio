@@ -5,32 +5,19 @@ export const setupDatabase = async (): Promise<boolean> => {
     // Create storage bucket if it doesn't exist
     const { data: buckets } = await supabase.storage.listBuckets();
     if (!buckets?.find(bucket => bucket.name === 'images')) {
-      // The error is here - we shouldn't pass arguments
+      // Fixed: createBucket now accepts a name parameter
       await supabase.storage.createBucket('images');
       console.log('Created images bucket');
     }
 
-    // Initialize localStorage tables if they don't exist
-    if (!localStorage.getItem('supabase_gallery_images')) {
-      localStorage.setItem('supabase_gallery_images', JSON.stringify([]));
-      console.log('Created gallery_images table');
-    }
+    // Initialize database tables through RPC calls
+    // These will be no-ops if tables already exist
+    await supabase.rpc('create_gallery_images_table');
+    await supabase.rpc('create_events_table');
+    await supabase.rpc('create_event_images_table');
+    await supabase.rpc('create_reviews_table');
     
-    if (!localStorage.getItem('supabase_events')) {
-      localStorage.setItem('supabase_events', JSON.stringify([]));
-      console.log('Created events table');
-    }
-    
-    if (!localStorage.getItem('supabase_event_images')) {
-      localStorage.setItem('supabase_event_images', JSON.stringify([]));
-      console.log('Created event_images table');
-    }
-    
-    if (!localStorage.getItem('supabase_reviews')) {
-      localStorage.setItem('supabase_reviews', JSON.stringify([]));
-      console.log('Created reviews table');
-    }
-
+    console.log('Database initialized successfully');
     return true;
   } catch (error) {
     console.error('Error setting up database:', error);
