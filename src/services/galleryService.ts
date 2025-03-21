@@ -37,8 +37,8 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
       .from('images')
       .upload(filePath, file);
     
-    // Fixed: Check if result has error property before using it
-    if (result && 'error' in result && result.error) {
+    // Fixed: Add proper type checking for the result
+    if (result && typeof result === 'object' && 'error' in result && result.error) {
       throw result.error;
     }
     
