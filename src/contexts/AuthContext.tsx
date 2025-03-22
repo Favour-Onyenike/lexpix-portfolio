@@ -3,12 +3,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { signIn, signOut, isAuthenticated, getCurrentUser } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 type AuthContextType = {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
+  generateInviteLink: () => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -88,8 +90,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const generateInviteLink = async (): Promise<string | null> => {
+    try {
+      // Generate a unique token
+      const token = crypto.randomUUID();
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
+      
+      // Store the token in Supabase
+      const { error } = await supabase
+        .from('invite_tokens')
+        .insert({ 
+          token, 
+          expires_at: expiresAt.toISOString(),
+          created_by: (await getCurrentUser())?.id
+        });
+        
+      if (error) {
+        console.error('Error creating invite token:', error);
+        toast.error('Could not generate invite link');
+        return null;
+      }
+      
+      // Return the invite link
+      const baseUrl = window.location.origin;
+      return `${baseUrl}/invite/${token}`;
+    } catch (error) {
+      console.error('Error generating invite link:', error);
+      toast.error('Could not generate invite link');
+      return null;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated: isAuth, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ isAuthenticated: isAuth, login, logout, isLoading, generateInviteLink }}>
       {children}
     </AuthContext.Provider>
   );
