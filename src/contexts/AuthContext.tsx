@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { signIn, signOut, isAuthenticated, setAuthenticated } from '@/lib/supabase';
+import { signIn, signOut, isAuthenticated, getCurrentUser } from '@/lib/supabase';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -22,17 +22,35 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuth, setIsAuth] = useState<boolean>(isAuthenticated());
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isAuth, setIsAuth] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Check authentication status on initial load
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const isUserAuthenticated = await isAuthenticated();
+        setIsAuth(isUserAuthenticated);
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   // Redirect logic for protected routes
   useEffect(() => {
-    const isAdminRoute = location.pathname.startsWith('/admin');
-    
-    if (isAdminRoute && !isAuth && location.pathname !== '/login') {
-      navigate('/login', { replace: true });
+    if (!isLoading) {
+      const isAdminRoute = location.pathname.startsWith('/admin');
+      
+      if (isAdminRoute && !isAuth && location.pathname !== '/login') {
+        navigate('/login', { replace: true });
+      }
     }
   }, [location.pathname, isAuth, navigate, isLoading]);
 
@@ -47,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       setIsAuth(true);
-      setAuthenticated(true);
       toast.success('Logged in successfully');
       return true;
     } catch (error) {
@@ -63,7 +80,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await signOut();
       setIsAuth(false);
-      setAuthenticated(false);
       navigate('/login');
       toast.info('Logged out');
     } catch (error) {
