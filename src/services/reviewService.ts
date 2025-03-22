@@ -14,21 +14,14 @@ export type Review = {
 // Get all published reviews
 export const getPublishedReviews = async (): Promise<Review[]> => {
   try {
-    const result = await supabase
+    const { data, error } = await supabase
       .from('reviews')
-      .select()
-      .eq('published', true);
+      .select('*')
+      .eq('published', true)
+      .order('created_at', { ascending: false });
     
-    // Sort manually after getting the data
-    const data = result.data || [];
-    const sortedData = [...data].sort((a, b) => {
-      if (a.created_at < b.created_at) return 1; // Descending order
-      if (a.created_at > b.created_at) return -1;
-      return 0;
-    });
-    
-    if (result.error) throw result.error;
-    return sortedData;
+    if (error) throw error;
+    return data || [];
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return [];
@@ -40,18 +33,11 @@ export const getAllReviews = async (): Promise<Review[]> => {
   try {
     const { data, error } = await supabase
       .from('reviews')
-      .select();
+      .select('*')
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
-    
-    // Sort manually after getting the data
-    const sortedData = [...(data || [])].sort((a, b) => {
-      if (a.created_at < b.created_at) return 1; // Descending order
-      if (a.created_at > b.created_at) return -1;
-      return 0;
-    });
-    
-    return sortedData;
+    return data || [];
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return [];

@@ -43,20 +43,13 @@ const mapToImageItem = (image: EventImage): ImageItem => ({
 // Get all events
 export const getEvents = async (): Promise<EventItem[]> => {
   try {
-    const result = await supabase
+    const { data, error } = await supabase
       .from('events')
-      .select();
+      .select('*')
+      .order('date', { ascending: false });
     
-    // Sort manually after getting the data
-    const data = result.data || [];
-    const sortedData = [...data].sort((a, b) => {
-      if (a.date < b.date) return 1; // Descending order by date
-      if (a.date > b.date) return -1;
-      return 0;
-    });
-    
-    if (result.error) throw result.error;
-    return sortedData.map(mapToEventItem);
+    if (error) throw error;
+    return (data || []).map(mapToEventItem);
   } catch (error) {
     console.error('Error fetching events:', error);
     return [];
@@ -68,7 +61,7 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
   try {
     const { data, error } = await supabase
       .from('events')
-      .select()
+      .select('*')
       .eq('id', id)
       .single();
     
@@ -165,12 +158,6 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
     
     if (error) throw error;
     
-    // Also delete associated event images
-    await supabase
-      .from('event_images')
-      .delete()
-      .eq('event_id', id);
-    
     return true;
   } catch (error) {
     console.error('Error deleting event:', error);
@@ -181,21 +168,14 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 // Get event images
 export const getEventImages = async (eventId: string): Promise<ImageItem[]> => {
   try {
-    const result = await supabase
+    const { data, error } = await supabase
       .from('event_images')
-      .select()
-      .eq('event_id', eventId);
+      .select('*')
+      .eq('event_id', eventId)
+      .order('created_at', { ascending: true });
     
-    // Sort manually after getting the data
-    const data = result.data || [];
-    const sortedData = [...data].sort((a, b) => {
-      if (a.created_at < b.created_at) return -1;
-      if (a.created_at > b.created_at) return 1;
-      return 0;
-    });
-    
-    if (result.error) throw result.error;
-    return sortedData.map(mapToImageItem);
+    if (error) throw error;
+    return (data || []).map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching event images:', error);
     return [];

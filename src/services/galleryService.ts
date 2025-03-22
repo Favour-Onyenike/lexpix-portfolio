@@ -24,13 +24,12 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
     
-    const result = await supabase.storage
+    const { error } = await supabase.storage
       .from('images')
       .upload(filePath, file);
     
-    // Fixed: Add proper type checking for the result
-    if (result && typeof result === 'object' && 'error' in result && result.error) {
-      throw result.error;
+    if (error) {
+      throw error;
     }
     
     // Get the public URL
@@ -67,18 +66,12 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
   try {
     const { data, error } = await supabase
       .from('gallery_images')
-      .select();
+      .select('*')
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
     
-    // Sort data manually after getting it
-    const sortedData = [...(data || [])].sort((a, b) => {
-      if (a.created_at < b.created_at) return 1; // Descending order
-      if (a.created_at > b.created_at) return -1;
-      return 0;
-    });
-    
-    return sortedData.map(mapToImageItem);
+    return (data || []).map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching gallery images:', error);
     return [];
