@@ -11,6 +11,24 @@ export const setupDatabase = async (): Promise<boolean> => {
       return false;
     }
     
+    // Check if storage bucket exists and create if it doesn't
+    try {
+      const { data: bucketExists } = await supabase.storage.getBucket('images');
+      if (!bucketExists) {
+        await supabase.storage.createBucket('images', { 
+          public: true,
+          fileSizeLimit: 10485760 // 10MB
+        });
+        console.log('Created images storage bucket');
+      }
+    } catch (bucketError) {
+      console.log('Creating images bucket');
+      await supabase.storage.createBucket('images', { 
+        public: true,
+        fileSizeLimit: 10485760 // 10MB
+      });
+    }
+    
     // Check if invite_tokens table exists and RPC functions are properly configured
     try {
       // Attempt to call the validate_invite_token function with a test value

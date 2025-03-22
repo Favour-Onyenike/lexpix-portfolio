@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import ImageUploader from '@/components/ImageUploader';
@@ -30,6 +29,7 @@ import { toast } from 'sonner';
 import { Calendar, Image, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
+import { createEvent, deleteEvent, getEvents } from '@/services/eventService';
 import { ImageItem } from '@/components/ImageGrid';
 
 const Events = () => {
@@ -43,22 +43,27 @@ const Events = () => {
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [eventImages, setEventImages] = useState<File[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadEvents = async () => {
+    setIsLoading(true);
+    try {
+      const eventsData = await getEvents();
+      console.log('Loaded events:', eventsData);
+      setEvents(eventsData);
+    } catch (error) {
+      console.error('Error loading events:', error);
+      toast.error('Failed to load events');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Load existing events from localStorage
-    const savedData = localStorage.getItem('eventsData');
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setEvents(parsedData.events || []);
-    }
+    loadEvents();
   }, []);
 
-  useEffect(() => {
-    // Save events data whenever it changes
-    localStorage.setItem('eventsData', JSON.stringify({ events }));
-  }, [events]);
-
-  const handleCreateEvent = () => {
+  const handleCreateEvent = async () => {
     if (!newEvent.title) {
       toast.error('Please enter an event title');
       return;
@@ -69,46 +74,43 @@ const Events = () => {
       return;
     }
 
-    // In a real app, we would upload to a server and get back URLs
-    // For this demo, we'll use data URLs for the cover image
-    const coverImageUrl = URL.createObjectURL(coverImage);
+    setIsLoading(true);
     
-    // Create a new event
-    const eventId = crypto.randomUUID();
-    const newEventData: EventItem = {
-      id: eventId,
-      title: newEvent.title || 'Untitled Event',
-      description: newEvent.description || '',
-      coverImage: coverImageUrl,
-      date: newEvent.date || format(new Date(), 'yyyy-MM-dd'),
-      imageCount: eventImages.length,
-    };
-    
-    setEvents((prev) => [...prev, newEventData]);
-    
-    // Store event images
-    if (eventImages.length > 0) {
-      const eventImageItems: ImageItem[] = eventImages.map(file => ({
-        id: crypto.randomUUID(),
-        url: URL.createObjectURL(file),
-        title: file.name.split('.')[0],
-      }));
+    try {
+      const eventData = {
+        title: newEvent.title || 'Untitled Event',
+        description: newEvent.description,
+        date: newEvent.date || format(new Date(), 'yyyy-MM-dd'),
+      };
       
-      // Save event images in localStorage
-      localStorage.setItem(`eventImages_${eventId}`, JSON.stringify({ images: eventImageItems }));
+      const createdEvent = await createEvent(
+        eventData,
+        coverImage,
+        eventImages
+      );
+      
+      if (createdEvent) {
+        setEvents(prev => [createdEvent, ...prev]);
+        
+        setNewEvent({
+          title: '',
+          description: '',
+          date: format(new Date(), 'yyyy-MM-dd'),
+        });
+        setCoverImage(null);
+        setEventImages([]);
+        setIsCreateOpen(false);
+        
+        toast.success('Event created successfully');
+      } else {
+        toast.error('Failed to create event');
+      }
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast.error('Failed to create event');
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Reset form and close sheet
-    setNewEvent({
-      title: '',
-      description: '',
-      date: format(new Date(), 'yyyy-MM-dd'),
-    });
-    setCoverImage(null);
-    setEventImages([]);
-    setIsCreateOpen(false);
-    
-    toast.success('Event created successfully');
   };
 
   const handleCoverImageUpload = (files: File[]) => {
@@ -127,24 +129,26 @@ const Events = () => {
     setDeleteId(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteId) {
-      // Find the event to get its cover image URL
-      const eventToDelete = events.find(event => event.id === deleteId);
+      setIsLoading(true);
       
-      // Filter out the deleted event
-      setEvents(events.filter(event => event.id !== deleteId));
-      
-      // Revoke the object URL to avoid memory leaks
-      if (eventToDelete?.coverImage.startsWith('blob:')) {
-        URL.revokeObjectURL(eventToDelete.coverImage);
+      try {
+        const success = await deleteEvent(deleteId);
+        
+        if (success) {
+          setEvents(events.filter(event => event.id !== deleteId));
+          toast.success('Event deleted successfully');
+        } else {
+          toast.error('Failed to delete event');
+        }
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        toast.error('Failed to delete event');
+      } finally {
+        setIsLoading(false);
+        setDeleteId(null);
       }
-      
-      // Remove event images from localStorage
-      localStorage.removeItem(`eventImages_${deleteId}`);
-      
-      toast.success('Event deleted successfully');
-      setDeleteId(null);
     }
   };
 

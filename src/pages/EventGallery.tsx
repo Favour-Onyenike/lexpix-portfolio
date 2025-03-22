@@ -25,13 +25,20 @@ const EventGallery = () => {
       
       try {
         // Fetch event data
+        console.log(`Loading event with ID ${eventId}`);
         const eventData = await getEvent(eventId);
+        
         if (eventData) {
+          console.log('Event loaded:', eventData);
           setEvent(eventData);
           
           // Fetch event images
           const eventImages = await getEventImages(eventId);
+          console.log(`Loaded ${eventImages.length} event images`);
           setImages(eventImages);
+        } else {
+          console.log(`No event found with ID ${eventId}`);
+          toast.error('Event not found');
         }
       } catch (error) {
         console.error('Error loading event data:', error);

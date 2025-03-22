@@ -24,6 +24,19 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
     
+    // Make sure the storage bucket exists
+    try {
+      const { data: bucketExists } = await supabase.storage.getBucket('images');
+      if (!bucketExists) {
+        await supabase.storage.createBucket('images', { public: true });
+        console.log('Created images bucket');
+      }
+    } catch (bucketError) {
+      console.log('Creating images bucket');
+      await supabase.storage.createBucket('images', { public: true });
+    }
+    
+    // Upload the file
     const { error } = await supabase.storage
       .from('images')
       .upload(filePath, file);
@@ -69,8 +82,12 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
       .select('*')
       .order('created_at', { ascending: false });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error in getGalleryImages:', error);
+      throw error;
+    }
     
+    console.log('Gallery images retrieved:', data?.length || 0);
     return (data || []).map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching gallery images:', error);

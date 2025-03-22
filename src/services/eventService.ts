@@ -30,7 +30,7 @@ const mapToEventItem = (event: Event): EventItem => ({
   description: event.description || '',
   date: event.date,
   coverImage: event.cover_image,
-  imageCount: event.image_count,
+  imageCount: event.image_count || 0,
 });
 
 // Map DB event image to UI image
@@ -48,7 +48,12 @@ export const getEvents = async (): Promise<EventItem[]> => {
       .select('*')
       .order('date', { ascending: false });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error in getEvents:', error);
+      throw error;
+    }
+    
+    console.log('Events retrieved:', data?.length || 0);
     return (data || []).map(mapToEventItem);
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -63,9 +68,18 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
       .from('events')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no event is found
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error in getEvent:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.log(`No event found with ID ${id}`);
+      return null;
+    }
+    
     return mapToEventItem(data);
   } catch (error) {
     console.error('Error fetching event:', error);
@@ -84,6 +98,8 @@ export const createEvent = async (
   eventImages: File[]
 ): Promise<EventItem | null> => {
   try {
+    console.log('Creating event:', eventData.title);
+    
     // Upload cover image
     const coverImageUrl = await uploadImage(coverImageFile, 'events/covers');
     if (!coverImageUrl) throw new Error('Failed to upload cover image');
@@ -97,13 +113,19 @@ export const createEvent = async (
       image_count: eventImages.length
     };
     
+    console.log('Inserting event record:', eventRecord);
     const { data, error } = await supabase
       .from('events')
       .insert([eventRecord])
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error inserting event:', error);
+      throw error;
+    }
+    
+    console.log('Event created:', data);
     
     // Upload event images
     if (data && eventImages.length > 0) {
@@ -174,7 +196,12 @@ export const getEventImages = async (eventId: string): Promise<ImageItem[]> => {
       .eq('event_id', eventId)
       .order('created_at', { ascending: true });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error in getEventImages:', error);
+      throw error;
+    }
+    
+    console.log(`Retrieved ${data?.length || 0} images for event ${eventId}`);
     return (data || []).map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching event images:', error);
