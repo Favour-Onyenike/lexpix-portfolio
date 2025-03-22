@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -83,10 +84,10 @@ const InviteSignup = () => {
       }
       
       // Mark the token as used
-      if (token) {
+      if (token && userData.user) {
         const { error: updateError } = await supabase.rpc('mark_invite_token_used', {
           p_token: token,
-          p_used_by: userData.user?.id
+          p_used_by: userData.user.id
         });
           
         if (updateError) {

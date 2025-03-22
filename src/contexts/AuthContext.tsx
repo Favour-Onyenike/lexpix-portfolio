@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const currentUser = await getCurrentUser();
       
-      // Store the token in Supabase
+      // Store the token using the RPC function
       const { error } = await supabase.rpc('insert_invite_token', {
         p_token: token,
         p_expires_at: expiresAt.toISOString(),
