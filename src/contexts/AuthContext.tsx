@@ -103,8 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.rpc('insert_invite_token', {
         p_token: token,
         p_expires_at: expiresAt.toISOString(),
-        p_created_by: currentUser?.id
-      });
+        p_created_by: currentUser?.id || null
+      } as any); // Use type assertion to bypass the type checking
         
       if (error) {
         console.error('Error creating invite token:', error);

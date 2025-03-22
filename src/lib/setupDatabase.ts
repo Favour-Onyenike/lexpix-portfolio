@@ -15,7 +15,9 @@ export const setupDatabase = async (): Promise<boolean> => {
     try {
       // Attempt to call the validate_invite_token function with a test value
       // This will fail gracefully if the function exists but the token is invalid
-      await supabase.rpc('validate_invite_token', { p_token: 'test-token' });
+      await supabase.rpc('validate_invite_token', { 
+        p_token: 'test-token'
+      } as any);
       console.log('invite_tokens RPC functions exist');
     } catch (rpcError) {
       console.error('Error checking invite_tokens RPC functions:', rpcError);

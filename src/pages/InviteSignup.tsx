@@ -31,7 +31,7 @@ const InviteSignup = () => {
         // Check if the token exists and has not expired using RPC function
         const { data, error } = await supabase.rpc('validate_invite_token', {
           p_token: token
-        });
+        } as any); // Use type assertion to bypass the type checking
 
         if (error || !data) {
           toast.error('Invalid or expired invitation link');
@@ -88,7 +88,7 @@ const InviteSignup = () => {
         const { error: updateError } = await supabase.rpc('mark_invite_token_used', {
           p_token: token,
           p_used_by: userData.user.id
-        });
+        } as any); // Use type assertion to bypass the type checking
           
         if (updateError) {
           console.error('Error updating token:', updateError);
