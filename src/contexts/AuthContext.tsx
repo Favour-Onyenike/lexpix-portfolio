@@ -97,14 +97,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
       
+      const currentUser = await getCurrentUser();
+      
       // Store the token in Supabase
-      const { error } = await supabase
-        .from('invite_tokens')
-        .insert({ 
-          token, 
-          expires_at: expiresAt.toISOString(),
-          created_by: (await getCurrentUser())?.id
-        });
+      const { error } = await supabase.rpc('insert_invite_token', {
+        p_token: token,
+        p_expires_at: expiresAt.toISOString(),
+        p_created_by: currentUser?.id
+      });
         
       if (error) {
         console.error('Error creating invite token:', error);

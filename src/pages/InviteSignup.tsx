@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -28,14 +27,10 @@ const InviteSignup = () => {
       }
 
       try {
-        // Check if the token exists and has not expired
-        const { data, error } = await supabase
-          .from('invite_tokens')
-          .select('*')
-          .eq('token', token)
-          .gt('expires_at', new Date().toISOString())
-          .eq('used', false)
-          .single();
+        // Check if the token exists and has not expired using RPC function
+        const { data, error } = await supabase.rpc('validate_invite_token', {
+          p_token: token
+        });
 
         if (error || !data) {
           toast.error('Invalid or expired invitation link');
@@ -89,10 +84,10 @@ const InviteSignup = () => {
       
       // Mark the token as used
       if (token) {
-        const { error: updateError } = await supabase
-          .from('invite_tokens')
-          .update({ used: true, used_by: userData.user?.id })
-          .eq('token', token);
+        const { error: updateError } = await supabase.rpc('mark_invite_token_used', {
+          p_token: token,
+          p_used_by: userData.user?.id
+        });
           
         if (updateError) {
           console.error('Error updating token:', updateError);

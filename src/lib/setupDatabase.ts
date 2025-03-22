@@ -11,28 +11,18 @@ export const setupDatabase = async (): Promise<boolean> => {
       return false;
     }
     
-    // Check if invite_tokens table exists, create it if it doesn't
-    const { error: schemaError } = await supabase.rpc('check_if_table_exists', {
-      table_name: 'invite_tokens'
-    });
+    // Check if invite_tokens table exists
+    // Since we've already created the table via SQL migrations, 
+    // we don't need to create it here anymore, just check for its existence
+    const { data: inviteTokensData, error: inviteTokensError } = await supabase
+      .from('invite_tokens')
+      .select('id')
+      .limit(1);
     
-    if (schemaError) {
-      // Table doesn't exist, create it
-      const { error: createError } = await supabase.query(`
-        CREATE TABLE IF NOT EXISTS public.invite_tokens (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          token TEXT NOT NULL UNIQUE,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-          expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-          used BOOLEAN DEFAULT false,
-          created_by UUID REFERENCES auth.users(id),
-          used_by UUID REFERENCES auth.users(id)
-        );
-      `);
-      
-      if (createError) {
-        console.error('Error creating invite_tokens table:', createError);
-      }
+    if (inviteTokensError) {
+      console.error('Error checking invite_tokens table:', inviteTokensError);
+    } else {
+      console.log('invite_tokens table exists');
     }
     
     console.log('Successfully connected to Supabase');

@@ -92,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_tokens: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          expires_at: string
+          id: string
+          token: string
+          used: boolean | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at: string
+          id?: string
+          token: string
+          used?: boolean | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+          used?: boolean | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           created_at: string | null
