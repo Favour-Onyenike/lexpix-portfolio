@@ -17,6 +17,17 @@ const mapToImageItem = (image: GalleryImage): ImageItem => ({
   url: image.url,
 });
 
+// Check if a URL actually exists and is accessible
+export const checkImageUrlValidity = async (url: string): Promise<boolean> => {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch (error) {
+    console.error('Error checking image URL validity:', error);
+    return false;
+  }
+};
+
 // Upload an image to storage
 export const uploadImage = async (file: File, folder: string = 'gallery'): Promise<string | null> => {
   try {

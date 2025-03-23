@@ -29,21 +29,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check authentication status on initial load
+  // Check authentication status on initial load and on path change
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setIsLoading(true);
         const isUserAuthenticated = await isAuthenticated();
         setIsAuth(isUserAuthenticated);
+        
+        // If route changed away from admin, invalidate auth state
+        const isAdminRoute = location.pathname.startsWith('/admin');
+        if (!isAdminRoute && isUserAuthenticated) {
+          // Force recheck authentication when leaving admin area
+          console.log('Left admin area, logging out');
+          await signOut();
+          setIsAuth(false);
+        }
       } catch (error) {
         console.error('Error checking authentication:', error);
+        setIsAuth(false);
       } finally {
         setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, []);
+  }, [location.pathname]);
 
   // Redirect logic for protected routes
   useEffect(() => {

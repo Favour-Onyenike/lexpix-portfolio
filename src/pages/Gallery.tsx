@@ -35,15 +35,34 @@ const Gallery = () => {
     const image = images.find(img => img.id === imageId);
     
     if (image) {
-      // Create a temporary anchor element
-      const link = document.createElement('a');
-      link.href = image.url;
-      link.download = image.title || `photo-${imageId}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast.success('Image download started');
+      try {
+        // Create a temporary anchor element
+        const link = document.createElement('a');
+        
+        // Fetch the image to create a blob URL (this ensures proper downloading)
+        fetch(image.url)
+          .then(response => response.blob())
+          .then(blob => {
+            const blobUrl = URL.createObjectURL(blob);
+            link.href = blobUrl;
+            link.download = image.title || `photo-${imageId}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up the blob URL after download is initiated
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+            
+            toast.success('Image download started');
+          })
+          .catch(err => {
+            console.error('Error downloading image:', err);
+            toast.error('Failed to download image');
+          });
+      } catch (error) {
+        console.error('Error initiating download:', error);
+        toast.error('Failed to download image');
+      }
     }
   };
 
