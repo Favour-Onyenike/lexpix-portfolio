@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -237,19 +236,19 @@ const Index = () => {
               {
                 title: "Events",
                 description: "Capturing memorable moments from special events and celebrations.",
-                image: "/lovable-uploads/9a5b8dd9-88d8-4ed4-bacf-07c70e1bdffe.png",
+                image: "/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png",
                 link: "/events"
-              },
-              {
-                title: "Portrait Series",
-                description: "Professional portraits that capture personality and character in every shot.",
-                image: "/lovable-uploads/6cb9671f-5f66-4a21-9e45-d97a2994a1e5.png",
-                link: "/gallery"
               },
               {
                 title: "Places",
                 description: "Stunning photography of landscapes, architecture, and beautiful locations.",
-                image: "/lovable-uploads/9d5ac26c-b0f6-4bcf-8420-4e8745b54848.png",
+                image: "/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png",
+                link: "/gallery"
+              },
+              {
+                title: "Portrait Series",
+                description: "Professional portraits that capture personality and character in every shot.",
+                image: "/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png",
                 link: "/gallery"
               }
             ].map((project, index) => (
