@@ -16,7 +16,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('');
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
@@ -25,15 +24,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Handle scrolling to contact section from any page
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
     if (location.pathname !== '/') {
-      // If not on homepage, navigate to homepage then scroll
       navigate('/', { state: { scrollToContact: true } });
     } else {
-      // If on homepage, just scroll to section
       const contactSection = document.getElementById('contact');
       if (contactSection) {
         contactSection.scrollIntoView({ behavior: 'smooth' });
@@ -44,15 +40,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
-  // Handle navigation to home/hero section
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
     if (location.pathname !== '/') {
-      // If not on homepage, navigate to homepage
       navigate('/');
     } else {
-      // If on homepage, scroll to hero section
       const heroSection = document.getElementById('hero');
       if (heroSection) {
         heroSection.scrollIntoView({ behavior: 'smooth' });
@@ -63,22 +56,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
-  // Check if we need to scroll to contact after navigation
   useEffect(() => {
     if (location.pathname === '/' && location.state && (location.state as any).scrollToContact) {
-      // Need to wait a bit for the DOM to be fully loaded
       setTimeout(() => {
         const contactSection = document.getElementById('contact');
         if (contactSection) {
           contactSection.scrollIntoView({ behavior: 'smooth' });
         }
-        // Clear the state so it doesn't scroll again on refresh
         navigate('/', { replace: true, state: {} });
       }, 100);
     }
   }, [location, navigate]);
 
-  // Check active section on scroll
   useEffect(() => {
     const handleScroll = () => {
       if (location.pathname === '/') {
@@ -99,12 +88,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initialize on mount
+    handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
   }, [location.pathname]);
 
-  // Determine if a nav item is active based on route or section
   const isActive = (path: string) => {
     if (path === '/' && location.pathname === '/') {
       return activeSection === 'hero';
@@ -131,12 +119,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <Link to="/" onClick={handleHomeClick} className="font-pacifico text-2xl tracking-wide logo-font">
+            <Link to="/" onClick={handleHomeClick} className="font-summer-fling text-2xl tracking-wide logo-font">
               LexPix<span className="text-yellow-400">.</span>
             </Link>
           </motion.div>
           
-          {/* Desktop Navigation - Center */}
           {!isMobile && (
             <motion.nav
               initial={{ opacity: 0, y: -10 }}
@@ -181,7 +168,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </motion.nav>
           )}
           
-          {/* Admin Button - Right */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -208,7 +194,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </motion.div>
         </div>
 
-        {/* Mobile Menu */}
         <AnimatePresence>
           {isMobile && mobileMenuOpen && (
             <motion.div
@@ -268,7 +253,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </Link>
               </div>
               
-              {/* Social links in mobile menu */}
               <div className="flex justify-center items-center space-x-6 pb-12">
                 <a href="#" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
                   <Instagram className="h-5 w-5" />
@@ -301,7 +285,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
-              <h3 className="font-pacifico text-2xl tracking-wide mb-4">LexPix<span className="text-yellow-400">.</span></h3>
+              <h3 className="font-summer-fling text-2xl tracking-wide mb-4 logo-font">LexPix<span className="text-yellow-400">.</span></h3>
               <p className="text-gray-400">Capturing moments with minimalist elegance.</p>
             </div>
             

@@ -21,6 +21,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'pacifico': ['Pacifico', 'cursive'],
+				'summer-fling': ['"Summer Fling"', 'cursive'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

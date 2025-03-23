@@ -105,11 +105,11 @@ const Index = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="bg-yellow-400 rounded-full overflow-hidden aspect-square max-w-xl mx-auto">
+            <div className="max-w-xl mx-auto">
               <img 
-                src="/lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
+                src="/lovable-uploads/f8361f6e-4625-4ae2-af1c-c08f29a899e4.png" 
                 alt="Photographer" 
-                className="w-full h-full object-cover mix-blend-darken"
+                className="w-full h-full object-contain"
               />
             </div>
           </motion.div>
@@ -126,7 +126,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-bold mb-6"
           >
-            About <span className="font-pacifico logo-font">LexPix</span>
+            About <span className="font-summer-fling logo-font">LexPix</span>
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
           
