@@ -127,7 +127,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-bold mb-6"
           >
-            About LexPix
+            About <span className="font-pacifico logo-font">LexPix</span>
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
           

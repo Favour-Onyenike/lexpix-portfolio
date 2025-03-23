@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,6 +37,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       const contactSection = document.getElementById('contact');
       if (contactSection) {
         contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    }
+  };
+
+  // Handle navigation to home/hero section
+  const handleHomeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (location.pathname !== '/') {
+      // If not on homepage, navigate to homepage
+      navigate('/');
+    } else {
+      // If on homepage, scroll to hero section
+      const heroSection = document.getElementById('hero');
+      if (heroSection) {
+        heroSection.scrollIntoView({ behavior: 'smooth' });
       }
       if (mobileMenuOpen) {
         setMobileMenuOpen(false);
@@ -113,7 +131,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <Link to="/" className="text-2xl font-medium tracking-tight">
+            <Link to="/" onClick={handleHomeClick} className="font-pacifico text-2xl tracking-wide logo-font">
               LexPix<span className="text-yellow-400">.</span>
             </Link>
           </motion.div>
@@ -128,6 +146,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <Link 
                 to="/" 
+                onClick={handleHomeClick}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
@@ -203,7 +222,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link 
                   to="/" 
                   className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={handleHomeClick}
                 >
                   Home
                   {location.pathname === '/' && activeSection === 'hero' && (
@@ -282,14 +301,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
-              <h3 className="text-2xl font-bold mb-4">LexPix<span className="text-yellow-400">.</span></h3>
+              <h3 className="font-pacifico text-2xl tracking-wide mb-4">LexPix<span className="text-yellow-400">.</span></h3>
               <p className="text-gray-400">Capturing moments with minimalist elegance.</p>
             </div>
             
             <div>
               <h3 className="text-xl font-bold mb-6">Quick Links</h3>
               <div className="flex flex-col space-y-4">
-                <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
+                <Link to="/" onClick={handleHomeClick} className="text-gray-400 hover:text-white transition-colors">Home</Link>
                 <Link to="/gallery" className="text-gray-400 hover:text-white transition-colors">Gallery</Link>
                 <Link to="/events" className="text-gray-400 hover:text-white transition-colors">Events</Link>
                 <a href="#contact" onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors">Contact</a>

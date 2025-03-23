@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -142,5 +143,11 @@
   .mobile-menu-exit-active {
     clip-path: circle(0% at top right);
     transition: clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .logo-font {
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 }

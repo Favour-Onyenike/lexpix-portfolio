@@ -36,7 +36,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <Button variant="ghost" size="icon" onClick={toggleSidebar}>
             <Menu size={20} />
           </Button>
-          <Link to="/" className="text-xl font-medium tracking-tight flex items-center gap-2">
+          <Link to="/" className="font-pacifico text-xl tracking-wide logo-font flex items-center gap-2">
             LexPix<span className="text-yellow-400">.</span> Admin
           </Link>
         </div>
@@ -51,7 +51,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         <div className="flex items-center justify-between mb-8">
-          <Link to="/" className="text-xl font-medium tracking-tight flex items-center gap-2">
+          <Link to="/" className="font-pacifico text-xl tracking-wide logo-font flex items-center gap-2">
             <ChevronLeft size={18} />
             LexPix<span className="text-yellow-400">.</span>
           </Link>
