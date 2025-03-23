@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -119,7 +120,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <Link to="/" onClick={handleHomeClick} className="font-summer-fling text-2xl tracking-wide logo-font">
+            <Link to="/" onClick={handleHomeClick} className="logo-font text-3xl tracking-wide">
               LexPix<span className="text-yellow-400">.</span>
             </Link>
           </motion.div>
@@ -285,7 +286,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
-              <h3 className="font-summer-fling text-2xl tracking-wide mb-4 logo-font">LexPix<span className="text-yellow-400">.</span></h3>
+              <h3 className="logo-font text-3xl mb-4">LexPix<span className="text-yellow-400">.</span></h3>
               <p className="text-gray-400">Capturing moments with minimalist elegance.</p>
             </div>
             
