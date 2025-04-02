@@ -120,8 +120,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <Link to="/" onClick={handleHomeClick} className="logo-font text-3xl tracking-wide">
-              LexPix<span className="text-yellow-400">.</span>
+            <Link to="/" onClick={handleHomeClick} className="flex items-center">
+              <img 
+                src="/public/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                alt="LexPix Logo" 
+                className="h-8 md:h-10"
+              />
             </Link>
           </motion.div>
           
@@ -204,6 +208,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col"
             >
+              <div className="flex justify-center py-8">
+                <img 
+                  src="/public/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                  alt="LexPix Logo" 
+                  className="h-10"
+                />
+              </div>
+              
               <div className="flex flex-col h-full justify-center items-center space-y-8 p-6">
                 <Link 
                   to="/" 
@@ -286,7 +298,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
-              <h3 className="logo-font text-3xl mb-4">LexPix<span className="text-yellow-400">.</span></h3>
+              <div className="mb-4">
+                <img 
+                  src="/public/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                  alt="LexPix Logo" 
+                  className="h-10"
+                />
+              </div>
               <p className="text-gray-400">Capturing moments with minimalist elegance.</p>
             </div>
             
