@@ -8,15 +8,21 @@ export type FeaturedProject = {
   image_url: string;
   link: string;
   sort_order?: number | null;
+  created_at?: string;
+  updated_at?: string;
 };
 
 // Get all featured projects
 export const getFeaturedProjects = async (): Promise<FeaturedProject[]> => {
   try {
+    // Use the generic version of from() to specify the return type
     const { data, error } = await supabase
       .from('featured_projects')
       .select('*')
-      .order('sort_order', { ascending: true });
+      .order('sort_order', { ascending: true }) as { 
+        data: FeaturedProject[] | null; 
+        error: any; 
+      };
       
     if (error) {
       console.error('Error fetching featured projects:', error);
@@ -37,7 +43,10 @@ export const getFeaturedProject = async (id: string): Promise<FeaturedProject | 
       .from('featured_projects')
       .select('*')
       .eq('id', id)
-      .single();
+      .single() as {
+        data: FeaturedProject | null;
+        error: any;
+      };
       
     if (error) {
       console.error('Error fetching featured project:', error);
@@ -58,7 +67,10 @@ export const createFeaturedProject = async (project: Omit<FeaturedProject, 'id'>
       .from('featured_projects')
       .insert([project])
       .select()
-      .single();
+      .single() as {
+        data: FeaturedProject | null;
+        error: any;
+      };
       
     if (error) {
       console.error('Error creating featured project:', error);
@@ -80,7 +92,10 @@ export const updateFeaturedProject = async (id: string, updates: Partial<Feature
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .single() as {
+        data: FeaturedProject | null;
+        error: any;
+      };
       
     if (error) {
       console.error('Error updating featured project:', error);
@@ -117,17 +132,25 @@ export const deleteFeaturedProject = async (id: string): Promise<boolean> => {
 // Reorder featured projects
 export const reorderFeaturedProjects = async (projectIds: string[]): Promise<boolean> => {
   try {
-    // Create a batch of updates for each project
+    // Create a batch of updates
     const updates = projectIds.map((id, index) => ({
       id,
-      sort_order: index
+      sort_order: index,
+      // Add required fields with dummy values for TypeScript
+      // These won't actually be used in the upsert operation because we specify onConflict
+      title: '',
+      description: '', 
+      image_url: '',
+      link: ''
     }));
     
     // Use upsert to update the sort_order for each project
     const { error } = await supabase
       .from('featured_projects')
       .upsert(updates, {
-        onConflict: 'id'
+        onConflict: 'id',
+        // Only update the sort_order field
+        returning: ['id', 'sort_order']
       });
       
     if (error) {
