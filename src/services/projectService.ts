@@ -148,9 +148,7 @@ export const reorderFeaturedProjects = async (projectIds: string[]): Promise<boo
     const { error } = await supabase
       .from('featured_projects')
       .upsert(updates, {
-        onConflict: 'id',
-        // Only update the sort_order field
-        returning: ['id', 'sort_order']
+        onConflict: 'id'
       });
       
     if (error) {
