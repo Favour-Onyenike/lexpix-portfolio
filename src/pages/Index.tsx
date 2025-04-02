@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,11 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/Layout';
 import ReviewSection from '@/components/ReviewSection';
+import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 
 const Index = () => {
   const statsRef = useRef(null);
   const [statsVisible, setStatsVisible] = useState(false);
   const [counters, setCounters] = useState([0, 0, 0, 0]);
+  const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const statsData = [
     { target: 25, label: "Satisfied Clients" },
@@ -20,6 +24,22 @@ const Index = () => {
     { target: 3, label: "Years Experience" },
     { target: 200, label: "Photos Delivered" }
   ];
+  
+  // Load featured projects from database
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const projects = await getFeaturedProjects();
+        setFeaturedProjects(projects);
+      } catch (error) {
+        console.error('Error loading featured projects:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadProjects();
+  }, []);
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -62,6 +82,34 @@ const Index = () => {
       window.requestAnimationFrame(step);
     }
   }, [statsVisible]);
+
+  // Fallback projects in case there are no projects in the database
+  const defaultProjects = [
+    {
+      id: '1',
+      title: "Events",
+      description: "Capturing memorable moments from special events and celebrations.",
+      image_url: "/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png",
+      link: "/events"
+    },
+    {
+      id: '2',
+      title: "Places",
+      description: "Stunning photography of landscapes, architecture, and beautiful locations.",
+      image_url: "/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png",
+      link: "/gallery"
+    },
+    {
+      id: '3',
+      title: "Portrait Series",
+      description: "Professional portraits that capture personality and character in every shot.",
+      image_url: "/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png",
+      link: "/gallery"
+    }
+  ];
+
+  // Use default projects if none are found in the database
+  const displayProjects = featuredProjects.length > 0 ? featuredProjects : defaultProjects;
 
   return (
     <Layout>
@@ -232,56 +280,57 @@ const Index = () => {
           </motion.h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Events",
-                description: "Capturing memorable moments from special events and celebrations.",
-                image: "/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png",
-                link: "/events"
-              },
-              {
-                title: "Places",
-                description: "Stunning photography of landscapes, architecture, and beautiful locations.",
-                image: "/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png",
-                link: "/gallery"
-              },
-              {
-                title: "Portrait Series",
-                description: "Professional portraits that capture personality and character in every shot.",
-                image: "/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png",
-                link: "/gallery"
-              }
-            ].map((project, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-black border border-gray-800 rounded-lg overflow-hidden w-full md:max-w-[95%] mx-auto"
-              >
-                <div className="aspect-video overflow-hidden">
-                  <img 
-                    src={project.image} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                  <p className="text-gray-400 mb-4">{project.description}</p>
-                  <Button 
-                    variant="outline" 
-                    className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
-                    asChild
-                  >
-                    <Link to={project.link}>
-                      Explore →
-                    </Link>
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
+            {isLoading ? (
+              // Loading skeletons
+              [...Array(3)].map((_, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
+                >
+                  <div className="aspect-video bg-gray-700 animate-pulse" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-6 bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 bg-gray-700 rounded animate-pulse w-3/4" />
+                    <div className="h-10 bg-gray-700 rounded animate-pulse w-1/3 mt-4" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              displayProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-black border border-gray-800 rounded-lg overflow-hidden w-full md:max-w-[95%] mx-auto"
+                >
+                  <div className="aspect-video overflow-hidden">
+                    <img 
+                      src={project.image_url} 
+                      alt={project.title} 
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                    <p className="text-gray-400 mb-4">{project.description}</p>
+                    <Button 
+                      variant="outline" 
+                      className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
+                      asChild
+                    >
+                      <Link to={project.link}>
+                        Explore →
+                      </Link>
+                    </Button>
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </section>
