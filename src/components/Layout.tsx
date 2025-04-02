@@ -122,7 +122,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <Link to="/" onClick={handleHomeClick} className="flex items-center">
               <img 
-                src="/public/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
                 alt="LexPix Logo" 
                 className="h-8 md:h-10"
               />
@@ -210,7 +210,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <div className="flex justify-center py-8">
                 <img 
-                  src="/public/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                  src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
                   alt="LexPix Logo" 
                   className="h-10"
                 />
@@ -300,7 +300,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div>
               <div className="mb-4">
                 <img 
-                  src="/public/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                  src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
                   alt="LexPix Logo" 
                   className="h-10"
                 />
