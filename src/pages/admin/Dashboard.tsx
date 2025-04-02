@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Image, CalendarDays, Plus, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -13,10 +14,35 @@ const Dashboard = () => {
     totalEvents: 0,
     totalReviews: 0
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const updateStats = () => {
-      // Get data from localStorage
+    const fetchStats = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch counts from Supabase tables
+        const [galleryResult, eventsResult, reviewsResult] = await Promise.all([
+          supabase.from('gallery_images').select('id', { count: 'exact', head: true }),
+          supabase.from('events').select('id', { count: 'exact', head: true }),
+          supabase.from('reviews').select('id', { count: 'exact', head: true })
+        ]);
+        
+        setStats({
+          totalImages: galleryResult.count || 0,
+          totalEvents: eventsResult.count || 0,
+          totalReviews: reviewsResult.count || 0
+        });
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        // Fallback to localStorage if Supabase fails
+        updateStatsFromLocalStorage();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const updateStatsFromLocalStorage = () => {
+      // Get data from localStorage as fallback
       const galleryData = localStorage.getItem('galleryData');
       const eventsData = localStorage.getItem('eventsData');
       const reviewsData = localStorage.getItem('reviewsData');
@@ -32,14 +58,14 @@ const Dashboard = () => {
       });
     };
 
-    // Initial update
-    updateStats();
+    // Initial fetch
+    fetchStats();
 
-    // Setup listener for storage changes
-    window.addEventListener('storage', updateStats);
+    // Setup listener for storage changes (for local storage fallback)
+    window.addEventListener('storage', updateStatsFromLocalStorage);
     
     return () => {
-      window.removeEventListener('storage', updateStats);
+      window.removeEventListener('storage', updateStatsFromLocalStorage);
     };
   }, []);
 
@@ -69,7 +95,9 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="mt-2 mb-4">
-                  <div className="text-2xl font-semibold">{stats.totalImages}</div>
+                  <div className="text-2xl font-semibold">
+                    {isLoading ? '...' : stats.totalImages}
+                  </div>
                   <p className="text-xs text-muted-foreground">Total images</p>
                 </div>
                 <Button asChild>
@@ -99,7 +127,9 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="mt-2 mb-4">
-                  <div className="text-2xl font-semibold">{stats.totalEvents}</div>
+                  <div className="text-2xl font-semibold">
+                    {isLoading ? '...' : stats.totalEvents}
+                  </div>
                   <p className="text-xs text-muted-foreground">Total events</p>
                 </div>
                 <Button asChild>
@@ -129,7 +159,9 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="mt-2 mb-4">
-                  <div className="text-2xl font-semibold">{stats.totalReviews}</div>
+                  <div className="text-2xl font-semibold">
+                    {isLoading ? '...' : stats.totalReviews}
+                  </div>
                   <p className="text-xs text-muted-foreground">Total reviews</p>
                 </div>
                 <Button asChild>

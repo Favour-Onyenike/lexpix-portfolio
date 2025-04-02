@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -185,7 +184,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
           >
-            Founded by Voks "Lucas Uzum" in partnership with Larry "Olanrewaju Lawal Rasaq", LexPix is a creative photography and visual 
+            Founded by Volks "Lucas Uzum" in partnership with Larry "Olanrewaju Lawal Rasaq", LexPix is a creative photography and visual 
             storytelling brand dedicated to capturing life's most meaningful moments. At LexPix, we believe every smile, glance, and milestone 
             tells a story. With a sharp eye for detail and a passion for bringing memories to life, we create stunning images and dynamic visuals 
             that preserve emotions in their purest form. Whether through striking photography or compelling videography, our goal is to bring out 
@@ -401,7 +400,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 mr-4 text-yellow-400" />
-                  <span>New York, NY</span>
+                  <span>Edmonton, AB</span>
                 </div>
               </div>
               

@@ -23,7 +23,7 @@ export const getFeaturedProjects = async (): Promise<FeaturedProject[]> => {
       throw error;
     }
     
-    return data || [];
+    return (data || []) as FeaturedProject[];
   } catch (error) {
     console.error('Error in getFeaturedProjects:', error);
     return [];
@@ -44,7 +44,7 @@ export const getFeaturedProject = async (id: string): Promise<FeaturedProject | 
       throw error;
     }
     
-    return data;
+    return data as FeaturedProject;
   } catch (error) {
     console.error('Error in getFeaturedProject:', error);
     return null;
@@ -65,7 +65,7 @@ export const createFeaturedProject = async (project: Omit<FeaturedProject, 'id'>
       throw error;
     }
     
-    return data;
+    return data as FeaturedProject;
   } catch (error) {
     console.error('Error in createFeaturedProject:', error);
     return null;
@@ -87,7 +87,7 @@ export const updateFeaturedProject = async (id: string, updates: Partial<Feature
       throw error;
     }
     
-    return data;
+    return data as FeaturedProject;
   } catch (error) {
     console.error('Error in updateFeaturedProject:', error);
     return null;
@@ -123,9 +123,12 @@ export const reorderFeaturedProjects = async (projectIds: string[]): Promise<boo
       sort_order: index
     }));
     
+    // Use upsert to update the sort_order for each project
     const { error } = await supabase
       .from('featured_projects')
-      .upsert(updates);
+      .upsert(updates, {
+        onConflict: 'id'
+      });
       
     if (error) {
       console.error('Error reordering projects:', error);
