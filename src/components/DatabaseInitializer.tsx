@@ -15,9 +15,10 @@ const DatabaseInitializer = () => {
         if (success) {
           console.log('Database initialized successfully');
           setInitialized(true);
+          toast.success('Connected to database successfully');
         } else {
           console.error('Failed to initialize database: setupDatabase returned false');
-          toast.error('Failed to initialize database');
+          toast.error('Database initialization encountered issues - some features may be limited');
         }
       } catch (error) {
         console.error('Error initializing database:', error);

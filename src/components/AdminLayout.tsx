@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -39,7 +38,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </Button>
           <div className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+              src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
               alt="LexPix Logo" 
               className="h-8"
             />
@@ -60,7 +59,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <Link to="/" className="flex items-center gap-2">
             <ChevronLeft size={18} />
             <img 
-              src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+              src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
               alt="LexPix Logo" 
               className="h-8"
             />

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -122,7 +121,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <Link to="/" onClick={handleHomeClick} className="flex items-center">
               <img 
-                src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
                 alt="LexPix Logo" 
                 className="h-8 md:h-10"
               />
@@ -210,7 +209,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <div className="flex justify-center py-8">
                 <img 
-                  src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                  src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
                   alt="LexPix Logo" 
                   className="h-10"
                 />
@@ -300,7 +299,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div>
               <div className="mb-4">
                 <img 
-                  src="/lovable-uploads/d985036e-35d7-4585-8804-fb606abcea49.png" 
+                  src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
                   alt="LexPix Logo" 
                   className="h-10"
                 />
