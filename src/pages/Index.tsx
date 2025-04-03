@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -395,7 +396,7 @@ const Index = () => {
               </div>
               
               <div className="mt-12">
-                <a href="#" className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-900 hover:bg-yellow-400 transition-colors duration-300">
+                <a href="https://www.instagram.com/lexarenpictures?igsh=MWoyZDg2dXQxOGp6cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-900 hover:bg-yellow-400 transition-colors duration-300">
                   <Instagram className="h-5 w-5 text-white" />
                 </a>
               </div>

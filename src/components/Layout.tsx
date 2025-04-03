@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -198,89 +197,89 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             )}
           </motion.div>
         </div>
-
-        <AnimatePresence>
-          {isMobile && mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "100vh" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col"
-            >
-              <div className="flex justify-center py-8">
-                <img 
-                  src="lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
-                  alt="LexPix Logo" 
-                  className="h-10"
-                />
-              </div>
-              
-              <div className="flex flex-col h-full justify-center items-center space-y-8 p-6">
-                <Link 
-                  to="/" 
-                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                  onClick={handleHomeClick}
-                >
-                  Home
-                  {location.pathname === '/' && activeSection === 'hero' && (
-                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
-                  )}
-                </Link>
-                <Link 
-                  to="/gallery" 
-                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Gallery
-                  {location.pathname === '/gallery' && (
-                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
-                  )}
-                </Link>
-                <Link 
-                  to="/events" 
-                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Events
-                  {location.pathname === '/events' && (
-                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
-                  )}
-                </Link>
-                <a 
-                  href="#contact" 
-                  onClick={handleContactClick}
-                  className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                >
-                  Contact
-                  {location.pathname === '/' && activeSection === 'contact' && (
-                    <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
-                  )}
-                </a>
-                <Link 
-                  to="/login" 
-                  className="mt-6 bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-4 rounded-md transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Admin
-                </Link>
-              </div>
-              
-              <div className="flex justify-center items-center space-x-6 pb-12">
-                <a href="#" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a href="mailto:lexarenlogistics@gmail.com" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
-                  <Mail className="h-5 w-5" />
-                </a>
-                <a href="tel:+18254610429" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
-                  <Phone className="h-5 w-5" />
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
+
+      <AnimatePresence>
+        {isMobile && mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100vh" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col"
+          >
+            <div className="flex justify-center py-8">
+              <img 
+                src="lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
+                alt="LexPix Logo" 
+                className="h-10"
+              />
+            </div>
+            
+            <div className="flex flex-col h-full justify-center items-center space-y-8 p-6">
+              <Link 
+                to="/" 
+                className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
+                onClick={handleHomeClick}
+              >
+                Home
+                {location.pathname === '/' && activeSection === 'hero' && (
+                  <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                )}
+              </Link>
+              <Link 
+                to="/gallery" 
+                className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Gallery
+                {location.pathname === '/gallery' && (
+                  <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                )}
+              </Link>
+              <Link 
+                to="/events" 
+                className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Events
+                {location.pathname === '/events' && (
+                  <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                )}
+              </Link>
+              <a 
+                href="#contact" 
+                onClick={handleContactClick}
+                className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
+              >
+                Contact
+                {location.pathname === '/' && activeSection === 'contact' && (
+                  <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
+                )}
+              </a>
+              <Link 
+                to="/login" 
+                className="mt-6 bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-4 rounded-md transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Admin
+              </Link>
+            </div>
+            
+            <div className="flex justify-center items-center space-x-6 pb-12">
+              <a href="https://www.instagram.com/lexarenpictures?igsh=MWoyZDg2dXQxOGp6cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="mailto:lexarenlogistics@gmail.com" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
+                <Mail className="h-5 w-5" />
+              </a>
+              <a href="tel:+18254610429" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
+                <Phone className="h-5 w-5" />
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="flex-grow">
         <motion.div
@@ -330,7 +329,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <span className="text-gray-400">+1 (825) 461-0429</span>
                 </div>
                 <div className="mt-6">
-                  <a href="#" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 hover:bg-yellow-400 transition-colors duration-300">
+                  <a href="https://www.instagram.com/lexarenpictures?igsh=MWoyZDg2dXQxOGp6cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 hover:bg-yellow-400 transition-colors duration-300">
                     <Instagram className="h-5 w-5 text-white" />
                   </a>
                 </div>
