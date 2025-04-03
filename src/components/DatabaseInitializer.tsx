@@ -18,11 +18,13 @@ const DatabaseInitializer = () => {
           toast.success('Connected to database successfully');
         } else {
           console.error('Failed to initialize database: setupDatabase returned false');
-          toast.error('Database initialization encountered issues - some features may be limited');
+          // Less alarming message for GitHub Pages users
+          toast.info('Using offline mode - some features may be limited');
         }
       } catch (error) {
         console.error('Error initializing database:', error);
-        toast.error('Error connecting to database: ' + (error instanceof Error ? error.message : String(error)));
+        // Less alarming message for users
+        toast.info('Using offline mode - some features may be limited');
       }
     };
 

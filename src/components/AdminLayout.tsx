@@ -38,7 +38,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </Button>
           <div className="flex items-center gap-2">
             <img 
-              src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
+              src="./lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
               alt="LexPix Logo" 
               className="h-8"
             />
@@ -59,7 +59,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <Link to="/" className="flex items-center gap-2">
             <ChevronLeft size={18} />
             <img 
-              src="lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
+              src="./lovable-uploads/2d6b9714-58b4-4087-ad68-b2d396684bce.png" 
               alt="LexPix Logo" 
               className="h-8"
             />
@@ -110,7 +110,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </Button>
       </motion.aside>
 
-      {/* Main content */}
       <div className="flex-grow md:max-h-screen md:overflow-y-auto">
         <motion.div
           initial={{ opacity: 0 }}
