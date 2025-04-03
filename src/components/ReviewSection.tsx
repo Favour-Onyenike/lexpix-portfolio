@@ -1,60 +1,77 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { getPublishedReviews, submitReview } from '@/services/reviewService';
+import type { Review } from '@/services/reviewService';
 
-// This component will be updated to use Supabase after connecting
 const ReviewSection = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Mock reviews data - will be replaced with Supabase data
-  const mockReviews = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      rating: 5,
-      text: 'Incredible experience working with LexPix! The photos captured the essence of our event perfectly.',
-      date: '2023-10-15'
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      rating: 4,
-      text: 'Professional service and amazing results. Our wedding photos turned out better than we could have imagined.',
-      date: '2023-09-22'
-    },
-    {
-      id: 3,
-      name: 'Amanda Rodriguez',
-      rating: 5,
-      text: 'Lucas has an incredible eye for detail. The portraits he took of our family are treasures we\'ll keep forever.',
-      date: '2023-11-05'
-    },
-    {
-      id: 4,
-      name: 'James Wilson',
-      rating: 5,
-      text: 'Working with LexPix was effortless and the results were stunning. Highly recommend for any event!',
-      date: '2023-12-01'
-    }
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Review submission will be implemented with Supabase integration.');
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getPublishedReviews();
+        setReviews(data);
+      } catch (error) {
+        console.error('Error loading reviews:', error);
+        toast.error('Failed to load reviews');
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Reset form
-    setName('');
-    setEmail('');
-    setRating(0);
-    setReview('');
+    loadReviews();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (rating === 0) {
+      toast.error('Please select a rating');
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const result = await submitReview({
+        name,
+        email,
+        rating,
+        text: review
+      });
+      
+      if (result) {
+        toast.success('Thank you for your review! It will be visible after approval.');
+        
+        // Reset form
+        setName('');
+        setEmail('');
+        setRating(0);
+        setReview('');
+      } else {
+        toast.error('Failed to submit review. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast.error('Something went wrong. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,36 +90,67 @@ const ReviewSection = () => {
         
         {/* Reviews Display */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {mockReviews.map((review) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-black border border-gray-800 p-6 rounded-lg"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="font-semibold text-lg">{review.name}</h3>
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className={i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-500"}
-                    />
-                  ))}
+          {isLoading ? (
+            // Loading skeleton
+            Array(4).fill(0).map((_, index) => (
+              <motion.div
+                key={`skeleton-${index}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-black border border-gray-800 p-6 rounded-lg"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="h-5 bg-gray-800 rounded w-1/3 animate-pulse"></div>
+                  <div className="flex space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={16} className="text-gray-700" />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <p className="text-gray-400 mb-2">{review.text}</p>
-              <span className="text-xs text-gray-500">{new Date(review.date).toLocaleDateString()}</span>
-            </motion.div>
-          ))}
+                <div className="h-16 bg-gray-800 rounded w-full animate-pulse mb-2"></div>
+                <div className="h-3 bg-gray-800 rounded w-1/4 animate-pulse"></div>
+              </motion.div>
+            ))
+          ) : reviews.length > 0 ? (
+            reviews.map((review) => (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="bg-black border border-gray-800 p-6 rounded-lg"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="font-semibold text-lg">{review.name}</h3>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className={i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-500"}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-400 mb-2">{review.text}</p>
+                <span className="text-xs text-gray-500">
+                  {format(new Date(review.created_at), 'MMM d, yyyy')}
+                </span>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-1 md:col-span-2 text-center p-8 border border-gray-800 rounded-lg">
+              <Star className="mx-auto h-10 w-10 text-gray-500 mb-4" />
+              <h3 className="text-xl font-medium mb-2">No reviews yet</h3>
+              <p className="text-gray-400">Be the first to share your experience!</p>
+            </div>
+          )}
         </div>
         
         {/* Add Review Form */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Remove "What Our Clients Say" section in desktop mode */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -169,8 +217,9 @@ const ReviewSection = () => {
                   <Button
                     type="submit"
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium h-12"
+                    disabled={isSubmitting}
                   >
-                    Submit
+                    {isSubmitting ? 'Submitting...' : 'Submit'}
                   </Button>
                 </div>
               </form>

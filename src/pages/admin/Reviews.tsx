@@ -26,50 +26,82 @@ import { Switch } from '@/components/ui/switch';
 import { Trash2, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { Review } from '@/services/reviewService';
+import { 
+  getAllReviews, 
+  updateReviewStatus, 
+  deleteReview, 
+  type Review 
+} from '@/services/reviewService';
 import { motion } from 'framer-motion';
 
 const AdminReviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const loadReviews = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getAllReviews();
+      setReviews(data);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+      toast.error('Failed to load reviews');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   useEffect(() => {
-    // Load existing reviews from localStorage
-    const savedData = localStorage.getItem('reviewsData');
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setReviews(parsedData.reviews || []);
-    }
+    loadReviews();
   }, []);
 
-  useEffect(() => {
-    // Save reviews data whenever it changes
-    localStorage.setItem('reviewsData', JSON.stringify({ reviews }));
-  }, [reviews]);
-
-  const handleTogglePublished = (id: string, currentStatus: boolean) => {
-    setReviews(reviews.map(review => 
-      review.id === id 
-        ? { ...review, published: !currentStatus } 
-        : review
-    ));
-    
-    toast.success(
-      currentStatus 
-        ? 'Review hidden from public view' 
-        : 'Review published successfully'
-    );
+  const handleTogglePublished = async (id: string, currentStatus: boolean) => {
+    try {
+      const success = await updateReviewStatus(id, !currentStatus);
+      
+      if (success) {
+        setReviews(reviews.map(review => 
+          review.id === id 
+            ? { ...review, published: !currentStatus } 
+            : review
+        ));
+        
+        toast.success(
+          currentStatus 
+            ? 'Review hidden from public view' 
+            : 'Review published successfully'
+        );
+      } else {
+        toast.error('Failed to update review status');
+      }
+    } catch (error) {
+      console.error('Error updating review status:', error);
+      toast.error('Something went wrong');
+    }
   };
 
   const handleDeleteReview = (id: string) => {
     setDeleteId(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteId) {
-      setReviews(reviews.filter(review => review.id !== deleteId));
-      toast.success('Review deleted successfully');
-      setDeleteId(null);
+      try {
+        const success = await deleteReview(deleteId);
+        
+        if (success) {
+          setReviews(reviews.filter(review => review.id !== deleteId));
+          toast.success('Review deleted successfully');
+        } else {
+          toast.error('Failed to delete review');
+        }
+      } catch (error) {
+        console.error('Error deleting review:', error);
+        toast.error('Something went wrong');
+      } finally {
+        setDeleteId(null);
+      }
     }
   };
 
@@ -104,7 +136,15 @@ const AdminReviews = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {reviews.length > 0 ? (
+              {isLoading ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-12 bg-muted rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : reviews.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
