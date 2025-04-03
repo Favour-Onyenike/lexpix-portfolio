@@ -24,7 +24,6 @@ const Index = () => {
     { target: 200, label: "Photos Delivered" }
   ];
   
-  // Load featured projects from database
   useEffect(() => {
     const loadProjects = async () => {
       try {
@@ -82,7 +81,6 @@ const Index = () => {
     }
   }, [statsVisible]);
 
-  // Fallback projects in case there are no projects in the database
   const defaultProjects = [
     {
       id: '1',
@@ -107,12 +105,10 @@ const Index = () => {
     }
   ];
 
-  // Use default projects if none are found in the database
   const displayProjects = featuredProjects.length > 0 ? featuredProjects : defaultProjects;
 
   return (
     <Layout>
-      {/* Hero Section */}
       <section id="hero" className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="w-full md:w-1/2 pl-0 md:pl-20 pr-0 md:pr-8 mb-10 md:mb-0">
           <motion.h1 
@@ -163,7 +159,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* About LexPix Section */}
       <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h2 
@@ -173,7 +168,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-bold mb-6"
           >
-            About <span className="font-summer-fling logo-font">LexPix</span>
+            About <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
           
@@ -193,7 +188,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Counter Section */}
       <section id="stats" ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -215,7 +209,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services Section */}
       <section id="services" className="py-16 md:py-24 px-6 md:px-10 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
@@ -265,7 +258,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Projects Section */}
       <section id="projects" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto">
           <motion.h2 
@@ -280,7 +272,6 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {isLoading ? (
-              // Loading skeletons
               [...Array(3)].map((_, index) => (
                 <motion.div
                   key={index}
@@ -334,7 +325,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
@@ -414,7 +404,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Reviews Section */}
       <section id="reviews">
         <ReviewSection />
       </section>
