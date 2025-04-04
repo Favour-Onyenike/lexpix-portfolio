@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/Layout';
 import ReviewSection from '@/components/ReviewSection';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
+import { getContentSection, ContentSection } from '@/services/contentService';
 
 const Index = () => {
   const statsRef = useRef(null);
@@ -17,6 +18,7 @@ const Index = () => {
   const [counters, setCounters] = useState([0, 0, 0, 0]);
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [aboutContent, setAboutContent] = useState<ContentSection | null>(null);
   
   const statsData = [
     { target: 25, label: "Satisfied Clients" },
@@ -26,18 +28,25 @@ const Index = () => {
   ];
   
   useEffect(() => {
-    const loadProjects = async () => {
+    const loadData = async () => {
       try {
+        // Load projects
         const projects = await getFeaturedProjects();
         setFeaturedProjects(projects);
+        
+        // Load about section content
+        const about = await getContentSection('about');
+        if (about) {
+          setAboutContent(about);
+        }
       } catch (error) {
-        console.error('Error loading featured projects:', error);
+        console.error('Error loading data:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadProjects();
+    loadData();
   }, []);
   
   useEffect(() => {
@@ -169,7 +178,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-bold mb-6"
           >
-            About <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
+            {aboutContent?.title || 'About'} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
           
@@ -180,11 +189,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
           >
-            Founded by Volks "Lucas Uzum" in partnership with Larry "Olanrewaju Lawal Rasaq", LexPix is a creative photography and visual 
-            storytelling brand dedicated to capturing life's most meaningful moments. At LexPix, we believe every smile, glance, and milestone 
-            tells a story. With a sharp eye for detail and a passion for bringing memories to life, we create stunning images and dynamic visuals 
-            that preserve emotions in their purest form. Whether through striking photography or compelling videography, our goal is to bring out 
-            the beauty in every scene, turning everyday moments into lasting treasures.
+            {aboutContent?.content || 'Loading content...'}
           </motion.p>
         </div>
       </section>

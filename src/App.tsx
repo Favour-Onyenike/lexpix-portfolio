@@ -24,6 +24,7 @@ import AdminEvents from "./pages/admin/Events";
 import AdminReviews from "./pages/admin/Reviews";
 import TeamManagement from "./pages/admin/TeamManagement";
 import FeaturedProjects from "./pages/admin/FeaturedProjects";
+import ContentManager from "./pages/admin/ContentManager";
 
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/admin/reviews" element={<AdminReviews />} />
               <Route path="/admin/team" element={<TeamManagement />} />
               <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
+              <Route path="/admin/content" element={<ContentManager />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

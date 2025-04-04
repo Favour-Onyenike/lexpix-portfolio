@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Grid, Image, Calendar, LogOut, Menu, X, Users, Award } from 'lucide-react';
+import { ChevronLeft, Grid, Image, Calendar, LogOut, Menu, X, Users, Award, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -25,6 +25,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Gallery', path: '/admin/gallery', icon: Image },
     { name: 'Events', path: '/admin/events', icon: Calendar },
     { name: 'Featured Projects', path: '/admin/featured-projects', icon: Award },
+    { name: 'Content', path: '/admin/content', icon: FileText },
     { name: 'Team', path: '/admin/team', icon: Users },
   ];
 
