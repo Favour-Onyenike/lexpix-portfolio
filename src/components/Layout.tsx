@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -300,11 +299,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
               <div className="mb-4">
-                <img 
-                  src="lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
-                  alt="LexPix Logo" 
-                  className="h-10"
-                />
+                <h2 className="logo-font text-2xl">
+                  LexPix<span className="text-yellow-400">.</span>
+                </h2>
               </div>
               <p className="text-gray-400">Capturing moments with minimalist elegance.</p>
             </div>
