@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -29,6 +30,65 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
+  const renderSidebarContent = () => (
+    <div className="flex flex-col h-full bg-background">
+      <div className="flex items-center justify-between mb-8">
+        <Link to="/" className="flex items-center gap-2">
+          <ChevronLeft size={18} />
+          <img 
+            src="./lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
+            alt="LexPix Logo" 
+            className="h-8"
+          />
+        </Link>
+        {isMobile && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleSidebar}
+          >
+            <X size={20} />
+          </Button>
+        )}
+      </div>
+
+      <nav className="space-y-1 flex-grow">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`
+                flex items-center gap-3 px-3 py-2 rounded-md transition-all text-sm
+                ${isActive 
+                  ? 'bg-primary text-primary-foreground font-medium' 
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                }
+              `}
+              onClick={() => isMobile && setSidebarOpen(false)}
+            >
+              <item.icon size={18} />
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <Separator className="my-6" />
+      
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full justify-start"
+        onClick={logout}
+      >
+        <LogOut size={16} className="mr-2" />
+        Logout
+      </Button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
       {/* Mobile header */}
@@ -48,68 +108,19 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
       </header>
 
-      {/* Sidebar */}
-      <motion.aside 
-        className={`fixed md:static inset-y-0 left-0 bg-background z-10 overflow-y-auto border-r border-border
-                    ${sidebarOpen ? 'flex' : 'hidden md:flex'} flex-col w-64 p-6 shadow-lg md:shadow-none`}
-        initial={{ x: isMobile ? -320 : 0 }}
-        animate={{ x: sidebarOpen || !isMobile ? 0 : -320 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-      >
-        <div className="flex items-center justify-between mb-8">
-          <Link to="/" className="flex items-center gap-2">
-            <ChevronLeft size={18} />
-            <img 
-              src="./lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
-              alt="LexPix Logo" 
-              className="h-8"
-            />
-          </Link>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden" 
-            onClick={toggleSidebar}
-          >
-            <X size={20} />
-          </Button>
-        </div>
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 p-6 border-r border-border">
+        {renderSidebarContent()}
+      </aside>
 
-        <nav className="space-y-1 flex-grow">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`
-                  flex items-center gap-3 px-3 py-2 rounded-md transition-all text-sm
-                  ${isActive 
-                    ? 'bg-primary text-primary-foreground font-medium' 
-                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-                  }
-                `}
-                onClick={() => isMobile && setSidebarOpen(false)}
-              >
-                <item.icon size={18} />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <Separator className="my-6" />
-        
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={logout}
-        >
-          <LogOut size={16} className="mr-2" />
-          Logout
-        </Button>
-      </motion.aside>
+      {/* Mobile Sidebar */}
+      {isMobile && (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-[80%] max-w-sm p-6 border-r border-border">
+            {renderSidebarContent()}
+          </SheetContent>
+        </Sheet>
+      )}
 
       <div className="flex-grow md:max-h-screen md:overflow-y-auto">
         <motion.div
