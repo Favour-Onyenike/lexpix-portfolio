@@ -29,34 +29,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check authentication status on initial load and on path change
+  // Subscribe to auth changes and handle session state
   useEffect(() => {
-    const checkAuth = async () => {
+    setIsLoading(true);
+    
+    // First set up the auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, !!session);
+        const newAuthState = !!session;
+        setIsAuth(newAuthState);
+        
+        // Handle auth state changes
+        if (event === 'SIGNED_OUT') {
+          // Redirect to login on sign out
+          if (location.pathname.startsWith('/admin')) {
+            navigate('/login');
+          }
+        }
+      }
+    );
+    
+    // Then check for existing session
+    const checkAuthStatus = async () => {
       try {
-        setIsLoading(true);
-        const isUserAuthenticated = await isAuthenticated();
+        const { data } = await supabase.auth.getSession();
+        const isUserAuthenticated = !!data.session;
+        console.log('Initial auth check:', isUserAuthenticated);
         setIsAuth(isUserAuthenticated);
         
-        // If route changed away from admin, invalidate auth state
+        // Handle redirects on initial load
         const isAdminRoute = location.pathname.startsWith('/admin');
-        if (!isAdminRoute && isUserAuthenticated) {
-          // Force recheck authentication when leaving admin area
-          console.log('Left admin area, logging out');
-          await signOut();
-          setIsAuth(false);
+        if (isAdminRoute && !isUserAuthenticated) {
+          navigate('/login', { replace: true });
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
         setIsAuth(false);
+        if (location.pathname.startsWith('/admin')) {
+          navigate('/login', { replace: true });
+        }
       } finally {
         setIsLoading(false);
       }
     };
+    
+    checkAuthStatus();
+    
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
-    checkAuth();
-  }, [location.pathname]);
-
-  // Redirect logic for protected routes
+  // Separate effect for handling route changes
   useEffect(() => {
     if (!isLoading) {
       const isAdminRoute = location.pathname.startsWith('/admin');

@@ -32,6 +32,9 @@ const Login = () => {
       if (success) {
         navigate('/admin');
       }
+    } catch (error) {
+      console.error('Login submission error:', error);
+      toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }

@@ -28,7 +28,7 @@ export const isAuthenticated = async () => {
   return !!data.session;
 };
 
-// Set authentication state - no longer needed with real Supabase
-export const setAuthenticated = (isAuth: boolean) => {
-  console.log('Using real Supabase authentication instead of mock authentication');
+// Make sure we handle auth state properly
+export const getSession = async () => {
+  return await supabase.auth.getSession();
 };
