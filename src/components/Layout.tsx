@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -203,10 +204,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {isMobile && mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "100vh" }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col"
+            className="fixed inset-0 top-[78px] bg-white z-50 flex flex-col overflow-y-auto pb-safe"
+            style={{ maxHeight: "calc(100vh - 78px)" }}
           >
             <div className="flex justify-center py-8">
               <img 
@@ -216,7 +218,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               />
             </div>
             
-            <div className="flex flex-col h-full justify-center items-center space-y-8 p-6">
+            <div className="flex flex-col justify-center items-center space-y-8 p-6 flex-1">
               <Link 
                 to="/" 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
@@ -266,7 +268,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
             </div>
             
-            <div className="flex justify-center items-center space-x-6 pb-12">
+            <div className="flex justify-center items-center space-x-6 py-12">
               <a href="https://www.instagram.com/lexarenpictures?igsh=MWoyZDg2dXQxOGp6cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-yellow-400 text-white hover:bg-yellow-500 transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>

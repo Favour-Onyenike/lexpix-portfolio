@@ -31,7 +31,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const renderSidebarContent = () => (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background relative z-10">
       <div className="flex items-center justify-between mb-8">
         <Link to="/" className="flex items-center gap-2">
           <ChevronLeft size={18} />
@@ -116,7 +116,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {/* Mobile Sidebar */}
       {isMobile && (
         <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="w-[80%] max-w-sm p-6 border-r border-border">
+          <SheetContent 
+            side="left" 
+            className="w-[80%] max-w-sm p-6 border-r border-border"
+            style={{ height: '100dvh', overflow: 'auto' }}
+          >
             {renderSidebarContent()}
           </SheetContent>
         </Sheet>
