@@ -11,12 +11,22 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { getAllContentSections, updateContentSection, ContentSection } from '@/services/contentService';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 
 const ContentManager = () => {
   const [contentSections, setContentSections] = useState<ContentSection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('about');
+  const [error, setError] = useState<string | null>(null);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const navigate = useNavigate();
 
   // Form states for each content section
@@ -68,6 +78,8 @@ const ContentManager = () => {
     if (!section) return;
     
     setIsSaving(true);
+    setError(null);
+    
     try {
       const success = await updateContentSection(section.id, {
         title: formValues[sectionName].title,
@@ -89,11 +101,17 @@ const ContentManager = () => {
             : s
         ));
       } else {
-        toast.error('Failed to update content');
+        const errorMsg = 'Failed to update content';
+        setError(errorMsg);
+        setShowErrorDialog(true);
+        toast.error(errorMsg);
       }
     } catch (error) {
       console.error('Error updating content:', error);
-      toast.error('Failed to update content');
+      const errorMsg = 'An unexpected error occurred while updating content.';
+      setError(errorMsg);
+      setShowErrorDialog(true);
+      toast.error(errorMsg);
     } finally {
       setIsSaving(false);
     }
@@ -176,6 +194,27 @@ const ContentManager = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Error Dialog */}
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Error Updating Content</DialogTitle>
+            <DialogDescription>
+              There was an error while updating the content section:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-destructive">{error}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              This might be due to a permissions issue with the database. Please ensure your Supabase project has the appropriate RLS policies set up for the content_sections table.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowErrorDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
