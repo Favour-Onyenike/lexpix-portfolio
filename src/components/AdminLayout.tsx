@@ -36,9 +36,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="flex items-center justify-between mb-8">
         <Link to="/" className="flex items-center gap-2">
           <ChevronLeft size={18} />
-          <h2 className="logo-font">
-            LexPix<span className="text-yellow-400">.</span>
-          </h2>
+          <img 
+            src="/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png" 
+            alt="LexPix Logo" 
+            className="h-7 w-auto" 
+          />
         </Link>
         {isMobile && (
           <Button 
@@ -97,9 +99,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <Menu size={20} />
           </Button>
           <div className="flex items-center gap-2">
-            <h2 className="logo-font">
-              LexPix<span className="text-yellow-400">.</span>
-            </h2>
+            <img 
+              src="/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png" 
+              alt="LexPix Logo" 
+              className="h-6 w-auto" 
+            />
             <span className="font-medium">Admin</span>
           </div>
         </div>
