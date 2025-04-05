@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -337,7 +338,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           
           <div className="pt-8 border-t border-gray-800 text-center md:text-left">
-            <p className="text-gray-500">© 2025 LexPix<span className="text-yellow-400">.</span> All rights reserved.</p>
+            <p className="text-gray-500">© 2025 <span className="logo-font">LexPix<span className="text-yellow-400">.</span></span> All rights reserved.</p>
           </div>
         </div>
       </footer>
