@@ -37,7 +37,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <Link to="/" className="flex items-center gap-2">
           <ChevronLeft size={18} />
           <img 
-            src="/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png" 
+            src="/lovable-uploads/1d6b6728-d366-45fd-9011-da3cf0b442b4.png" 
             alt="LexPix Logo" 
             className="h-7 w-auto" 
           />
@@ -100,7 +100,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </Button>
           <div className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png" 
+              src="/lovable-uploads/1d6b6728-d366-45fd-9011-da3cf0b442b4.png" 
               alt="LexPix Logo" 
               className="h-6 w-auto" 
             />
