@@ -33,7 +33,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const renderSidebarContent = () => (
     <div className="flex flex-col h-full bg-background relative z-10">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-center mb-8">
         <Link to="/" className="flex items-center gap-2">
           <ChevronLeft size={18} />
           <img 
@@ -47,6 +47,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             variant="ghost" 
             size="icon" 
             onClick={toggleSidebar}
+            className="absolute right-0"
           >
             <X size={20} />
           </Button>
@@ -98,14 +99,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <Button variant="ghost" size="icon" onClick={toggleSidebar}>
             <Menu size={20} />
           </Button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center flex-1">
             <img 
               src="/lovable-uploads/1d6b6728-d366-45fd-9011-da3cf0b442b4.png" 
               alt="LexPix Logo" 
               className="h-6 w-auto" 
             />
-            <span className="font-medium">Admin</span>
           </div>
+          <div className="w-10"></div> {/* Empty div for balance */}
         </div>
       </header>
 
