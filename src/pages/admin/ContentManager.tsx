@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Loader2, Save } from 'lucide-react';
 import AdminLayout from '@/components/AdminLayout';
@@ -19,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '@/components/ui/table';
 
 const ContentManager = () => {
   const [contentSections, setContentSections] = useState<ContentSection[]>([]);
@@ -27,7 +27,8 @@ const ContentManager = () => {
   const [activeTab, setActiveTab] = useState('about');
   const [error, setError] = useState<string | null>(null);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
-  const navigate = useNavigate();
+  const [showDebugDialog, setShowDebugDialog] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   // Form states for each content section
   const [formValues, setFormValues] = useState<Record<string, { title: string, content: string }>>({});
@@ -81,10 +82,14 @@ const ContentManager = () => {
     setError(null);
     
     try {
-      const success = await updateContentSection(section.id, {
+      console.log(`Submitting update for section ${sectionName} with ID ${section.id}`);
+      
+      const updateData = {
         title: formValues[sectionName].title,
         content: formValues[sectionName].content
-      });
+      };
+      
+      const { success, error } = await updateContentSection(section.id, updateData);
       
       if (success) {
         toast.success('Content updated successfully');
@@ -101,10 +106,18 @@ const ContentManager = () => {
             : s
         ));
       } else {
-        const errorMsg = 'Failed to update content';
+        console.error('Update failed with error:', error);
+        const errorMsg = error?.message || 'Failed to update content';
         setError(errorMsg);
         setShowErrorDialog(true);
         toast.error(errorMsg);
+        
+        // Set debug info
+        setDebugInfo({
+          sectionId: section.id,
+          updateData,
+          error
+        });
       }
     } catch (error) {
       console.error('Error updating content:', error);
@@ -112,9 +125,19 @@ const ContentManager = () => {
       setError(errorMsg);
       setShowErrorDialog(true);
       toast.error(errorMsg);
+      
+      // Set debug info
+      setDebugInfo({
+        error,
+        section
+      });
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const showDebugInfo = () => {
+    setShowDebugDialog(true);
   };
 
   if (isLoading) {
@@ -173,7 +196,14 @@ const ContentManager = () => {
                     />
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end">
+                <CardFooter className="flex justify-between">
+                  <Button 
+                    variant="outline"
+                    onClick={showDebugInfo}
+                    type="button"
+                  >
+                    Debug Info
+                  </Button>
                   <Button 
                     onClick={() => handleSubmit(section.name)}
                     disabled={isSaving}
@@ -212,6 +242,55 @@ const ContentManager = () => {
           </div>
           <DialogFooter>
             <Button onClick={() => setShowErrorDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Debug Dialog */}
+      <Dialog open={showDebugDialog} onOpenChange={setShowDebugDialog}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Debug Information</DialogTitle>
+            <DialogDescription>
+              Technical details for troubleshooting content updates:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <h3 className="font-medium mb-2">Content Sections Data:</h3>
+            <div className="max-h-[300px] overflow-y-auto border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Updated</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contentSections.map(section => (
+                    <TableRow key={section.id}>
+                      <TableCell className="font-mono text-xs">{section.id}</TableCell>
+                      <TableCell>{section.name}</TableCell>
+                      <TableCell>{section.title || '(none)'}</TableCell>
+                      <TableCell>{new Date(section.updated_at).toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            
+            {debugInfo && (
+              <div className="mt-4">
+                <h3 className="font-medium mb-2">Last Error Data:</h3>
+                <pre className="bg-muted p-4 rounded-md overflow-x-auto text-xs">
+                  {JSON.stringify(debugInfo, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowDebugDialog(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

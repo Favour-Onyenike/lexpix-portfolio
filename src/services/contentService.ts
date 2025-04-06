@@ -42,8 +42,11 @@ export async function getAllContentSections(): Promise<ContentSection[]> {
 export async function updateContentSection(
   id: string, 
   updates: { title?: string; content?: string }
-): Promise<boolean> {
-  const { error } = await supabase
+): Promise<{ success: boolean; error: any }> {
+  console.log('Updating content section with ID:', id);
+  console.log('Updates:', updates);
+  
+  const { data, error } = await supabase
     .from('content_sections')
     .update({
       ...updates,
@@ -53,8 +56,8 @@ export async function updateContentSection(
     
   if (error) {
     console.error('Error updating content section:', error);
-    return false;
+    return { success: false, error };
   }
   
-  return true;
+  return { success: true, error: null };
 }
