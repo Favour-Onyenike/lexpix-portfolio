@@ -300,7 +300,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
               <div className="mb-4">
-                <h2 className="logo-font text-2xl">
+                <h2 className="font-summer-fling text-2xl italic">
                   LexPix<span className="text-yellow-400">.</span>
                 </h2>
               </div>
@@ -338,7 +338,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           
           <div className="pt-8 border-t border-gray-800 text-center md:text-left">
-            <p className="text-gray-500">© 2025 <span className="logo-font">LexPix<span className="text-yellow-400">.</span></span> All rights reserved.</p>
+            <p className="text-gray-500">© 2025 <span className="font-summer-fling italic">LexPix<span className="text-yellow-400">.</span></span> All rights reserved.</p>
           </div>
         </div>
       </footer>
