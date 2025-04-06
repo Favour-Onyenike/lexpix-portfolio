@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -56,18 +57,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isUserAuthenticated = !!data.session;
         console.log('Initial auth check:', isUserAuthenticated);
         setIsAuth(isUserAuthenticated);
-        
-        // Handle redirects on initial load
-        const isAdminRoute = location.pathname.startsWith('/admin');
-        if (isAdminRoute && !isUserAuthenticated) {
-          navigate('/login', { replace: true });
-        }
       } catch (error) {
         console.error('Error checking authentication:', error);
         setIsAuth(false);
-        if (location.pathname.startsWith('/admin')) {
-          navigate('/login', { replace: true });
-        }
       } finally {
         setIsLoading(false);
       }

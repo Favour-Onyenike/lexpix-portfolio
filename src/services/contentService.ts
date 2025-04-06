@@ -46,18 +46,23 @@ export async function updateContentSection(
   console.log('Updating content section with ID:', id);
   console.log('Updates:', updates);
   
-  const { data, error } = await supabase
-    .from('content_sections')
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', id);
+  try {
+    const { error } = await supabase
+      .from('content_sections')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+      
+    if (error) {
+      console.error('Error updating content section:', error);
+      return { success: false, error };
+    }
     
-  if (error) {
-    console.error('Error updating content section:', error);
-    return { success: false, error };
+    return { success: true, error: null };
+  } catch (err) {
+    console.error('Exception updating content section:', err);
+    return { success: false, error: err };
   }
-  
-  return { success: true, error: null };
 }
