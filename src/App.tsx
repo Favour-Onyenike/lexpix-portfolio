@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AnimatePresence } from "framer-motion";
 import DatabaseInitializer from "@/components/DatabaseInitializer";
@@ -27,6 +27,7 @@ import FeaturedProjects from "./pages/admin/FeaturedProjects";
 import ContentManager from "./pages/admin/ContentManager";
 
 import NotFound from "./pages/NotFound";
+import RequireAuth from "./components/RequireAuth";
 
 const queryClient = new QueryClient();
 
@@ -47,14 +48,16 @@ const App = () => (
               <Route path="/signup" element={<Signup />} />
               <Route path="/invite/:token" element={<InviteSignup />} />
               
-              {/* Admin Routes */}
-              <Route path="/admin" element={<Dashboard />} />
-              <Route path="/admin/gallery" element={<AdminGallery />} />
-              <Route path="/admin/events" element={<AdminEvents />} />
-              <Route path="/admin/reviews" element={<AdminReviews />} />
-              <Route path="/admin/team" element={<TeamManagement />} />
-              <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
-              <Route path="/admin/content" element={<ContentManager />} />
+              {/* Admin Routes - Protected */}
+              <Route element={<RequireAuth />}>
+                <Route path="/admin" element={<Dashboard />} />
+                <Route path="/admin/gallery" element={<AdminGallery />} />
+                <Route path="/admin/events" element={<AdminEvents />} />
+                <Route path="/admin/reviews" element={<AdminReviews />} />
+                <Route path="/admin/team" element={<TeamManagement />} />
+                <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
+                <Route path="/admin/content" element={<ContentManager />} />
+              </Route>
               
               <Route path="*" element={<NotFound />} />
             </Routes>

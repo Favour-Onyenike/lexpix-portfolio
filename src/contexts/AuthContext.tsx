@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -80,18 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
-
-  // Separate effect for handling route changes
-  useEffect(() => {
-    if (!isLoading) {
-      const isAdminRoute = location.pathname.startsWith('/admin');
-      
-      if (isAdminRoute && !isAuth && location.pathname !== '/login') {
-        navigate('/login', { replace: true });
-      }
-    }
-  }, [location.pathname, isAuth, navigate, isLoading]);
+  }, [navigate, location.pathname]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
