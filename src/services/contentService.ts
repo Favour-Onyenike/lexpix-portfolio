@@ -56,28 +56,15 @@ export async function updateContentSection(
   id: string, 
   updates: { title?: string; content?: string }
 ): Promise<{ success: boolean; error: any }> {
-  console.log('Updating content section with ID:', id);
-  console.log('Updates:', updates);
-  
   try {
-    // Check if the user is authenticated before attempting the update
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    
-    if (sessionError) {
-      console.error('Session error:', sessionError);
-      toast.error('Authentication error. Please log in again.');
-      return { 
-        success: false, 
-        error: { message: 'Authentication required. Please log in again.', code: 'AUTH_REQUIRED' } 
-      };
-    }
+    // Check session before update
+    const { data: sessionData } = await supabase.auth.getSession();
     
     if (!sessionData.session) {
-      console.error('No active session found');
       toast.error('You must be logged in to update content');
       return { 
         success: false, 
-        error: { message: 'Authentication required. Please log in again.', code: 'AUTH_REQUIRED' } 
+        error: { message: 'Authentication required' } 
       };
     }
 
@@ -93,14 +80,13 @@ export async function updateContentSection(
     if (error) {
       console.error('Error updating content section:', error);
       
-      // Specific error message for permissions issues
       if (error.code === 'PGRST116' || error.message?.includes('permission denied')) {
-        toast.error('Permission denied. You may not have the right access level.');
+        toast.error('Permission denied. You may need additional access rights.');
         return { 
           success: false, 
           error: { 
             ...error, 
-            message: 'Permission denied. This could be due to missing RLS policies on the content_sections table.' 
+            message: 'Permission denied' 
           } 
         };
       }

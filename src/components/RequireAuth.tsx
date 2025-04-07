@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader } from 'lucide-react';
@@ -7,11 +7,6 @@ import { Loader } from 'lucide-react';
 const RequireAuth = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-
-  // Debug authentication status
-  useEffect(() => {
-    console.log("RequireAuth - Auth status:", { isAuthenticated, isLoading });
-  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
     return (
@@ -25,12 +20,9 @@ const RequireAuth = () => {
   }
 
   if (!isAuthenticated) {
-    console.log("Not authenticated, redirecting to login");
-    // Redirect to the login page with a return path
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  console.log("Authenticated, rendering outlet");
   return <Outlet />;
 };
 

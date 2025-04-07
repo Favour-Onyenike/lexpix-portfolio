@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 // Export the Supabase client directly from the integration
 export const supabase = supabaseClient;
 
-// Auth helper functions with improved error handling
+// Auth helper functions with simplified error handling
 export const getCurrentUser = async () => {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
@@ -23,47 +23,36 @@ export const getCurrentUser = async () => {
 
 export const signIn = async (email: string, password: string) => {
   try {
-    console.log('Attempting to sign in with email:', email);
-    const response = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
     
-    if (response.error) {
-      console.error('Sign in error:', response.error);
-      toast.error(response.error.message || 'Failed to sign in');
-    } else {
-      console.log('Sign in successful:', !!response.data.session);
+    if (error) {
+      console.error('Sign in error:', error);
+      toast.error(error.message || 'Failed to sign in');
+      return { data: { session: null, user: null }, error };
     }
     
-    return response;
-  } catch (error: any) {
+    return { data, error: null };
+  } catch (error) {
     console.error('Exception during sign in:', error);
-    toast.error(error?.message || 'Network error. Please try again');
+    toast.error('Network error. Please try again');
     return { 
       data: { session: null, user: null }, 
-      error: error instanceof Error ? error : new Error('Failed to connect to authentication service')
+      error: error instanceof Error ? error : new Error('Login failed') 
     };
   }
 };
 
 export const signOut = async () => {
-  try {
-    return await supabase.auth.signOut();
-  } catch (error) {
-    console.error('Exception during sign out:', error);
-    throw error;
-  }
+  return await supabase.auth.signOut();
 };
 
 // Check if user is authenticated (for client-side protection)
 export const isAuthenticated = async () => {
   try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-      console.error('Error checking authentication:', error);
-      return false;
-    }
+    const { data } = await supabase.auth.getSession();
     return !!data.session;
   } catch (error) {
     console.error('Exception checking authentication:', error);
@@ -71,7 +60,7 @@ export const isAuthenticated = async () => {
   }
 };
 
-// Make sure we handle auth state properly
+// Get user session
 export const getSession = async () => {
   try {
     return await supabase.auth.getSession();

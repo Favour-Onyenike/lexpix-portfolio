@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChevronLeft, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -18,15 +17,10 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the intended destination from location state, or default to admin
   const from = (location.state as any)?.from?.pathname || '/admin';
 
-  console.log('Login page - Auth status:', { isAuthenticated, authLoading });
-
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      console.log('Already authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, authLoading, navigate, from]);
@@ -37,18 +31,15 @@ const Login = () => {
     setLoginError(null);
     
     try {
-      console.log('Attempting login with:', { email });
       const success = await login(email, password);
       if (success) {
-        console.log('Login successful, navigating to:', from);
         navigate(from, { replace: true });
       } else {
         setLoginError('Invalid email or password. Please try again.');
       }
     } catch (error: any) {
-      console.error('Login submission error:', error);
-      setLoginError(error?.message || 'Network error. Please check your connection and try again.');
-      toast.error('Login failed. Please try again.');
+      console.error('Login error:', error);
+      setLoginError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
