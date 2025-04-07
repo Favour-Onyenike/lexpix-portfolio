@@ -57,15 +57,7 @@ export async function updateContentSection(
   updates: { title?: string; content?: string }
 ): Promise<{ success: boolean; error: any }> {
   try {
-    // Check authentication status before attempting update
-    const { data: authData } = await supabase.auth.getSession();
-    
-    if (!authData.session) {
-      toast.error('You must be logged in to update content');
-      return { success: false, error: { message: 'Not authenticated' } };
-    }
-
-    // Proceed with the update
+    // Proceed with the update without checking auth.users table
     const { error } = await supabase
       .from('content_sections')
       .update({
