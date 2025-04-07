@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,6 +34,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError(null);
     
     try {
       console.log('Attempting login with:', { email });
@@ -40,10 +42,13 @@ const Login = () => {
       if (success) {
         console.log('Login successful, navigating to:', from);
         navigate(from, { replace: true });
+      } else {
+        setLoginError('Invalid email or password. Please try again.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login submission error:', error);
-      toast.error('An unexpected error occurred');
+      setLoginError(error?.message || 'Network error. Please check your connection and try again.');
+      toast.error('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +84,13 @@ const Login = () => {
         </div>
 
         <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+          {loginError && (
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive rounded-md flex items-start gap-2">
+              <AlertCircle size={18} className="text-destructive mt-0.5 flex-shrink-0" />
+              <span className="text-destructive text-sm">{loginError}</span>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -89,6 +101,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -101,6 +114,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
+                disabled={isLoading}
               />
             </div>
             

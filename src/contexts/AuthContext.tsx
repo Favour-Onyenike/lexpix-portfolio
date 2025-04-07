@@ -31,14 +31,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Subscribe to auth changes and handle session state
   useEffect(() => {
+    let mounted = true;
     setIsLoading(true);
     
+    console.log('Setting up auth state change listener');
     // First set up the auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, !!session);
         const newAuthState = !!session;
-        setIsAuth(newAuthState);
+        
+        if (mounted) {
+          setIsAuth(newAuthState);
+        }
         
         // Handle auth state changes
         if (event === 'SIGNED_OUT') {
@@ -53,22 +58,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Then check for existing session
     const checkAuthStatus = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error checking session:', error);
+          if (mounted) {
+            setIsAuth(false);
+            setIsLoading(false);
+          }
+          return;
+        }
+        
         const isUserAuthenticated = !!data.session;
         console.log('Initial auth check:', isUserAuthenticated);
-        setIsAuth(isUserAuthenticated);
+        
+        if (mounted) {
+          setIsAuth(isUserAuthenticated);
+          setIsLoading(false);
+        }
       } catch (error) {
-        console.error('Error checking authentication:', error);
-        setIsAuth(false);
-      } finally {
-        setIsLoading(false);
+        console.error('Exception checking authentication:', error);
+        if (mounted) {
+          setIsAuth(false);
+          setIsLoading(false);
+        }
       }
     };
     
     checkAuthStatus();
     
-    // Cleanup subscription on unmount
+    // Cleanup subscription and prevent state updates after unmount
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
@@ -76,19 +96,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const { error } = await signIn(email, password);
+      const { data, error } = await signIn(email, password);
       
       if (error) {
+        console.error('Login error:', error);
         toast.error(error.message || 'Invalid credentials');
         return false;
       }
       
-      setIsAuth(true);
-      toast.success('Logged in successfully');
-      return true;
-    } catch (error) {
+      if (data.session) {
+        setIsAuth(true);
+        toast.success('Logged in successfully');
+        return true;
+      } else {
+        toast.error('No session returned after login');
+        return false;
+      }
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('An error occurred during login');
+      toast.error(error?.message || 'An error occurred during login');
       return false;
     } finally {
       setIsLoading(false);
@@ -97,13 +123,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
+      setIsLoading(true);
       await signOut();
       setIsAuth(false);
       navigate('/login');
       toast.info('Logged out');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Logout error:', error);
-      toast.error('Error logging out');
+      toast.error(error?.message || 'Error logging out');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -115,6 +144,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
       
       const currentUser = await getCurrentUser();
+      
+      if (!currentUser) {
+        toast.error('You must be logged in to generate an invite link');
+        return null;
+      }
       
       // Store the token using the RPC function
       const { error } = await supabase.rpc('insert_invite_token', {
@@ -132,9 +166,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Return the invite link
       const baseUrl = window.location.origin;
       return `${baseUrl}/invite/${token}`;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating invite link:', error);
-      toast.error('Could not generate invite link');
+      toast.error(error?.message || 'Could not generate invite link');
       return null;
     }
   };

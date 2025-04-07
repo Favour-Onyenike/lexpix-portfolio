@@ -1,5 +1,6 @@
 
 import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 export interface ContentSection {
   id: string;
@@ -11,32 +12,44 @@ export interface ContentSection {
 }
 
 export async function getContentSection(name: string): Promise<ContentSection | null> {
-  const { data, error } = await supabase
-    .from('content_sections')
-    .select('*')
-    .eq('name', name)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('content_sections')
+      .select('*')
+      .eq('name', name)
+      .single();
+      
+    if (error) {
+      console.error('Error fetching content section:', error);
+      return null;
+    }
     
-  if (error) {
-    console.error('Error fetching content section:', error);
+    return data as ContentSection;
+  } catch (error) {
+    console.error('Exception fetching content section:', error);
     return null;
   }
-  
-  return data as ContentSection;
 }
 
 export async function getAllContentSections(): Promise<ContentSection[]> {
-  const { data, error } = await supabase
-    .from('content_sections')
-    .select('*')
-    .order('name');
+  try {
+    const { data, error } = await supabase
+      .from('content_sections')
+      .select('*')
+      .order('name');
+      
+    if (error) {
+      console.error('Error fetching content sections:', error);
+      toast.error('Could not load content sections');
+      return [];
+    }
     
-  if (error) {
-    console.error('Error fetching content sections:', error);
+    return data as ContentSection[];
+  } catch (error) {
+    console.error('Exception fetching content sections:', error);
+    toast.error('Failed to connect to the database');
     return [];
   }
-  
-  return data as ContentSection[];
 }
 
 export async function updateContentSection(
@@ -50,8 +63,18 @@ export async function updateContentSection(
     // Check if the user is authenticated before attempting the update
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
     
-    if (sessionError || !sessionData.session) {
-      console.error('Authentication error or no active session:', sessionError);
+    if (sessionError) {
+      console.error('Session error:', sessionError);
+      toast.error('Authentication error. Please log in again.');
+      return { 
+        success: false, 
+        error: { message: 'Authentication required. Please log in again.', code: 'AUTH_REQUIRED' } 
+      };
+    }
+    
+    if (!sessionData.session) {
+      console.error('No active session found');
+      toast.error('You must be logged in to update content');
       return { 
         success: false, 
         error: { message: 'Authentication required. Please log in again.', code: 'AUTH_REQUIRED' } 
@@ -72,6 +95,7 @@ export async function updateContentSection(
       
       // Specific error message for permissions issues
       if (error.code === 'PGRST116' || error.message?.includes('permission denied')) {
+        toast.error('Permission denied. You may not have the right access level.');
         return { 
           success: false, 
           error: { 
@@ -81,12 +105,15 @@ export async function updateContentSection(
         };
       }
       
+      toast.error('Failed to update content');
       return { success: false, error };
     }
     
+    toast.success('Content updated successfully');
     return { success: true, error: null };
   } catch (err) {
     console.error('Exception updating content section:', err);
+    toast.error('An unexpected error occurred');
     return { success: false, error: err };
   }
 }
