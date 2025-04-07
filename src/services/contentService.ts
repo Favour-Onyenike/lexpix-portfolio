@@ -57,15 +57,12 @@ export async function updateContentSection(
   updates: { title?: string; content?: string }
 ): Promise<{ success: boolean; error: any }> {
   try {
-    // Check session before update
-    const { data: sessionData } = await supabase.auth.getSession();
+    // Check authentication status before attempting update
+    const { data: authData } = await supabase.auth.getSession();
     
-    if (!sessionData.session) {
+    if (!authData.session) {
       toast.error('You must be logged in to update content');
-      return { 
-        success: false, 
-        error: { message: 'Authentication required' } 
-      };
+      return { success: false, error: { message: 'Not authenticated' } };
     }
 
     // Proceed with the update
@@ -79,19 +76,7 @@ export async function updateContentSection(
       
     if (error) {
       console.error('Error updating content section:', error);
-      
-      if (error.code === 'PGRST116' || error.message?.includes('permission denied')) {
-        toast.error('Permission denied. You may need additional access rights.');
-        return { 
-          success: false, 
-          error: { 
-            ...error, 
-            message: 'Permission denied' 
-          } 
-        };
-      }
-      
-      toast.error('Failed to update content');
+      toast.error('Failed to update content: ' + error.message);
       return { success: false, error };
     }
     

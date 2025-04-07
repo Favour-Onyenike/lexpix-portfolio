@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader } from 'lucide-react';
@@ -7,6 +7,11 @@ import { Loader } from 'lucide-react';
 const RequireAuth = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  
+  // Log authentication status for debugging
+  useEffect(() => {
+    console.log('Auth status in RequireAuth:', { isAuthenticated, isLoading });
+  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
     return (
