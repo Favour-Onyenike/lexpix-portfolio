@@ -47,6 +47,18 @@ export async function updateContentSection(
   console.log('Updates:', updates);
   
   try {
+    // Check if the user is authenticated before attempting the update
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !sessionData.session) {
+      console.error('Authentication error or no active session:', sessionError);
+      return { 
+        success: false, 
+        error: { message: 'Authentication required. Please log in again.', code: 'AUTH_REQUIRED' } 
+      };
+    }
+
+    // Proceed with the update
     const { error } = await supabase
       .from('content_sections')
       .update({
@@ -57,6 +69,18 @@ export async function updateContentSection(
       
     if (error) {
       console.error('Error updating content section:', error);
+      
+      // Specific error message for permissions issues
+      if (error.code === 'PGRST116' || error.message?.includes('permission denied')) {
+        return { 
+          success: false, 
+          error: { 
+            ...error, 
+            message: 'Permission denied. This could be due to missing RLS policies on the content_sections table.' 
+          } 
+        };
+      }
+      
       return { success: false, error };
     }
     
