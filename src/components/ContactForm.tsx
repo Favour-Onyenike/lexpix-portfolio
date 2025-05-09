@@ -41,10 +41,10 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Replace these with your actual Email.js IDs
-      const serviceId = 'YOUR_SERVICE_ID';
-      const templateId = 'YOUR_TEMPLATE_ID';
-      const publicKey = 'YOUR_PUBLIC_KEY';
+      // Real Email.js credentials
+      const serviceId = 'service_h28xamr';
+      const templateId = 'template_wil5jo6';
+      const publicKey = 'N81FOQih4FIfB5U5l';
 
       const templateParams = {
         from_name: values.name,
