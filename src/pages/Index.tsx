@@ -16,7 +16,12 @@ const Index = () => {
   const [counters, setCounters] = useState([0, 0, 0, 0]);
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [aboutContent, setAboutContent] = useState<ContentSection | null>(null);
+  
+  // Fixed about content
+  const aboutContent = {
+    title: 'About',
+    content: "LexPix is a photography and visual storytelling brand built on passion, purpose, and love. Founded by Volks \"Lucas Uzum\", LexPix was born under the Lexaren Corporation, proudly owned by the Uzum family. This venture was made possible through the unwavering love, support, and initial funding from his parents, whose belief laid the foundation for everything LexPix is becoming.\nWith a sharp eye for detail and a heart for storytelling, LexPix captures life's most meaningful moments, the smiles, glances, and emotions, all in their purest, most vibrant form. Through high-quality photography and visual content, we aim to help others see the color and beauty in their own stories. Every frame we take is a reflection of the love that birthed this vision, and a commitment to preserving the essence of every moment we touch."
+  };
   
   const statsData = [
     { target: 25, label: "Satisfied Clients" },
@@ -31,12 +36,6 @@ const Index = () => {
         // Load projects
         const projects = await getFeaturedProjects();
         setFeaturedProjects(projects);
-        
-        // Load about section content
-        const about = await getContentSection('about');
-        if (about) {
-          setAboutContent(about);
-        }
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -176,19 +175,21 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-bold mb-6"
           >
-            {aboutContent?.title || 'About'} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
+            {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
           
-          <motion.p 
+          <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
             className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
           >
-            {aboutContent?.content || 'Loading content...'}
-          </motion.p>
+            {aboutContent.content.split('\n').map((paragraph, index) => (
+              <p key={index} className="mb-4">{paragraph}</p>
+            ))}
+          </motion.div>
         </div>
       </section>
 

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { InfoIcon } from 'lucide-react';
 import { getAllContentSections, updateContentSection, ContentSection } from '@/services/contentService';
 import { 
   Dialog,
@@ -24,7 +26,7 @@ const ContentManager = () => {
   const [contentSections, setContentSections] = useState<ContentSection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('about');
+  const [activeTab, setActiveTab] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [showDebugDialog, setShowDebugDialog] = useState(false);
@@ -37,7 +39,11 @@ const ContentManager = () => {
     const loadContentSections = async () => {
       setIsLoading(true);
       try {
-        const sections = await getAllContentSections();
+        let sections = await getAllContentSections();
+        
+        // Filter out the "about" section since it's now fixed
+        sections = sections.filter(section => section.name !== 'about');
+        
         setContentSections(sections);
         
         // Initialize form values
@@ -50,7 +56,7 @@ const ContentManager = () => {
         });
         setFormValues(initialFormValues);
         
-        if (sections.length > 0 && !sections.find(s => s.name === activeTab)) {
+        if (sections.length > 0 && activeTab === '') {
           setActiveTab(sections[0].name);
         }
       } catch (error) {
@@ -157,6 +163,14 @@ const ContentManager = () => {
         <p className="text-muted-foreground mt-1">Edit content sections displayed on the website</p>
       </div>
 
+      <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+        <InfoIcon className="h-4 w-4 text-yellow-600" />
+        <AlertTitle>Note</AlertTitle>
+        <AlertDescription>
+          The About section is now fixed and cannot be edited through this interface.
+        </AlertDescription>
+      </Alert>
+
       {contentSections.length > 0 ? (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
@@ -220,7 +234,7 @@ const ContentManager = () => {
       ) : (
         <Card>
           <CardContent className="py-10 text-center">
-            <p className="text-muted-foreground">No content sections found</p>
+            <p className="text-muted-foreground">No editable content sections found</p>
           </CardContent>
         </Card>
       )}
