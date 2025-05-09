@@ -1,14 +1,12 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/Layout';
 import ReviewSection from '@/components/ReviewSection';
+import ContactForm from '@/components/ContactForm';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 import { getContentSection, ContentSection } from '@/services/contentService';
 
@@ -349,37 +347,7 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-sm">
-              <form>
-                <div className="space-y-6">
-                  <div>
-                    <Input 
-                      type="text" 
-                      placeholder="Name" 
-                      className="border rounded-md p-4 h-14 focus:border-black focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <Input 
-                      type="email" 
-                      placeholder="Email" 
-                      className="border rounded-md p-4 h-14 focus:border-black focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <Textarea 
-                      placeholder="Message" 
-                      className="border rounded-md p-4 min-h-[150px] focus:border-black focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <Button 
-                      className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium h-14"
-                    >
-                      Send
-                    </Button>
-                  </div>
-                </div>
-              </form>
+              <ContactForm />
             </div>
             
             <div className="bg-black text-white p-8 rounded-lg">
