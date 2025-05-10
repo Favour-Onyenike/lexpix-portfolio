@@ -7,8 +7,8 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { getPublishedReviews, submitReview } from '@/services/reviewService';
-import type { Review } from '@/services/reviewService';
+import { getPublishedReviews, submitReview } from '@/services/localReviewService';
+import type { Review } from '@/services/localReviewService';
 
 const ReviewSection = () => {
   const [name, setName] = useState('');

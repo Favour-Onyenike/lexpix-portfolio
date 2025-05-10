@@ -31,7 +31,7 @@ import {
   updateReviewStatus, 
   deleteReview, 
   type Review 
-} from '@/services/reviewService';
+} from '@/services/localReviewService';
 import { motion } from 'framer-motion';
 
 const AdminReviews = () => {
