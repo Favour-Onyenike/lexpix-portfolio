@@ -20,20 +20,20 @@ const ReviewSection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  const loadReviews = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getPublishedReviews();
+      setReviews(data);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+      toast.error('Failed to load reviews');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const loadReviews = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getPublishedReviews();
-        setReviews(data);
-      } catch (error) {
-        console.error('Error loading reviews:', error);
-        toast.error('Failed to load reviews');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     loadReviews();
   }, []);
 
@@ -56,7 +56,10 @@ const ReviewSection = () => {
       });
       
       if (result) {
-        toast.success('Thank you for your review! It will be visible after approval.');
+        toast.success('Thank you for your review! It has been published.');
+        
+        // Refresh reviews list to show new review
+        loadReviews();
         
         // Reset form
         setName('');

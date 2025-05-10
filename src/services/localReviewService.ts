@@ -59,7 +59,7 @@ export const getAllReviews = async (): Promise<Review[]> => {
   }
 };
 
-// Submit a new review
+// Submit a new review - now automatically published
 export const submitReview = async (reviewData: {
   name: string;
   email: string;
@@ -73,7 +73,7 @@ export const submitReview = async (reviewData: {
       id: uuidv4(),
       ...reviewData,
       created_at: new Date().toISOString(),
-      published: false, // Reviews need admin approval
+      published: true, // Now automatically published
     };
     
     reviews.push(newReview);
