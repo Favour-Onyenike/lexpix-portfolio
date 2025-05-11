@@ -18,8 +18,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      // Add JSX runtime options to fix the exports issue
-      jsxRuntime: "automatic",
+      // Don't use jsxRuntime option as it causes TypeScript error
     }),
     mode === 'development' &&
     componentTagger(),
@@ -27,7 +26,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Ensure react/jsx-runtime is properly aliased
+      // Ensure proper aliasing for React
       "react/jsx-runtime": "react/jsx-runtime",
       "react": "react"
     },

@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 const TOAST_LIMIT = 5
@@ -126,15 +125,16 @@ function dispatch(action: Action) {
   })
 }
 
-type ToastProps = Omit<ToasterToast, "id">
+type ToastProps = Omit<ToasterToast, "id"> | string
 
-function toast(props: ToastProps | string) {
+// Modified toast function to handle both string and object inputs
+function toast(props: ToastProps) {
   const id = genId()
 
   // Handle string inputs by converting them to the expected format
-  const toastProps: ToastProps = typeof props === "string" 
+  const toastProps: ToasterToast = typeof props === "string" 
     ? { title: props } 
-    : props;
+    : { ...props };
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -160,14 +160,12 @@ function toast(props: ToastProps | string) {
 }
 
 // Add variant methods
-toast.success = (props: Omit<ToasterToast, "id" | "variant"> | string) => {
-  const toastProps = typeof props === "string" ? { title: props } : props;
-  return toast({ ...toastProps, variant: "default" });
+toast.success = (props: string | Omit<ToasterToast, "id" | "variant">) => {
+  return toast(typeof props === "string" ? { title: props, variant: "default" } : { ...props, variant: "default" });
 };
 
-toast.error = (props: Omit<ToasterToast, "id" | "variant"> | string) => {
-  const toastProps = typeof props === "string" ? { title: props } : props;
-  return toast({ ...toastProps, variant: "destructive" });
+toast.error = (props: string | Omit<ToasterToast, "id" | "variant">) => {
+  return toast(typeof props === "string" ? { title: props, variant: "destructive" } : { ...props, variant: "destructive" });
 };
 
 function useToast() {
