@@ -20,15 +20,6 @@ export default defineConfig(({ mode }) => ({
     react({
       // Force React to use the named exports for hooks
       jsxImportSource: "react",
-      swc: {
-        jsc: {
-          transform: {
-            react: {
-              runtime: "automatic",
-            },
-          },
-        },
-      },
     }),
     mode === 'development' &&
     componentTagger(),
@@ -36,7 +27,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react/jsx-runtime": "react/jsx-runtime.js",
+      "react/jsx-runtime": "react/jsx-runtime",
     },
   },
   // Add proper MIME type handling for modules
