@@ -17,18 +17,22 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      jsxImportSource: "react",
+      jsxRuntime: "automatic",
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Force React to use the correct modules
+      // Explicitly set paths for React modules to avoid resolution issues
       "react": path.resolve(__dirname, "./node_modules/react"),
       "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
       "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime")
     },
+    dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
   // Add proper MIME type handling for modules
   assetsInclude: ['**/*.js'],
@@ -40,6 +44,11 @@ export default defineConfig(({ mode }) => ({
     ],
     esbuildOptions: {
       jsx: 'automatic',
+      jsxImportSource: 'react',
+      resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],
+      define: {
+        'process.env.NODE_ENV': JSON.stringify(mode)
+      },
     }
   },
 }));
