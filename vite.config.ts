@@ -17,15 +17,35 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Force React to use the named exports for hooks
+      jsxImportSource: "react",
+      swc: {
+        jsc: {
+          transform: {
+            react: {
+              runtime: "automatic",
+            },
+          },
+        },
+      },
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react/jsx-runtime": "react/jsx-runtime.js",
     },
   },
   // Add proper MIME type handling for modules
   assetsInclude: ['**/*.js'],
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime'
+    ],
+  },
 }));
