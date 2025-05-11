@@ -17,18 +17,17 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      // Don't use jsxRuntime option as it causes TypeScript error
-    }),
+    react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Ensure proper aliasing for React
-      "react/jsx-runtime": "react/jsx-runtime",
-      "react": "react"
+      // Force React to use the correct modules
+      "react": path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime")
     },
   },
   // Add proper MIME type handling for modules
@@ -39,5 +38,8 @@ export default defineConfig(({ mode }) => ({
       'react-dom',
       'react/jsx-runtime'
     ],
+    esbuildOptions: {
+      jsx: 'automatic',
+    }
   },
 }));

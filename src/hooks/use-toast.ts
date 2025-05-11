@@ -127,14 +127,13 @@ function dispatch(action: Action) {
 
 type ToastProps = Omit<ToasterToast, "id"> | string
 
-// Modified toast function to handle both string and object inputs
 function toast(props: ToastProps) {
   const id = genId()
 
-  // Handle string inputs by converting them to the expected format
+  // Handle string inputs by converting them to the expected format with the id
   const toastProps: ToasterToast = typeof props === "string" 
-    ? { title: props } 
-    : { ...props };
+    ? { id, title: props } 
+    : { ...props, id };
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -146,10 +145,7 @@ function toast(props: ToastProps) {
 
   dispatch({
     type: actionTypes.ADD_TOAST,
-    toast: {
-      ...toastProps,
-      id,
-    },
+    toast: toastProps,
   })
 
   return {
