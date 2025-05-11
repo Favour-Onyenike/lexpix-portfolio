@@ -19,7 +19,7 @@ const Events = () => {
         setEvents(eventsData);
       } catch (error) {
         console.error('Error loading events:', error);
-        toast.error({ title: 'Failed to load events' });
+        toast.error('Failed to load events');
       } finally {
         // Add a small delay to simulate loading for smoother animation
         setTimeout(() => {

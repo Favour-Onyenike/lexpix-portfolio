@@ -17,14 +17,19 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Add JSX runtime options to fix the exports issue
+      jsxRuntime: "automatic",
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Ensure react/jsx-runtime is properly aliased
       "react/jsx-runtime": "react/jsx-runtime",
+      "react": "react"
     },
   },
   // Add proper MIME type handling for modules
