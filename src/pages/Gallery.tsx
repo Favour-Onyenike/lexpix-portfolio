@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
@@ -18,7 +19,7 @@ const Gallery = () => {
         setImages(galleryImages);
       } catch (error) {
         console.error('Error loading gallery:', error);
-        toast.error('Failed to load gallery images');
+        toast.error({ title: 'Failed to load gallery images' });
       } finally {
         // Add a small delay to simulate loading for smoother animation
         setTimeout(() => {
@@ -52,15 +53,15 @@ const Gallery = () => {
             // Clean up the blob URL after download is initiated
             setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
             
-            toast.success('Image download started');
+            toast.success({ title: 'Image download started' });
           })
           .catch(err => {
             console.error('Error downloading image:', err);
-            toast.error('Failed to download image');
+            toast.error({ title: 'Failed to download image' });
           });
       } catch (error) {
         console.error('Error initiating download:', error);
-        toast.error('Failed to download image');
+        toast.error({ title: 'Failed to download image' });
       }
     }
   };

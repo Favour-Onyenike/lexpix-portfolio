@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
@@ -18,7 +19,7 @@ const Events = () => {
         setEvents(eventsData);
       } catch (error) {
         console.error('Error loading events:', error);
-        toast.error('Failed to load events');
+        toast.error({ title: 'Failed to load events' });
       } finally {
         // Add a small delay to simulate loading for smoother animation
         setTimeout(() => {
