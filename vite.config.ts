@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       jsxImportSource: "react",
-      jsxRuntime: "automatic",
+      // Remove jsxRuntime as it's not a valid option in the TypeScript type definitions
     }),
     mode === 'development' &&
     componentTagger(),
