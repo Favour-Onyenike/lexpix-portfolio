@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import emailjs from '@emailjs/browser';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 import { Button } from '@/components/ui/button';
 import {

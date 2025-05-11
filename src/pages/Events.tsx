@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import EventCard, { EventItem } from '@/components/EventCard';
 import { getEvents } from '@/services/eventService';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 const Events = () => {
   const [events, setEvents] = useState<EventItem[]>([]);

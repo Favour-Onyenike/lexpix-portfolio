@@ -5,7 +5,7 @@ import { Star } from 'lucide-react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { getPublishedReviews, submitReview } from '@/services/localReviewService';
 import type { Review } from '@/services/localReviewService';

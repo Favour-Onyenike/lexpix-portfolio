@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import ImageGrid, { ImageItem } from '@/components/ImageGrid';
 import { getGalleryImages } from '@/services/galleryService';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 const Gallery = () => {
   const [images, setImages] = useState<ImageItem[]>([]);
