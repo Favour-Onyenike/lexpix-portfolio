@@ -26,4 +26,6 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Add proper MIME type handling for modules
+  assetsInclude: ['**/*.js'],
 }));
