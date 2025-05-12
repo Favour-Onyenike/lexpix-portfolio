@@ -1,3 +1,4 @@
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -62,7 +63,26 @@ This project is built with .
 
 ## How can I deploy this project?
 
+### Deploy with Lovable
+
 Simply open [Lovable](https://lovable.dev/projects/a5fa25a6-5485-4a6f-8231-542dfbf444ac) and click on Share -> Publish.
+
+### Deploy to GitHub Pages
+
+This project is configured to deploy to GitHub Pages at https://favour-onyenike.github.io/lexpix-portfolio/
+
+To deploy:
+
+1. Make sure your repository is connected to GitHub and you have the necessary permissions
+2. Run one of the following commands:
+
+```sh
+# Option 1: Use the helper script
+node src/deploy.js
+
+# Option 2: Use the simple deploy script
+bash deploy.sh
+```
 
 ## I want to use a custom domain - is that possible?
 
