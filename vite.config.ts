@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/lexpix-portfolio/", // Correct base path format for GitHub Pages
+  base: "/", // Correct base path format for GitHub Pages
   build: {
     outDir: "dist",
     emptyOutDir: true,
