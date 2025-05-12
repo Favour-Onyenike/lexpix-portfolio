@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 const TOAST_LIMIT = 5
@@ -133,7 +134,7 @@ function toast(props: ToastProps) {
   // Handle string inputs by converting them to the expected format with the id
   const toastProps: ToasterToast = typeof props === "string" 
     ? { id, title: props } 
-    : { ...props, id };
+    : { id, ...props };
 
   const update = (props: ToasterToast) =>
     dispatch({

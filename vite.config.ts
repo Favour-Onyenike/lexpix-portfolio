@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       jsxImportSource: "react",
-      // Remove jsxRuntime as it's not a valid option in the TypeScript type definitions
     }),
     mode === 'development' &&
     componentTagger(),
@@ -27,28 +26,28 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Explicitly set paths for React modules to avoid resolution issues
       "react": path.resolve(__dirname, "./node_modules/react"),
       "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
-      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime")
+      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime"),
+      "react/jsx-dev-runtime": path.resolve(__dirname, "./node_modules/react/jsx-dev-runtime")
     },
-    dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
+    dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
   },
-  // Add proper MIME type handling for modules
-  assetsInclude: ['**/*.js'],
   optimizeDeps: {
     include: [
       'react',
       'react-dom',
-      'react/jsx-runtime'
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime'
     ],
     esbuildOptions: {
       jsx: 'automatic',
       jsxImportSource: 'react',
       resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],
       define: {
-        'process.env.NODE_ENV': JSON.stringify(mode)
-      },
+        'process.env.NODE_ENV': JSON.stringify(mode),
+        'global': 'window'
+      }
     }
   },
 }));
