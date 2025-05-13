@@ -38,6 +38,15 @@ try {
   console.log(`${colors.cyan}Building the project...${colors.reset}`);
   execSync('npm run build', { stdio: 'inherit' });
   
+  // Create .nojekyll file
+  console.log(`${colors.cyan}Creating .nojekyll file...${colors.reset}`);
+  const distDir = path.join(process.cwd(), 'dist');
+  fs.writeFileSync(path.join(distDir, '.nojekyll'), '');
+  
+  // Ensure CNAME file exists
+  console.log(`${colors.cyan}Ensuring CNAME file exists...${colors.reset}`);
+  fs.writeFileSync(path.join(distDir, 'CNAME'), 'lexarenpixtures.com');
+  
   // Get the remote origin URL if it exists
   let remoteUrl = '';
   try {
@@ -65,25 +74,14 @@ try {
     } else {
       console.log(`${colors.green}${colors.bright}✓ Successfully deployed to GitHub Pages!${colors.reset}`);
       
-      // Extract username and repo name from the remote URL
-      let username = '';
-      let repoName = '';
-      
-      if (remoteUrl.includes('github.com')) {
-        const match = remoteUrl.match(/github\.com[/:](.*?)\/(.*?)(?:\.git)?$/);
-        if (match) {
-          username = match[1];
-          repoName = match[2];
-          
-          console.log(`\n${colors.cyan}${colors.bright}Your site is now live at:${colors.reset}`);
-          console.log(`${colors.cyan}https://${username}.github.io/${repoName}/${colors.reset}`);
-        }
-      }
+      console.log(`\n${colors.cyan}${colors.bright}Your site is now live at:${colors.reset}`);
+      console.log(`${colors.cyan}https://lexarenpixtures.com/${colors.reset}`);
       
       console.log(`\n${colors.cyan}${colors.bright}Next steps:${colors.reset}`);
-      console.log(`${colors.cyan}1. Go to your repository settings on GitHub${colors.reset}`);
-      console.log(`${colors.cyan}2. Navigate to Pages section${colors.reset}`);
-      console.log(`${colors.cyan}3. Ensure the source is set to the gh-pages branch${colors.reset}`);
+      console.log(`${colors.cyan}1. Ensure your domain DNS is configured correctly to point to GitHub Pages${colors.reset}`);
+      console.log(`${colors.cyan}2. Go to your repository settings on GitHub${colors.reset}`);
+      console.log(`${colors.cyan}3. Navigate to Pages section${colors.reset}`);
+      console.log(`${colors.cyan}4. Verify the custom domain settings${colors.reset}`);
     }
   });
   

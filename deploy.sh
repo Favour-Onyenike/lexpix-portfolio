@@ -14,8 +14,14 @@ npm run build
 echo "Creating .nojekyll file..."
 touch dist/.nojekyll
 
+# Make sure CNAME file is in the dist directory
+echo "Ensuring CNAME file is present..."
+if [ ! -f dist/CNAME ]; then
+  echo "lexarenpixtures.com" > dist/CNAME
+fi
+
 # Deploy using gh-pages
 echo "Deploying to GitHub Pages..."
 npx gh-pages -d dist
 
-echo "Deployment complete! Your site should be available at https://favour-onyenike.github.io/lexpix-portfolio/"
+echo "Deployment complete! Your site should be available at https://lexarenpixtures.com/"
