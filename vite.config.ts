@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/", // Correct base path format for GitHub Pages
+  base: "/", // Root path for assets when using a custom domain
   build: {
     outDir: "dist",
     emptyOutDir: true,
