@@ -1,5 +1,6 @@
 
-import { supabase } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 export type Review = {
   id: string;
@@ -19,11 +20,15 @@ export const getPublishedReviews = async (): Promise<Review[]> => {
       .select('*')
       .eq('published', true)
       .order('created_at', { ascending: false });
-    
-    if (error) throw error;
+
+    if (error) {
+      console.error('Error fetching published reviews:', error);
+      return [];
+    }
+
     return data || [];
   } catch (error) {
-    console.error('Error fetching reviews:', error);
+    console.error('Exception fetching published reviews:', error);
     return [];
   }
 };
@@ -35,16 +40,20 @@ export const getAllReviews = async (): Promise<Review[]> => {
       .from('reviews')
       .select('*')
       .order('created_at', { ascending: false });
-    
-    if (error) throw error;
+
+    if (error) {
+      console.error('Error fetching all reviews:', error);
+      return [];
+    }
+
     return data || [];
   } catch (error) {
-    console.error('Error fetching reviews:', error);
+    console.error('Exception fetching all reviews:', error);
     return [];
   }
 };
 
-// Submit a new review
+// Submit a new review - now automatically published
 export const submitReview = async (reviewData: {
   name: string;
   email: string;
@@ -52,19 +61,26 @@ export const submitReview = async (reviewData: {
   text: string;
 }): Promise<Review | null> => {
   try {
+    const newReview = {
+      ...reviewData,
+      created_at: new Date().toISOString(),
+      published: true, // Automatically published
+    };
+    
     const { data, error } = await supabase
       .from('reviews')
-      .insert([{
-        ...reviewData,
-        published: false, // Reviews need admin approval
-      }])
+      .insert([newReview])
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error submitting review:', error);
+      return null;
+    }
+    
     return data;
   } catch (error) {
-    console.error('Error submitting review:', error);
+    console.error('Exception submitting review:', error);
     return null;
   }
 };
@@ -77,10 +93,14 @@ export const updateReviewStatus = async (id: string, published: boolean): Promis
       .update({ published })
       .eq('id', id);
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error updating review status:', error);
+      return false;
+    }
+    
     return true;
   } catch (error) {
-    console.error('Error updating review status:', error);
+    console.error('Exception updating review status:', error);
     return false;
   }
 };
@@ -93,10 +113,14 @@ export const deleteReview = async (id: string): Promise<boolean> => {
       .delete()
       .eq('id', id);
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error deleting review:', error);
+      return false;
+    }
+    
     return true;
   } catch (error) {
-    console.error('Error deleting review:', error);
+    console.error('Exception deleting review:', error);
     return false;
   }
 };

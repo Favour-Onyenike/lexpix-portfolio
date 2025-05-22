@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
@@ -7,8 +6,8 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { getPublishedReviews, submitReview } from '@/services/localReviewService';
-import type { Review } from '@/services/localReviewService';
+import { getPublishedReviews, submitReview } from '@/services/reviewService';
+import type { Review } from '@/services/reviewService';
 
 const ReviewSection = () => {
   const [name, setName] = useState('');
