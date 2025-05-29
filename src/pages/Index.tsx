@@ -29,6 +29,14 @@ const Index = () => {
     { target: 3, label: "Years Experience" },
     { target: 200, label: "Photos Delivered" }
   ];
+
+  const handleGetInTouchClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   useEffect(() => {
     const loadData = async () => {
@@ -142,9 +150,9 @@ const Index = () => {
             <Button 
               size="lg" 
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 transition-colors duration-300 hover:bg-yellow-400 hover:text-black"
-              asChild
+              onClick={handleGetInTouchClick}
             >
-              <a href="#contact">Get in touch</a>
+              Get in touch
             </Button>
           </motion.div>
         </div>
