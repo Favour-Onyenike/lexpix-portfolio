@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,11 +38,14 @@ const AdminReviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const loadReviews = async () => {
     try {
       setIsLoading(true);
+      console.log('Loading reviews...');
       const data = await getAllReviews();
+      console.log('Loaded reviews:', data);
       setReviews(data);
     } catch (error) {
       console.error('Error loading reviews:', error);
@@ -57,6 +61,7 @@ const AdminReviews = () => {
 
   const handleTogglePublished = async (id: string, currentStatus: boolean) => {
     try {
+      console.log('Toggling review status:', id, 'from', currentStatus, 'to', !currentStatus);
       const success = await updateReviewStatus(id, !currentStatus);
       
       if (success) {
@@ -81,26 +86,37 @@ const AdminReviews = () => {
   };
 
   const handleDeleteReview = (id: string) => {
+    console.log('Initiating delete for review:', id);
     setDeleteId(id);
   };
 
   const confirmDelete = async () => {
-    if (deleteId) {
-      try {
-        const success = await deleteReview(deleteId);
-        
-        if (success) {
-          setReviews(reviews.filter(review => review.id !== deleteId));
-          toast.success('Review deleted successfully');
-        } else {
-          toast.error('Failed to delete review');
-        }
-      } catch (error) {
-        console.error('Error deleting review:', error);
-        toast.error('Something went wrong');
-      } finally {
-        setDeleteId(null);
+    if (!deleteId) {
+      console.error('No delete ID set');
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      console.log('Deleting review:', deleteId);
+      
+      const success = await deleteReview(deleteId);
+      console.log('Delete result:', success);
+      
+      if (success) {
+        setReviews(reviews.filter(review => review.id !== deleteId));
+        toast.success('Review deleted successfully');
+        console.log('Review deleted successfully');
+      } else {
+        toast.error('Failed to delete review');
+        console.error('Delete operation returned false');
       }
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast.error('Something went wrong while deleting');
+    } finally {
+      setIsDeleting(false);
+      setDeleteId(null);
     }
   };
 
@@ -188,6 +204,7 @@ const AdminReviews = () => {
                             size="icon"
                             onClick={() => handleDeleteReview(review.id)}
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            disabled={isDeleting}
                           >
                             <Trash2 size={16} />
                           </Button>
@@ -219,9 +236,13 @@ const AdminReviews = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
-              Delete
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete} 
+              className="bg-destructive text-destructive-foreground"
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
