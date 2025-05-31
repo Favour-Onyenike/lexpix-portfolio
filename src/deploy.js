@@ -3,9 +3,9 @@
 // To use it, run:
 // node src/deploy.js
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 // Colors for console output
 const colors = {
@@ -61,9 +61,9 @@ try {
   
   // Deploy to gh-pages
   console.log(`${colors.cyan}Deploying to GitHub Pages...${colors.reset}`);
-  const ghPages = require('gh-pages');
+  const ghPages = await import('gh-pages');
   
-  ghPages.publish('dist', {
+  ghPages.default.publish('dist', {
     branch: 'gh-pages',
     repo: remoteUrl,
     message: 'Auto-deploy to GitHub Pages',
