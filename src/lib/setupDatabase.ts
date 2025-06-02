@@ -3,10 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const setupDatabase = async (): Promise<boolean> => {
   try {
-    // Check Supabase connection by making a simple query
+    // Check Supabase connection by making a simple query for published reviews
+    // This should work with our new RLS policies that allow public access to published reviews
     const { data, error } = await supabase
       .from('reviews')
-      .select('count()', { count: 'exact', head: true });
+      .select('id')
+      .eq('published', true)
+      .limit(1);
       
     if (error) {
       console.error('Supabase connection error:', error);
