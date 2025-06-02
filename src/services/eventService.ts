@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { EventItem } from '@/components/EventCard';
 import { ImageItem } from '@/components/ImageGrid';
@@ -190,17 +189,103 @@ export const createEvent = async (
   }
 };
 
-// Delete an event
+// Delete an event and all associated images from storage and database
 export const deleteEvent = async (id: string): Promise<boolean> => {
   try {
+    console.log('Deleting event:', id);
+    
+    // First, get the event to access the cover image URL
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select('cover_image')
+      .eq('id', id)
+      .single();
+    
+    if (eventError) {
+      console.error('Error fetching event for deletion:', eventError);
+    }
+    
+    // Get all event images
+    const { data: eventImages, error: imagesError } = await supabase
+      .from('event_images')
+      .select('url')
+      .eq('event_id', id);
+    
+    if (imagesError) {
+      console.error('Error fetching event images for deletion:', imagesError);
+    }
+    
+    // Delete all event images from storage
+    if (eventImages && eventImages.length > 0) {
+      for (const image of eventImages) {
+        try {
+          // Extract file path from URL
+          const url = new URL(image.url);
+          const filePath = url.pathname.split('/storage/v1/object/public/images/')[1];
+          
+          if (filePath) {
+            const { error: storageError } = await supabase.storage
+              .from('images')
+              .remove([filePath]);
+            
+            if (storageError) {
+              console.error('Error deleting image from storage:', filePath, storageError);
+            } else {
+              console.log('Deleted image from storage:', filePath);
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing image URL:', image.url, parseError);
+        }
+      }
+    }
+    
+    // Delete cover image from storage
+    if (event?.cover_image) {
+      try {
+        const url = new URL(event.cover_image);
+        const filePath = url.pathname.split('/storage/v1/object/public/images/')[1];
+        
+        if (filePath) {
+          const { error: coverStorageError } = await supabase.storage
+            .from('images')
+            .remove([filePath]);
+          
+          if (coverStorageError) {
+            console.error('Error deleting cover image from storage:', filePath, coverStorageError);
+          } else {
+            console.log('Deleted cover image from storage:', filePath);
+          }
+        }
+      } catch (parseError) {
+        console.error('Error parsing cover image URL:', event.cover_image, parseError);
+      }
+    }
+    
+    // Delete event images from database (cascade should handle this, but let's be explicit)
+    const { error: deleteImagesError } = await supabase
+      .from('event_images')
+      .delete()
+      .eq('event_id', id);
+    
+    if (deleteImagesError) {
+      console.error('Error deleting event images from database:', deleteImagesError);
+    } else {
+      console.log('Deleted event images from database');
+    }
+    
     // Delete event from database
-    const { error } = await supabase
+    const { error: deleteEventError } = await supabase
       .from('events')
       .delete()
       .eq('id', id);
     
-    if (error) throw error;
+    if (deleteEventError) {
+      console.error('Error deleting event from database:', deleteEventError);
+      throw deleteEventError;
+    }
     
+    console.log('Event deleted successfully');
     return true;
   } catch (error) {
     console.error('Error deleting event:', error);

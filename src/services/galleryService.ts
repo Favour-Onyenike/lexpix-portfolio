@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { ImageItem } from '@/components/ImageGrid';
 
@@ -106,15 +105,58 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
   }
 };
 
-// Delete a gallery image
+// Delete a gallery image from both database and storage
 export const deleteGalleryImage = async (id: string): Promise<boolean> => {
   try {
-    const { error } = await supabase
+    console.log('Deleting gallery image:', id);
+    
+    // First, get the image to access the URL
+    const { data: image, error: fetchError } = await supabase
+      .from('gallery_images')
+      .select('url')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) {
+      console.error('Error fetching image for deletion:', fetchError);
+      throw fetchError;
+    }
+    
+    // Delete from storage
+    if (image?.url) {
+      try {
+        // Extract file path from URL
+        const url = new URL(image.url);
+        const filePath = url.pathname.split('/storage/v1/object/public/images/')[1];
+        
+        if (filePath) {
+          const { error: storageError } = await supabase.storage
+            .from('images')
+            .remove([filePath]);
+          
+          if (storageError) {
+            console.error('Error deleting image from storage:', filePath, storageError);
+          } else {
+            console.log('Deleted image from storage:', filePath);
+          }
+        }
+      } catch (parseError) {
+        console.error('Error parsing image URL:', image.url, parseError);
+      }
+    }
+    
+    // Delete from database
+    const { error: deleteError } = await supabase
       .from('gallery_images')
       .delete()
       .eq('id', id);
     
-    if (error) throw error;
+    if (deleteError) {
+      console.error('Error deleting image from database:', deleteError);
+      throw deleteError;
+    }
+    
+    console.log('Gallery image deleted successfully');
     return true;
   } catch (error) {
     console.error('Error deleting gallery image:', error);

@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -105,22 +104,25 @@ export const updateReviewStatus = async (id: string, published: boolean): Promis
   }
 };
 
-// Delete a review
+// Delete a review from database
 export const deleteReview = async (id: string): Promise<boolean> => {
   try {
+    console.log('Deleting review:', id);
+    
     const { error } = await supabase
       .from('reviews')
       .delete()
       .eq('id', id);
     
     if (error) {
-      console.error('Error deleting review:', error);
-      return false;
+      console.error('Error deleting review from database:', error);
+      throw error;
     }
     
+    console.log('Review deleted successfully');
     return true;
   } catch (error) {
-    console.error('Exception deleting review:', error);
+    console.error('Error deleting review:', error);
     return false;
   }
 };
