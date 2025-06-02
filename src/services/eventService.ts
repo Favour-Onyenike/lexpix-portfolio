@@ -68,7 +68,7 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
       .from('events')
       .select('*')
       .eq('id', id)
-      .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no event is found
+      .maybeSingle();
     
     if (error) {
       console.error('Error in getEvent:', error);
@@ -87,7 +87,7 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
   }
 };
 
-// Create a new event
+// Create a new event with improved image upload handling
 export const createEvent = async (
   eventData: { 
     title: string; 
@@ -99,6 +99,7 @@ export const createEvent = async (
 ): Promise<EventItem | null> => {
   try {
     console.log('Creating event:', eventData.title);
+    console.log('Total images to upload:', eventImages.length);
     
     // Upload cover image
     const coverImageUrl = await uploadImage(coverImageFile, 'events/covers');
@@ -127,38 +128,58 @@ export const createEvent = async (
     
     console.log('Event created:', data);
     
-    // Upload event images
+    // Upload event images with better error handling
     if (data && eventImages.length > 0) {
       const eventId = data.id;
+      let successfulUploads = 0;
+      let failedUploads = 0;
       
-      // Process images in batches of 5 to avoid overwhelming the API
-      const batchSize = 5;
-      for (let i = 0; i < eventImages.length; i += batchSize) {
-        const batch = eventImages.slice(i, i + batchSize);
+      // Process images one by one to better track failures
+      for (let i = 0; i < eventImages.length; i++) {
+        const file = eventImages[i];
+        console.log(`Uploading image ${i + 1} of ${eventImages.length}: ${file.name}`);
         
-        // Upload each image in the batch
-        const uploads = await Promise.all(
-          batch.map(async (file) => {
-            const imageUrl = await uploadImage(file, `events/${eventId}`);
-            if (!imageUrl) return null;
+        try {
+          // Upload the image file
+          const imageUrl = await uploadImage(file, `events/${eventId}`);
+          
+          if (imageUrl) {
+            // Insert into database
+            const { error: insertError } = await supabase
+              .from('event_images')
+              .insert([{
+                event_id: eventId,
+                title: file.name.split('.')[0],
+                url: imageUrl
+              }]);
             
-            return {
-              event_id: eventId,
-              title: file.name.split('.')[0],
-              url: imageUrl
-            };
-          })
-        );
-        
-        // Filter out any failed uploads
-        const validUploads = uploads.filter(Boolean);
-        
-        // Insert event images into the database
-        if (validUploads.length > 0) {
-          await supabase
-            .from('event_images')
-            .insert(validUploads);
+            if (insertError) {
+              console.error(`Failed to insert image ${i + 1} into database:`, insertError);
+              failedUploads++;
+            } else {
+              console.log(`Successfully uploaded and saved image ${i + 1}`);
+              successfulUploads++;
+            }
+          } else {
+            console.error(`Failed to upload image ${i + 1}: ${file.name}`);
+            failedUploads++;
+          }
+        } catch (uploadError) {
+          console.error(`Error processing image ${i + 1}:`, uploadError);
+          failedUploads++;
         }
+      }
+      
+      console.log(`Upload summary: ${successfulUploads} successful, ${failedUploads} failed`);
+      
+      // Update the event's image count with actual successful uploads
+      if (successfulUploads !== eventImages.length) {
+        await supabase
+          .from('events')
+          .update({ image_count: successfulUploads })
+          .eq('id', eventId);
+        
+        console.log(`Updated event image count to ${successfulUploads}`);
       }
     }
     
