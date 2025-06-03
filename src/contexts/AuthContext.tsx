@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { signIn, signOut, getCurrentUser } from '@/lib/supabase';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +25,6 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
 
   // Simple auth state listener
   useEffect(() => {
@@ -34,10 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (event, session) => {
         console.log('Auth state changed:', event, !!session);
         setIsAuth(!!session);
-        
-        if (event === 'SIGNED_OUT') {
-          navigate('/login');
-        }
       }
     );
     
@@ -59,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -92,8 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       await signOut();
       setIsAuth(false);
-      navigate('/login');
       toast.info('Logged out');
+      // Navigation will be handled by the component that calls logout
     } catch (error: any) {
       toast.error(error?.message || 'Error logging out');
     } finally {
