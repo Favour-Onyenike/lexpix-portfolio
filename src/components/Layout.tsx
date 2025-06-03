@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Mail, Phone, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -73,6 +72,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
+  const handleNavClick = (path: string) => {
+    window.location.hash = path;
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (currentPath === '/') {
@@ -124,13 +130,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <Link to="/" onClick={handleHomeClick} className="flex items-center">
+            <a href="#/" onClick={handleHomeClick} className="flex items-center">
               <img 
                 src="lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
                 alt="LexPix Logo" 
                 className="h-8 md:h-10"
               />
-            </Link>
+            </a>
           </motion.div>
           
           {!isMobile && (
@@ -140,31 +146,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="flex items-center space-x-8 justify-center"
             >
-              <Link 
-                to="/" 
+              <a 
+                href="#/" 
                 onClick={handleHomeClick}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Home
-              </Link>
-              <Link 
-                to="/gallery" 
+              </a>
+              <a 
+                href="#/gallery" 
+                onClick={() => handleNavClick('/gallery')}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/gallery') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Gallery
-              </Link>
-              <Link 
-                to="/events" 
+              </a>
+              <a 
+                href="#/events" 
+                onClick={() => handleNavClick('/events')}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/events') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Events
-              </Link>
+              </a>
               <a 
                 href="#contact" 
                 onClick={handleContactClick}
@@ -185,7 +193,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             {!isMobile ? (
               <Button asChild variant="outline" className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" size="sm">
-                <Link to="/login">Admin</Link>
+                <a href="#/login">Admin</a>
               </Button>
             ) : (
               <button 
@@ -223,8 +231,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             
             <div className="flex flex-col justify-center items-center space-y-8 p-6 flex-1">
-              <Link 
-                to="/" 
+              <a 
+                href="#/" 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                 onClick={handleHomeClick}
               >
@@ -232,27 +240,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {currentPath === '/' && activeSection === 'hero' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </Link>
-              <Link 
-                to="/gallery" 
+              </a>
+              <a 
+                href="#/gallery" 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => handleNavClick('/gallery')}
               >
                 Gallery
                 {currentPath === '/gallery' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </Link>
-              <Link 
-                to="/events" 
+              </a>
+              <a 
+                href="#/events" 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => handleNavClick('/events')}
               >
                 Events
                 {currentPath === '/events' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </Link>
+              </a>
               <a 
                 href="#contact" 
                 onClick={handleContactClick}
@@ -263,13 +271,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </a>
-              <Link 
-                to="/login" 
+              <a 
+                href="#/login" 
                 className="mt-6 bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-4 rounded-md transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => handleNavClick('/login')}
               >
                 Admin
-              </Link>
+              </a>
             </div>
             
             <div className="flex justify-center items-center space-x-6 py-12">
@@ -314,9 +322,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div>
               <h3 className="text-xl font-bold mb-6">Quick Links</h3>
               <div className="flex flex-col space-y-4">
-                <Link to="/" onClick={handleHomeClick} className="text-gray-400 hover:text-white transition-colors">Home</Link>
-                <Link to="/gallery" className="text-gray-400 hover:text-white transition-colors">Gallery</Link>
-                <Link to="/events" className="text-gray-400 hover:text-white transition-colors">Events</Link>
+                <a href="#/" onClick={handleHomeClick} className="text-gray-400 hover:text-white transition-colors">Home</a>
+                <a href="#/gallery" onClick={() => handleNavClick('/gallery')} className="text-gray-400 hover:text-white transition-colors">Gallery</a>
+                <a href="#/events" onClick={() => handleNavClick('/events')} className="text-gray-400 hover:text-white transition-colors">Events</a>
                 <a href="#contact" onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors">Contact</a>
               </div>
             </div>
