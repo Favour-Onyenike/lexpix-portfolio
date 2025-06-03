@@ -12,6 +12,27 @@ interface LayoutProps {
 
 // Hook to safely use router hooks with fallback
 const useSafeRouter = () => {
+  const [routerAvailable, setRouterAvailable] = useState(true);
+  
+  // Check if we're in a router context by testing if hooks work
+  useEffect(() => {
+    try {
+      // This will throw if not in router context
+      const testLocation = window.location;
+      setRouterAvailable(true);
+    } catch {
+      setRouterAvailable(false);
+    }
+  }, []);
+
+  if (!routerAvailable) {
+    return { 
+      location: { pathname: '/', state: null }, 
+      navigate: () => {}, 
+      hasRouter: false 
+    };
+  }
+
   try {
     const location = useLocation();
     const navigate = useNavigate();
@@ -19,7 +40,7 @@ const useSafeRouter = () => {
   } catch (error) {
     console.warn('Router hooks not available, using fallback');
     return { 
-      location: { pathname: '/', state: null }, 
+      location: { pathname: window.location.hash.replace('#', '') || '/', state: null }, 
       navigate: () => {}, 
       hasRouter: false 
     };
