@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { ImageItem } from '@/components/ImageGrid';
 
@@ -16,11 +17,25 @@ const mapToImageItem = (image: GalleryImage): ImageItem => ({
   url: image.url,
 });
 
-// Check if a URL actually exists and is accessible
+// Enhanced URL validation
 export const checkImageUrlValidity = async (url: string): Promise<boolean> => {
   try {
-    const response = await fetch(url, { method: 'HEAD' });
-    return response.ok;
+    // First check if URL is properly formatted
+    const urlObj = new URL(url);
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      return false;
+    }
+
+    const response = await fetch(url, { 
+      method: 'HEAD',
+      timeout: 10000, // 10 second timeout
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    
+    const contentType = response.headers.get('content-type');
+    return response.ok && (contentType?.startsWith('image/') || false);
   } catch (error) {
     console.error('Error checking image URL validity:', error);
     return false;
@@ -67,9 +82,22 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
   }
 };
 
-// Create a new gallery image
+// Create a new gallery image with validation
 export const createGalleryImage = async (image: { title: string, url: string }): Promise<GalleryImage | null> => {
   try {
+    // Validate URL before saving
+    if (!image.url || !image.url.trim()) {
+      console.error('Empty URL provided');
+      return null;
+    }
+
+    try {
+      new URL(image.url);
+    } catch (error) {
+      console.error('Invalid URL format:', image.url);
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('gallery_images')
       .insert([{ title: image.title, url: image.url }])
@@ -84,7 +112,7 @@ export const createGalleryImage = async (image: { title: string, url: string }):
   }
 };
 
-// Get all gallery images
+// Get all gallery images with better error handling
 export const getGalleryImages = async (): Promise<ImageItem[]> => {
   try {
     const { data, error } = await supabase
@@ -97,8 +125,26 @@ export const getGalleryImages = async (): Promise<ImageItem[]> => {
       throw error;
     }
     
-    console.log('Gallery images retrieved:', data?.length || 0);
-    return (data || []).map(mapToImageItem);
+    if (!data) {
+      console.log('No gallery images found');
+      return [];
+    }
+
+    console.log('Gallery images retrieved:', data.length);
+    
+    // Filter out any images with invalid URLs
+    const validImages = data.filter(image => {
+      try {
+        new URL(image.url);
+        return true;
+      } catch {
+        console.warn('Filtering out image with invalid URL:', image.url);
+        return false;
+      }
+    });
+    
+    console.log('Valid images after filtering:', validImages.length);
+    return validImages.map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching gallery images:', error);
     return [];
