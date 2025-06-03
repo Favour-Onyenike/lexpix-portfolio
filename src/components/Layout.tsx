@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,67 +10,24 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Hook to safely use router functionality with fallback
-const useSafeRouter = () => {
-  const [hasRouter, setHasRouter] = useState(false);
-  const [location, setLocation] = useState({ pathname: '/', state: null });
-  
-  useEffect(() => {
-    // Check if we're in a router context by looking for React Router
-    try {
-      // Check if we have a hash router setup
-      const isHashRouter = window.location.hash.length > 0 || 
-                          (window.location.pathname === '/' && window.location.hash === '');
-      setHasRouter(isHashRouter);
-      
-      if (isHashRouter) {
-        // Update location from hash
-        setLocation({ 
-          pathname: window.location.hash.replace('#', '') || '/', 
-          state: null 
-        });
-        
-        // Listen for hash changes
-        const handleHashChange = () => {
-          setLocation({ 
-            pathname: window.location.hash.replace('#', '') || '/', 
-            state: null 
-          });
-        };
-        
-        window.addEventListener('hashchange', handleHashChange);
-        return () => window.removeEventListener('hashchange', handleHashChange);
-      }
-    } catch (error) {
-      console.warn('Router not available, using fallback');
-      setHasRouter(false);
-    }
-  }, []);
-
-  const navigate = (path: string, options?: { replace?: boolean, state?: any }) => {
-    if (hasRouter) {
-      if (options?.replace) {
-        window.location.hash = path;
-      } else {
-        window.location.hash = path;
-      }
-    } else {
-      console.warn('Navigation not available outside router context');
-    }
-  };
-
-  return { location, navigate, hasRouter };
-};
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { location, navigate, hasRouter } = useSafeRouter();
+  const [currentPath, setCurrentPath] = useState('/');
   const [activeSection, setActiveSection] = useState('');
 
+  // Track current path from hash
   useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+    const updatePath = () => {
+      const path = window.location.hash.replace('#', '') || '/';
+      setCurrentPath(path);
+      setMobileMenuOpen(false);
+    };
+
+    updatePath();
+    window.addEventListener('hashchange', updatePath);
+    return () => window.removeEventListener('hashchange', updatePath);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -78,64 +36,46 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    if (!hasRouter) {
-      console.warn('Router not available for navigation');
-      return;
-    }
-    
-    if (location.pathname !== '/') {
-      navigate('/', { state: { scrollToContact: true } });
+    if (currentPath !== '/') {
+      window.location.hash = '/';
+      setTimeout(() => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          contactSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     } else {
       const contactSection = document.getElementById('contact');
       if (contactSection) {
         contactSection.scrollIntoView({ behavior: 'smooth' });
       }
-      if (mobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
+    }
+    
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
     }
   };
 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    if (!hasRouter) {
-      console.warn('Router not available for navigation');
-      return;
-    }
-    
-    if (location.pathname !== '/') {
-      navigate('/');
+    if (currentPath !== '/') {
+      window.location.hash = '/';
     } else {
       const heroSection = document.getElementById('hero');
       if (heroSection) {
         heroSection.scrollIntoView({ behavior: 'smooth' });
       }
-      if (mobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
+    }
+    
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
     }
   };
 
   useEffect(() => {
-    if (!hasRouter) return;
-    
-    if (location.pathname === '/' && location.state && (location.state as any).scrollToContact) {
-      setTimeout(() => {
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-          contactSection.scrollIntoView({ behavior: 'smooth' });
-        }
-        navigate('/', { replace: true, state: {} });
-      }, 100);
-    }
-  }, [location, navigate, hasRouter]);
-
-  useEffect(() => {
-    if (!hasRouter) return;
-    
     const handleScroll = () => {
-      if (location.pathname === '/') {
+      if (currentPath === '/') {
         const sections = ['hero', 'about', 'stats', 'services', 'projects', 'contact', 'reviews'];
         const current = sections.find(section => {
           const element = document.getElementById(section);
@@ -156,18 +96,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [location.pathname, hasRouter]);
+  }, [currentPath]);
 
   const isActive = (path: string) => {
-    if (!hasRouter) return false;
-    
-    if (path === '/' && location.pathname === '/') {
+    if (path === '/' && currentPath === '/') {
       return activeSection === 'hero';
     }
-    if (path === '/gallery' && location.pathname === '/gallery') {
+    if (path === '/gallery' && currentPath === '/gallery') {
       return true;
     }
-    if (path === '/events' && location.pathname === '/events') {
+    if (path === '/events' && currentPath === '/events') {
       return true;
     }
     if (path === '#contact') {
@@ -291,7 +229,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={handleHomeClick}
               >
                 Home
-                {hasRouter && location.pathname === '/' && activeSection === 'hero' && (
+                {currentPath === '/' && activeSection === 'hero' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </Link>
@@ -301,7 +239,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Gallery
-                {hasRouter && location.pathname === '/gallery' && (
+                {currentPath === '/gallery' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </Link>
@@ -311,7 +249,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Events
-                {hasRouter && location.pathname === '/events' && (
+                {currentPath === '/events' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </Link>
@@ -321,7 +259,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
               >
                 Contact
-                {hasRouter && location.pathname === '/' && activeSection === 'contact' && (
+                {currentPath === '/' && activeSection === 'contact' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </a>
