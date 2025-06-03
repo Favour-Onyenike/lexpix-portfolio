@@ -15,10 +15,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [currentPath, setCurrentPath] = useState('/');
   const [activeSection, setActiveSection] = useState('');
 
-  // Track current path from hash
+  // Track current path from hash - completely independent of React Router
   useEffect(() => {
     const updatePath = () => {
-      const path = window.location.hash.replace('#', '') || '/';
+      const hash = window.location.hash;
+      const path = hash.replace('#', '') || '/';
       setCurrentPath(path);
       setMobileMenuOpen(false);
     };
@@ -28,6 +29,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return () => window.removeEventListener('hashchange', updatePath);
   }, []);
 
+  const navigateTo = (path: string) => {
+    window.location.hash = path;
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -36,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     e.preventDefault();
     
     if (currentPath !== '/') {
-      window.location.hash = '/';
+      navigateTo('/');
       setTimeout(() => {
         const contactSection = document.getElementById('contact');
         if (contactSection) {
@@ -49,33 +57,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         contactSection.scrollIntoView({ behavior: 'smooth' });
       }
     }
-    
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
   };
 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
     if (currentPath !== '/') {
-      window.location.hash = '/';
+      navigateTo('/');
     } else {
       const heroSection = document.getElementById('hero');
       if (heroSection) {
         heroSection.scrollIntoView({ behavior: 'smooth' });
       }
-    }
-    
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
-  };
-
-  const handleNavClick = (path: string) => {
-    window.location.hash = path;
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
     }
   };
 
@@ -130,13 +123,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition={{ duration: 0.5 }}
             className="flex-shrink-0"
           >
-            <a href="#/" onClick={handleHomeClick} className="flex items-center">
+            <button onClick={handleHomeClick} className="flex items-center">
               <img 
                 src="lovable-uploads/02801854-0522-49da-a353-395229e44ac6.png" 
                 alt="LexPix Logo" 
                 className="h-8 md:h-10"
               />
-            </a>
+            </button>
           </motion.div>
           
           {!isMobile && (
@@ -146,42 +139,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="flex items-center space-x-8 justify-center"
             >
-              <a 
-                href="#/" 
+              <button 
                 onClick={handleHomeClick}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Home
-              </a>
-              <a 
-                href="#/gallery" 
-                onClick={() => handleNavClick('/gallery')}
+              </button>
+              <button 
+                onClick={() => navigateTo('/gallery')}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/gallery') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Gallery
-              </a>
-              <a 
-                href="#/events" 
-                onClick={() => handleNavClick('/events')}
+              </button>
+              <button 
+                onClick={() => navigateTo('/events')}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('/events') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Events
-              </a>
-              <a 
-                href="#contact" 
+              </button>
+              <button 
                 onClick={handleContactClick}
                 className={`text-sm hover:text-primary/80 transition-colors relative ${
                   isActive('#contact') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
                 }`}
               >
                 Contact
-              </a>
+              </button>
             </motion.nav>
           )}
           
@@ -192,8 +181,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className="flex-shrink-0"
           >
             {!isMobile ? (
-              <Button asChild variant="outline" className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" size="sm">
-                <a href="#/login">Admin</a>
+              <Button 
+                onClick={() => navigateTo('/login')}
+                variant="outline" 
+                className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
+                size="sm"
+              >
+                Admin
               </Button>
             ) : (
               <button 
@@ -231,8 +225,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             
             <div className="flex flex-col justify-center items-center space-y-8 p-6 flex-1">
-              <a 
-                href="#/" 
+              <button 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                 onClick={handleHomeClick}
               >
@@ -240,29 +233,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {currentPath === '/' && activeSection === 'hero' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </a>
-              <a 
-                href="#/gallery" 
+              </button>
+              <button 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                onClick={() => handleNavClick('/gallery')}
+                onClick={() => navigateTo('/gallery')}
               >
                 Gallery
                 {currentPath === '/gallery' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </a>
-              <a 
-                href="#/events" 
+              </button>
+              <button 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                onClick={() => handleNavClick('/events')}
+                onClick={() => navigateTo('/events')}
               >
                 Events
                 {currentPath === '/events' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </a>
-              <a 
-                href="#contact" 
+              </button>
+              <button 
                 onClick={handleContactClick}
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
               >
@@ -270,14 +260,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {currentPath === '/' && activeSection === 'contact' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
-              </a>
-              <a 
-                href="#/login" 
+              </button>
+              <button 
                 className="mt-6 bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 py-4 rounded-md transition-colors"
-                onClick={() => handleNavClick('/login')}
+                onClick={() => navigateTo('/login')}
               >
                 Admin
-              </a>
+              </button>
             </div>
             
             <div className="flex justify-center items-center space-x-6 py-12">
@@ -322,10 +311,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div>
               <h3 className="text-xl font-bold mb-6">Quick Links</h3>
               <div className="flex flex-col space-y-4">
-                <a href="#/" onClick={handleHomeClick} className="text-gray-400 hover:text-white transition-colors">Home</a>
-                <a href="#/gallery" onClick={() => handleNavClick('/gallery')} className="text-gray-400 hover:text-white transition-colors">Gallery</a>
-                <a href="#/events" onClick={() => handleNavClick('/events')} className="text-gray-400 hover:text-white transition-colors">Events</a>
-                <a href="#contact" onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors">Contact</a>
+                <button onClick={handleHomeClick} className="text-gray-400 hover:text-white transition-colors text-left">Home</button>
+                <button onClick={() => navigateTo('/gallery')} className="text-gray-400 hover:text-white transition-colors text-left">Gallery</button>
+                <button onClick={() => navigateTo('/events')} className="text-gray-400 hover:text-white transition-colors text-left">Events</button>
+                <button onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors text-left">Contact</button>
               </div>
             </div>
             
