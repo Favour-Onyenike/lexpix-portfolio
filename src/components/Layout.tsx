@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, Mail, Phone, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -9,38 +9,56 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-// Hook to safely use router hooks with fallback
+// Hook to safely use router functionality with fallback
 const useSafeRouter = () => {
   const [hasRouter, setHasRouter] = useState(false);
+  const [location, setLocation] = useState({ pathname: '/', state: null });
   
-  // Check if we're in a router context
   useEffect(() => {
-    // Simple check to see if we have access to router context
-    // by checking if we're in a hash router environment
-    const isHashRouter = window.location.hash.length > 0 || window.location.pathname === '/';
-    setHasRouter(isHashRouter);
+    // Check if we're in a router context by looking for React Router
+    try {
+      // Check if we have a hash router setup
+      const isHashRouter = window.location.hash.length > 0 || 
+                          (window.location.pathname === '/' && window.location.hash === '');
+      setHasRouter(isHashRouter);
+      
+      if (isHashRouter) {
+        // Update location from hash
+        setLocation({ 
+          pathname: window.location.hash.replace('#', '') || '/', 
+          state: null 
+        });
+        
+        // Listen for hash changes
+        const handleHashChange = () => {
+          setLocation({ 
+            pathname: window.location.hash.replace('#', '') || '/', 
+            state: null 
+          });
+        };
+        
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+      }
+    } catch (error) {
+      console.warn('Router not available, using fallback');
+      setHasRouter(false);
+    }
   }, []);
 
-  // Only call router hooks if we detect router context
-  let location, navigate;
-  
-  try {
-    // Only attempt to use router hooks if we think we're in router context
+  const navigate = (path: string, options?: { replace?: boolean, state?: any }) => {
     if (hasRouter) {
-      location = useLocation();
-      navigate = useNavigate();
-      return { location, navigate, hasRouter: true };
+      if (options?.replace) {
+        window.location.hash = path;
+      } else {
+        window.location.hash = path;
+      }
+    } else {
+      console.warn('Navigation not available outside router context');
     }
-  } catch (error) {
-    console.warn('Router hooks not available, using fallback');
-  }
-  
-  // Fallback when router is not available
-  return { 
-    location: { pathname: window.location.hash.replace('#', '') || '/', state: null }, 
-    navigate: () => console.warn('Navigation not available outside router context'), 
-    hasRouter: false 
   };
+
+  return { location, navigate, hasRouter };
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
