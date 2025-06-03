@@ -10,11 +10,26 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+// Hook to safely use router hooks with fallback
+const useSafeRouter = () => {
+  try {
+    const location = useLocation();
+    const navigate = useNavigate();
+    return { location, navigate, hasRouter: true };
+  } catch (error) {
+    console.warn('Router hooks not available, using fallback');
+    return { 
+      location: { pathname: '/', state: null }, 
+      navigate: () => {}, 
+      hasRouter: false 
+    };
+  }
+};
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { location, navigate, hasRouter } = useSafeRouter();
   const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
@@ -27,6 +42,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    if (!hasRouter) {
+      console.warn('Router not available for navigation');
+      return;
+    }
     
     if (location.pathname !== '/') {
       navigate('/', { state: { scrollToContact: true } });
@@ -44,6 +64,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
+    if (!hasRouter) {
+      console.warn('Router not available for navigation');
+      return;
+    }
+    
     if (location.pathname !== '/') {
       navigate('/');
     } else {
@@ -58,6 +83,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!hasRouter) return;
+    
     if (location.pathname === '/' && location.state && (location.state as any).scrollToContact) {
       setTimeout(() => {
         const contactSection = document.getElementById('contact');
@@ -67,9 +94,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         navigate('/', { replace: true, state: {} });
       }, 100);
     }
-  }, [location, navigate]);
+  }, [location, navigate, hasRouter]);
 
   useEffect(() => {
+    if (!hasRouter) return;
+    
     const handleScroll = () => {
       if (location.pathname === '/') {
         const sections = ['hero', 'about', 'stats', 'services', 'projects', 'contact', 'reviews'];
@@ -92,9 +121,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [location.pathname]);
+  }, [location.pathname, hasRouter]);
 
   const isActive = (path: string) => {
+    if (!hasRouter) return false;
+    
     if (path === '/' && location.pathname === '/') {
       return activeSection === 'hero';
     }
@@ -225,7 +256,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={handleHomeClick}
               >
                 Home
-                {location.pathname === '/' && activeSection === 'hero' && (
+                {hasRouter && location.pathname === '/' && activeSection === 'hero' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </Link>
@@ -235,7 +266,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Gallery
-                {location.pathname === '/gallery' && (
+                {hasRouter && location.pathname === '/gallery' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </Link>
@@ -245,7 +276,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Events
-                {location.pathname === '/events' && (
+                {hasRouter && location.pathname === '/events' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </Link>
@@ -255,7 +286,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
               >
                 Contact
-                {location.pathname === '/' && activeSection === 'contact' && (
+                {hasRouter && location.pathname === '/' && activeSection === 'contact' && (
                   <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
                 )}
               </a>
