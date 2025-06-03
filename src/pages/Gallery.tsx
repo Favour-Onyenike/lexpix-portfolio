@@ -21,10 +21,7 @@ const Gallery = () => {
         console.error('Error loading gallery:', error);
         toast.error({ title: 'Failed to load gallery images' });
       } finally {
-        // Add a small delay to simulate loading for smoother animation
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 500);
+        setIsLoading(false);
       }
     };
     
@@ -83,11 +80,11 @@ const Gallery = () => {
           </motion.div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {[...Array(8)].map((_, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
+              {[...Array(12)].map((_, index) => (
                 <div 
                   key={index} 
-                  className="aspect-[3/4] bg-muted animate-pulse rounded-md"
+                  className="aspect-[4/3] bg-muted animate-pulse rounded-lg"
                 />
               ))}
             </div>

@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import OptimizedImage from './OptimizedImage';
 
 export interface ImageItem {
   id: string;
@@ -28,17 +29,21 @@ const ImageGrid: React.FC<ImageGridProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const isMobile = useIsMobile();
   
   const handleOpenLightbox = (image: ImageItem) => {
     setSelectedImage(image);
-    // Find the index of the selected image
     const index = images.findIndex(img => img.id === image.id);
     setCurrentIndex(index >= 0 ? index : 0);
   };
   
   const handleCloseLightbox = () => {
     setSelectedImage(null);
+  };
+
+  const handleImageLoad = (imageId: string) => {
+    setLoadedImages(prev => new Set(prev).add(imageId));
   };
 
   const handleDownload = (e: React.MouseEvent, id: string) => {
@@ -76,14 +81,14 @@ const ImageGrid: React.FC<ImageGridProps> = ({
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05
+        staggerChildren: 0.03
       }
     }
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+    show: { opacity: 1, y: 0, transition: { duration: 0.4 } }
   };
 
   return (
@@ -97,20 +102,22 @@ const ImageGrid: React.FC<ImageGridProps> = ({
           className
         )}
       >
-        {images.map((image) => (
+        {images.map((image, index) => (
           <motion.div
             key={image.id}
             variants={item}
-            className="group image-card relative overflow-hidden"
+            className="group image-card relative overflow-hidden cursor-pointer rounded-lg"
             onClick={() => handleOpenLightbox(image)}
-            style={{ aspectRatio: isMobile ? '1/1' : '4/3' }} // Changed aspect ratio
           >
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
             
-            <img 
-              src={image.url} 
-              alt={image.title || 'Gallery image'} 
-              className="object-cover h-full w-full transition-transform duration-500 group-hover:scale-105" 
+            <OptimizedImage
+              src={image.url}
+              alt={image.title || 'Gallery image'}
+              className="transition-transform duration-500 group-hover:scale-105"
+              aspectRatio={isMobile ? '1/1' : '4/3'}
+              priority={index < 4} // Prioritize first 4 images
+              onLoad={() => handleImageLoad(image.id)}
             />
             
             <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-20">
@@ -155,7 +162,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
         ))}
       </motion.div>
 
-      {/* Lightbox - Mobile Optimized */}
+      {/* Lightbox - Optimized for faster loading */}
       <Dialog open={!!selectedImage} onOpenChange={handleCloseLightbox}>
         <DialogContent className="max-w-full sm:max-w-4xl p-0 overflow-hidden bg-black/90 border-none flex flex-col">
           <div className="relative w-full h-full flex flex-col">
@@ -180,10 +187,12 @@ const ImageGrid: React.FC<ImageGridProps> = ({
                     exit={{ opacity: 0 }}
                     className="w-full h-full flex items-center justify-center"
                   >
-                    <img 
-                      src={selectedImage.url} 
+                    <OptimizedImage
+                      src={selectedImage.url}
                       alt={selectedImage.title || 'Gallery image'}
-                      className="w-full h-auto max-h-[80vh] object-contain"
+                      className="w-full h-auto max-h-[80vh]"
+                      aspectRatio="auto"
+                      priority={true}
                     />
                   </motion.div>
                 )}
@@ -229,7 +238,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
               )}
             </div>
             
-            {/* Thumbnail preview on desktop */}
+            {/* Thumbnail preview on desktop - Optimized */}
             {!isMobile && images.length > 1 && (
               <div className="hidden sm:flex overflow-x-auto gap-2 p-2 bg-black/40">
                 {images.map((img, idx) => (
@@ -244,10 +253,12 @@ const ImageGrid: React.FC<ImageGridProps> = ({
                       setCurrentIndex(idx);
                     }}
                   >
-                    <img 
-                      src={img.url} 
-                      alt={img.title || `Thumbnail ${idx}`} 
-                      className="h-full w-full object-cover"
+                    <OptimizedImage
+                      src={img.url}
+                      alt={img.title || `Thumbnail ${idx}`}
+                      className="h-full w-full"
+                      aspectRatio="1/1"
+                      priority={Math.abs(idx - currentIndex) <= 2} // Prioritize nearby thumbnails
                     />
                   </div>
                 ))}
