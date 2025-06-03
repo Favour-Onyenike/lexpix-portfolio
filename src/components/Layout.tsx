@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,39 +11,36 @@ interface LayoutProps {
 
 // Hook to safely use router hooks with fallback
 const useSafeRouter = () => {
-  const [routerAvailable, setRouterAvailable] = useState(true);
+  const [hasRouter, setHasRouter] = useState(false);
   
-  // Check if we're in a router context by testing if hooks work
+  // Check if we're in a router context
   useEffect(() => {
-    try {
-      // This will throw if not in router context
-      const testLocation = window.location;
-      setRouterAvailable(true);
-    } catch {
-      setRouterAvailable(false);
-    }
+    // Simple check to see if we have access to router context
+    // by checking if we're in a hash router environment
+    const isHashRouter = window.location.hash.length > 0 || window.location.pathname === '/';
+    setHasRouter(isHashRouter);
   }, []);
 
-  if (!routerAvailable) {
-    return { 
-      location: { pathname: '/', state: null }, 
-      navigate: () => {}, 
-      hasRouter: false 
-    };
-  }
-
+  // Only call router hooks if we detect router context
+  let location, navigate;
+  
   try {
-    const location = useLocation();
-    const navigate = useNavigate();
-    return { location, navigate, hasRouter: true };
+    // Only attempt to use router hooks if we think we're in router context
+    if (hasRouter) {
+      location = useLocation();
+      navigate = useNavigate();
+      return { location, navigate, hasRouter: true };
+    }
   } catch (error) {
     console.warn('Router hooks not available, using fallback');
-    return { 
-      location: { pathname: window.location.hash.replace('#', '') || '/', state: null }, 
-      navigate: () => {}, 
-      hasRouter: false 
-    };
   }
+  
+  // Fallback when router is not available
+  return { 
+    location: { pathname: window.location.hash.replace('#', '') || '/', state: null }, 
+    navigate: () => console.warn('Navigation not available outside router context'), 
+    hasRouter: false 
+  };
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
