@@ -17,7 +17,7 @@ const mapToImageItem = (image: GalleryImage): ImageItem => ({
   url: image.url,
 });
 
-// Enhanced URL validation
+// Enhanced URL validation with proper timeout handling
 export const checkImageUrlValidity = async (url: string): Promise<boolean> => {
   try {
     // First check if URL is properly formatted
@@ -26,14 +26,19 @@ export const checkImageUrlValidity = async (url: string): Promise<boolean> => {
       return false;
     }
 
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     const response = await fetch(url, { 
       method: 'HEAD',
-      timeout: 10000, // 10 second timeout
+      signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
     
+    clearTimeout(timeoutId);
     const contentType = response.headers.get('content-type');
     return response.ok && (contentType?.startsWith('image/') || false);
   } catch (error) {
