@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { EventItem } from '@/components/EventCard';
 import { ImageItem } from '@/components/ImageGrid';
@@ -39,7 +40,41 @@ const mapToImageItem = (image: EventImage): ImageItem => ({
   url: image.url,
 });
 
-// Get all events
+// Helper function to update event image count based on actual database records
+const updateEventImageCount = async (eventId: string): Promise<number> => {
+  try {
+    const { count, error } = await supabase
+      .from('event_images')
+      .select('*', { count: 'exact', head: true })
+      .eq('event_id', eventId);
+    
+    if (error) {
+      console.error('Error counting event images:', error);
+      return 0;
+    }
+    
+    const actualCount = count || 0;
+    
+    // Update the event's image_count field
+    const { error: updateError } = await supabase
+      .from('events')
+      .update({ image_count: actualCount })
+      .eq('id', eventId);
+    
+    if (updateError) {
+      console.error('Error updating event image count:', updateError);
+    } else {
+      console.log(`Updated event ${eventId} image count to ${actualCount}`);
+    }
+    
+    return actualCount;
+  } catch (error) {
+    console.error('Error in updateEventImageCount:', error);
+    return 0;
+  }
+};
+
+// Get all events with corrected image counts
 export const getEvents = async (): Promise<EventItem[]> => {
   try {
     const { data, error } = await supabase
@@ -53,6 +88,15 @@ export const getEvents = async (): Promise<EventItem[]> => {
     }
     
     console.log('Events retrieved:', data?.length || 0);
+    
+    // Update image counts for all events to ensure accuracy
+    if (data && data.length > 0) {
+      for (const event of data) {
+        const actualCount = await updateEventImageCount(event.id);
+        event.image_count = actualCount;
+      }
+    }
+    
     return (data || []).map(mapToEventItem);
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -60,7 +104,7 @@ export const getEvents = async (): Promise<EventItem[]> => {
   }
 };
 
-// Get a specific event
+// Get a specific event with corrected image count
 export const getEvent = async (id: string): Promise<EventItem | null> => {
   try {
     const { data, error } = await supabase
@@ -78,6 +122,10 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
       console.log(`No event found with ID ${id}`);
       return null;
     }
+    
+    // Update the image count for this specific event
+    const actualCount = await updateEventImageCount(id);
+    data.image_count = actualCount;
     
     return mapToEventItem(data);
   } catch (error) {
@@ -308,6 +356,12 @@ export const getEventImages = async (eventId: string): Promise<ImageItem[]> => {
     }
     
     console.log(`Retrieved ${data?.length || 0} images for event ${eventId}`);
+    
+    // Update the event's image count to match actual images
+    if (data) {
+      await updateEventImageCount(eventId);
+    }
+    
     return (data || []).map(mapToImageItem);
   } catch (error) {
     console.error('Error fetching event images:', error);
