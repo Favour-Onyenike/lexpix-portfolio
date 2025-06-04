@@ -1,99 +1,144 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Camera, 
-  Star, 
-  Calendar,
-  Users,
-  FileText,
-  Settings,
-  Image,
-  LogOut
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ChevronLeft, Grid, Image, Calendar, LogOut, Menu, X, Users, Award, FileText } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { signOut } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { Separator } from '@/components/ui/separator';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+  const { logout } = useAuth();
   const location = useLocation();
-  
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast.success('Signed out successfully');
-      window.location.href = '/login';
-    } catch (error) {
-      toast.error('Failed to sign out');
-    }
-  };
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const menuItems = [
-    { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/gallery', label: 'Gallery', icon: Camera },
-    { path: '/admin/events', label: 'Events', icon: Calendar },
-    { path: '/admin/featured-projects', label: 'Featured Projects', icon: FileText },
-    { path: '/admin/about-images', label: 'About Images', icon: Image },
-    { path: '/admin/reviews', label: 'Reviews', icon: Star },
-    { path: '/admin/content', label: 'Content Manager', icon: Settings },
-    { path: '/admin/team', label: 'Team Management', icon: Users },
+  const navItems = [
+    { name: 'Dashboard', path: '/admin', icon: Grid },
+    { name: 'Gallery', path: '/admin/gallery', icon: Image },
+    { name: 'Events', path: '/admin/events', icon: Calendar },
+    { name: 'Featured Projects', path: '/admin/featured-projects', icon: Award },
+    { name: 'Content', path: '/admin/content', icon: FileText },
+    { name: 'Team', path: '/admin/team', icon: Users },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <aside className="w-64 bg-white shadow-sm border-r">
-        <div className="p-6 border-b">
-          <Link to="/" className="text-xl font-bold">
-            LexPix<span className="text-yellow-400">.</span> Admin
-          </Link>
-        </div>
-        
-        <nav className="mt-6">
-          <div className="px-3 space-y-1">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive
-                      ? 'bg-yellow-50 text-yellow-700 border-r-2 border-yellow-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-        
-        <div className="absolute bottom-4 left-4 right-4">
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+  const renderSidebarContent = () => (
+    <div className="flex flex-col h-full bg-background relative z-10">
+      <div className="flex items-center justify-center mb-8">
+        <Link to="/" className="flex items-center gap-2">
+          <ChevronLeft size={18} />
+          <img 
+            src="/lovable-uploads/1d6b6728-d366-45fd-9011-da3cf0b442b4.png" 
+            alt="LexPix Logo" 
+            className="h-7 w-auto" 
+          />
+        </Link>
+        {isMobile && (
           <Button 
-            onClick={handleSignOut}
-            variant="outline" 
-            className="w-full justify-start"
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleSidebar}
+            className="absolute right-0"
           >
-            <LogOut className="mr-3 h-4 w-4" />
-            Sign Out
+            <X size={20} />
           </Button>
-        </div>
-      </aside>
+        )}
+      </div>
+
+      <nav className="space-y-1 flex-grow">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`
+                flex items-center gap-3 px-3 py-2 rounded-md transition-all text-sm
+                ${isActive 
+                  ? 'bg-primary text-primary-foreground font-medium' 
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                }
+              `}
+              onClick={() => isMobile && setSidebarOpen(false)}
+            >
+              <item.icon size={18} />
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <Separator className="my-6" />
       
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">
-          {children}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full justify-start"
+        onClick={logout}
+      >
+        <LogOut size={16} className="mr-2" />
+        Logout
+      </Button>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row bg-background">
+      {/* Mobile header */}
+      <header className="md:hidden py-4 px-6 border-b border-border sticky top-0 z-20 bg-background">
+        <div className="flex justify-between items-center">
+          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Menu size={20} />
+          </Button>
+          <div className="flex items-center justify-center flex-1">
+            <img 
+              src="/lovable-uploads/1d6b6728-d366-45fd-9011-da3cf0b442b4.png" 
+              alt="LexPix Logo" 
+              className="h-6 w-auto" 
+            />
+          </div>
+          <div className="w-10"></div> {/* Empty div for balance */}
         </div>
-      </main>
+      </header>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 p-6 border-r border-border">
+        {renderSidebarContent()}
+      </aside>
+
+      {/* Mobile Sidebar */}
+      {isMobile && (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent 
+            side="left" 
+            className="w-[80%] max-w-sm p-6 border-r border-border"
+            style={{ height: '100dvh', overflow: 'auto' }}
+          >
+            {renderSidebarContent()}
+          </SheetContent>
+        </Sheet>
+      )}
+
+      <div className="flex-grow md:max-h-screen md:overflow-y-auto">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="p-6 md:p-10"
+        >
+          {children}
+        </motion.div>
+      </div>
     </div>
   );
 };
