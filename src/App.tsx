@@ -1,14 +1,13 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { AnimatePresence } from "framer-motion";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import DatabaseInitializer from "@/components/DatabaseInitializer";
+import RequireAuth from "@/components/RequireAuth";
 
-// Client Pages
+// Import pages
 import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import Events from "./pages/Events";
@@ -16,58 +15,56 @@ import EventGallery from "./pages/EventGallery";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import InviteSignup from "./pages/InviteSignup";
+import NotFound from "./pages/NotFound";
 
-// Admin Pages
+// Import admin pages
 import Dashboard from "./pages/admin/Dashboard";
 import AdminGallery from "./pages/admin/Gallery";
 import AdminEvents from "./pages/admin/Events";
-import AdminReviews from "./pages/admin/Reviews";
-import TeamManagement from "./pages/admin/TeamManagement";
 import FeaturedProjects from "./pages/admin/FeaturedProjects";
+import AboutImages from "./pages/admin/AboutImages";
+import Reviews from "./pages/admin/Reviews";
 import ContentManager from "./pages/admin/ContentManager";
-
-import NotFound from "./pages/NotFound";
-import RequireAuth from "./components/RequireAuth";
+import TeamManagement from "./pages/admin/TeamManagement";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <HashRouter>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
         <AuthProvider>
           <DatabaseInitializer />
-          <AnimatePresence mode="wait">
+          <Toaster />
+          <BrowserRouter>
             <Routes>
-              {/* Client Routes */}
+              {/* Public routes */}
               <Route path="/" element={<Index />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/events" element={<Events />} />
-              <Route path="/events/:eventId" element={<EventGallery />} />
+              <Route path="/events/:id" element={<EventGallery />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/invite/:token" element={<InviteSignup />} />
+              <Route path="/invite-signup" element={<InviteSignup />} />
               
-              {/* Admin Routes - Protected */}
-              <Route element={<RequireAuth />}>
-                <Route path="/admin" element={<Dashboard />} />
-                <Route path="/admin/gallery" element={<AdminGallery />} />
-                <Route path="/admin/events" element={<AdminEvents />} />
-                <Route path="/admin/reviews" element={<AdminReviews />} />
-                <Route path="/admin/team" element={<TeamManagement />} />
-                <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
-                <Route path="/admin/content" element={<ContentManager />} />
-              </Route>
+              {/* Protected admin routes */}
+              <Route path="/admin/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+              <Route path="/admin/gallery" element={<RequireAuth><AdminGallery /></RequireAuth>} />
+              <Route path="/admin/events" element={<RequireAuth><AdminEvents /></RequireAuth>} />
+              <Route path="/admin/featured-projects" element={<RequireAuth><FeaturedProjects /></RequireAuth>} />
+              <Route path="/admin/about-images" element={<RequireAuth><AboutImages /></RequireAuth>} />
+              <Route path="/admin/reviews" element={<RequireAuth><Reviews /></RequireAuth>} />
+              <Route path="/admin/content" element={<RequireAuth><ContentManager /></RequireAuth>} />
+              <Route path="/admin/team" element={<RequireAuth><TeamManagement /></RequireAuth>} />
               
+              {/* 404 route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </AnimatePresence>
+          </BrowserRouter>
         </AuthProvider>
-      </HashRouter>
-      <Toaster />
-      <Sonner />
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

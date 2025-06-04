@@ -7,14 +7,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import Layout from '@/components/Layout';
 import ReviewSection from '@/components/ReviewSection';
 import ContactForm from '@/components/ContactForm';
+import PolaroidImage from '@/components/PolaroidImage';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 import { getContentSection, ContentSection } from '@/services/contentService';
+import { getAboutImages, AboutImage } from '@/services/aboutImageService';
 
 const Index = () => {
   const statsRef = useRef(null);
   const [statsVisible, setStatsVisible] = useState(false);
   const [counters, setCounters] = useState([0, 0, 0, 0]);
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
+  const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Fixed about content
@@ -41,9 +44,13 @@ const Index = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load projects
-        const projects = await getFeaturedProjects();
+        // Load projects and about images
+        const [projects, images] = await Promise.all([
+          getFeaturedProjects(),
+          getAboutImages()
+        ]);
         setFeaturedProjects(projects);
+        setAboutImages(images);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -122,6 +129,9 @@ const Index = () => {
 
   const displayProjects = featuredProjects.length > 0 ? featuredProjects : defaultProjects;
 
+  // Polaroid rotations for natural look
+  const polaroidRotations = [-8, 4, -3];
+
   return (
     <Layout>
       <section id="hero" className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
@@ -175,29 +185,66 @@ const Index = () => {
       </section>
 
       <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mb-6"
-          >
-            {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
-          </motion.h2>
-          <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
-          >
-            {aboutContent.content.split('\n').map((paragraph, index) => (
-              <p key={index} className="mb-4">{paragraph}</p>
-            ))}
-          </motion.div>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="text-3xl md:text-5xl font-bold mb-6"
+              >
+                {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
+              </motion.h2>
+              <div className="w-16 h-1 bg-yellow-400 mx-auto lg:mx-0 mb-8"></div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="text-md md:text-lg leading-relaxed"
+              >
+                {aboutContent.content.split('\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4">{paragraph}</p>
+                ))}
+              </motion.div>
+            </div>
+
+            <div className="relative">
+              <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
+                {aboutImages.length > 0 ? (
+                  aboutImages.map((image, index) => (
+                    <div key={image.id} className={index === 0 ? "col-span-2" : ""}>
+                      <PolaroidImage
+                        src={image.image_url}
+                        alt={image.alt_text || 'LexPix photography'}
+                        rotation={polaroidRotations[index] || 0}
+                        index={index}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  // Default images if no custom images are set
+                  [
+                    { src: '/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png', alt: 'Portrait photography' },
+                    { src: '/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png', alt: 'Landscape photography' },
+                    { src: '/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png', alt: 'Event photography' }
+                  ].map((image, index) => (
+                    <div key={index} className={index === 0 ? "col-span-2" : ""}>
+                      <PolaroidImage
+                        src={image.src}
+                        alt={image.alt}
+                        rotation={polaroidRotations[index] || 0}
+                        index={index}
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
