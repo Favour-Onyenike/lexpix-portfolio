@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { EventItem } from '@/components/EventCard';
 import { ImageItem } from '@/components/ImageGrid';
@@ -134,7 +133,7 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
   }
 };
 
-// Create a new event with improved image upload handling
+// Create a new event with better error handling and authentication check
 export const createEvent = async (
   eventData: { 
     title: string; 
@@ -148,9 +147,22 @@ export const createEvent = async (
     console.log('Creating event:', eventData.title);
     console.log('Total images to upload:', eventImages.length);
     
+    // Check authentication first
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('Authentication error:', authError);
+      throw new Error('User must be authenticated to create events');
+    }
+    
+    console.log('User authenticated:', user.id);
+    
     // Upload cover image
+    console.log('Uploading cover image...');
     const coverImageUrl = await uploadImage(coverImageFile, 'events/covers');
-    if (!coverImageUrl) throw new Error('Failed to upload cover image');
+    if (!coverImageUrl) {
+      throw new Error('Failed to upload cover image');
+    }
+    console.log('Cover image uploaded:', coverImageUrl);
     
     // Create event record
     const eventRecord = {
@@ -173,13 +185,15 @@ export const createEvent = async (
       throw error;
     }
     
-    console.log('Event created:', data);
+    console.log('Event created successfully:', data);
     
     // Upload event images with better error handling
     if (data && eventImages.length > 0) {
       const eventId = data.id;
       let successfulUploads = 0;
       let failedUploads = 0;
+      
+      console.log(`Starting upload of ${eventImages.length} images...`);
       
       // Process images one by one to better track failures
       for (let i = 0; i < eventImages.length; i++) {
@@ -221,19 +235,23 @@ export const createEvent = async (
       
       // Update the event's image count with actual successful uploads
       if (successfulUploads !== eventImages.length) {
-        await supabase
+        const { error: updateError } = await supabase
           .from('events')
           .update({ image_count: successfulUploads })
           .eq('id', eventId);
         
-        console.log(`Updated event image count to ${successfulUploads}`);
+        if (updateError) {
+          console.error('Error updating event image count:', updateError);
+        } else {
+          console.log(`Updated event image count to ${successfulUploads}`);
+        }
       }
     }
     
     return data ? mapToEventItem(data) : null;
   } catch (error) {
     console.error('Error creating event:', error);
-    return null;
+    throw error; // Re-throw to let the UI handle the error
   }
 };
 

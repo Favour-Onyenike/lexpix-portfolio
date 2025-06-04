@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import ImageUploader from '@/components/ImageUploader';
@@ -30,7 +31,6 @@ import { Calendar, Image, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { createEvent, deleteEvent, getEvents } from '@/services/eventService';
-import { ImageItem } from '@/components/ImageGrid';
 
 const Events = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -64,7 +64,7 @@ const Events = () => {
   }, []);
 
   const handleCreateEvent = async () => {
-    if (!newEvent.title) {
+    if (!newEvent.title?.trim()) {
       toast.error('Please enter an event title');
       return;
     }
@@ -78,10 +78,14 @@ const Events = () => {
     
     try {
       const eventData = {
-        title: newEvent.title || 'Untitled Event',
-        description: newEvent.description,
+        title: newEvent.title.trim(),
+        description: newEvent.description?.trim(),
         date: newEvent.date || format(new Date(), 'yyyy-MM-dd'),
       };
+      
+      console.log('Creating event with data:', eventData);
+      console.log('Cover image:', coverImage.name);
+      console.log('Event images count:', eventImages.length);
       
       const createdEvent = await createEvent(
         eventData,
@@ -92,6 +96,7 @@ const Events = () => {
       if (createdEvent) {
         setEvents(prev => [createdEvent, ...prev]);
         
+        // Reset form
         setNewEvent({
           title: '',
           description: '',
@@ -107,7 +112,7 @@ const Events = () => {
       }
     } catch (error) {
       console.error('Error creating event:', error);
-      toast.error('Failed to create event');
+      toast.error(error instanceof Error ? error.message : 'Failed to create event');
     } finally {
       setIsLoading(false);
     }
@@ -116,13 +121,13 @@ const Events = () => {
   const handleCoverImageUpload = (files: File[]) => {
     if (files.length > 0) {
       setCoverImage(files[0]);
-      toast.success('Cover image selected');
+      console.log('Cover image selected:', files[0].name);
     }
   };
 
   const handleEventImagesUpload = (files: File[]) => {
     setEventImages((prev) => [...prev, ...files]);
-    toast.success(`${files.length} images added to event`);
+    console.log(`${files.length} images added to event gallery`);
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -160,7 +165,7 @@ const Events = () => {
             <h1 className="text-3xl font-semibold mb-2">Event Galleries</h1>
             <p className="text-muted-foreground">Create and manage client event galleries</p>
           </div>
-          <Button onClick={() => setIsCreateOpen(true)}>
+          <Button onClick={() => setIsCreateOpen(true)} disabled={isLoading}>
             <PlusCircle size={16} className="mr-2" />
             Create Event
           </Button>
@@ -193,7 +198,7 @@ const Events = () => {
             <p className="text-muted-foreground mb-4">
               Create your first event gallery for clients
             </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
+            <Button onClick={() => setIsCreateOpen(true)} disabled={isLoading}>
               Create Event
             </Button>
           </div>
@@ -212,12 +217,13 @@ const Events = () => {
           
           <div className="grid gap-6 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Event Title</Label>
+              <Label htmlFor="title">Event Title *</Label>
               <Input
                 id="title"
-                value={newEvent.title}
+                value={newEvent.title || ''}
                 onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                 placeholder="Enter event name"
+                required
               />
             </div>
             
@@ -225,7 +231,7 @@ const Events = () => {
               <Label htmlFor="description">Description (Optional)</Label>
               <Textarea
                 id="description"
-                value={newEvent.description}
+                value={newEvent.description || ''}
                 onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                 placeholder="Briefly describe this event"
                 rows={3}
@@ -233,17 +239,18 @@ const Events = () => {
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="date">Event Date</Label>
+              <Label htmlFor="date">Event Date *</Label>
               <Input
                 id="date"
                 type="date"
-                value={newEvent.date}
+                value={newEvent.date || format(new Date(), 'yyyy-MM-dd')}
                 onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                required
               />
             </div>
             
             <div className="grid gap-2">
-              <Label>Cover Image</Label>
+              <Label>Cover Image *</Label>
               <div className="border rounded-md p-3">
                 {coverImage ? (
                   <div className="relative aspect-[16/9] overflow-hidden rounded-md">
@@ -271,7 +278,7 @@ const Events = () => {
             </div>
             
             <div className="grid gap-2">
-              <Label>Event Images</Label>
+              <Label>Event Images (Optional)</Label>
               <div className="border rounded-md p-3">
                 <ImageUploader 
                   onImageUpload={handleEventImagesUpload} 
@@ -288,9 +295,14 @@ const Events = () => {
           
           <SheetFooter className="mt-6">
             <SheetClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" disabled={isLoading}>Cancel</Button>
             </SheetClose>
-            <Button onClick={handleCreateEvent}>Create Event</Button>
+            <Button 
+              onClick={handleCreateEvent} 
+              disabled={isLoading || !newEvent.title?.trim() || !coverImage}
+            >
+              {isLoading ? 'Creating...' : 'Create Event'}
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
