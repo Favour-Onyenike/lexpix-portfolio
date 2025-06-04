@@ -9,17 +9,30 @@ interface ImageUploaderProps {
   onImageUpload: (files: File[]) => void;
   multiple?: boolean;
   className?: string;
+  autoUpload?: boolean;
+  acceptedFiles?: File[];
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ 
   onImageUpload, 
   multiple = true,
-  className 
+  className,
+  autoUpload = false,
+  acceptedFiles = []
 }) => {
   const [dragActive, setDragActive] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>(acceptedFiles);
   const [previews, setPreviews] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update internal state when acceptedFiles prop changes
+  React.useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      setSelectedFiles(acceptedFiles);
+      const newPreviews = acceptedFiles.map(file => URL.createObjectURL(file));
+      setPreviews(newPreviews);
+    }
+  }, [acceptedFiles]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -55,8 +68,16 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     // Create preview URLs
     const newPreviews = validFiles.map(file => URL.createObjectURL(file));
     
-    setSelectedFiles(prev => multiple ? [...prev, ...validFiles] : validFiles);
-    setPreviews(prev => multiple ? [...prev, ...newPreviews] : newPreviews);
+    const updatedFiles = multiple ? [...selectedFiles, ...validFiles] : validFiles;
+    const updatedPreviews = multiple ? [...previews, ...newPreviews] : newPreviews;
+    
+    setSelectedFiles(updatedFiles);
+    setPreviews(updatedPreviews);
+    
+    // Auto-upload if enabled
+    if (autoUpload) {
+      onImageUpload(updatedFiles);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -82,14 +103,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   };
 
   const handleRemoveFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    const newPreviews = previews.filter((_, i) => i !== index);
+    
+    setSelectedFiles(newFiles);
     
     // Release object URL to avoid memory leaks
     URL.revokeObjectURL(previews[index]);
-    setPreviews(prev => prev.filter((_, i) => i !== index));
+    setPreviews(newPreviews);
+    
+    // Update parent component if auto-upload is enabled
+    if (autoUpload) {
+      onImageUpload(newFiles);
+    }
   };
 
-  const handleUpload = () => {
+  const handleManualUpload = () => {
     if (selectedFiles.length === 0) {
       toast.error('Please select at least one image');
       return;
@@ -97,11 +126,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     
     onImageUpload(selectedFiles);
     
-    // Clear previews and files after upload
+    if (!autoUpload) {
+      // Clear previews and files after manual upload
+      previews.forEach(URL.revokeObjectURL);
+      setSelectedFiles([]);
+      setPreviews([]);
+      toast.success('Images uploaded successfully');
+    }
+  };
+
+  const clearAll = () => {
     previews.forEach(URL.revokeObjectURL);
     setSelectedFiles([]);
     setPreviews([]);
-    toast.success('Images uploaded successfully');
+    if (autoUpload) {
+      onImageUpload([]);
+    }
   };
 
   return (
@@ -129,9 +169,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           <div className="rounded-full bg-secondary p-3">
             <Upload size={24} className="text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-medium mt-2">Drag images here</h3>
+          <h3 className="text-lg font-medium mt-2">
+            {selectedFiles.length > 0 ? 'Add more images' : 'Drag images here'}
+          </h3>
           <p className="text-sm text-muted-foreground mb-2">
-            Upload JPG, PNG or GIF files
+            Upload JPG, PNG or GIF files {multiple ? '(multiple allowed)' : '(single file)'}
           </p>
           <Button 
             type="button" 
@@ -147,10 +189,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         <div className="mt-6">
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-medium">Selected images ({previews.length})</h4>
-            <Button onClick={handleUpload} size="sm">
-              <Check size={16} className="mr-2" />
-              Upload All
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={clearAll} size="sm" variant="outline">
+                Clear All
+              </Button>
+              {!autoUpload && (
+                <Button onClick={handleManualUpload} size="sm">
+                  <Check size={16} className="mr-2" />
+                  Upload All
+                </Button>
+              )}
+            </div>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

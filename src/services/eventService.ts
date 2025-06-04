@@ -73,6 +73,49 @@ const updateEventImageCount = async (eventId: string): Promise<number> => {
   }
 };
 
+// Validation functions
+const validateEventData = (eventData: { title: string; description?: string; date: string }) => {
+  const errors: string[] = [];
+  
+  if (!eventData.title?.trim()) {
+    errors.push('Event title is required');
+  }
+  
+  if (eventData.title && eventData.title.trim().length > 100) {
+    errors.push('Event title must be less than 100 characters');
+  }
+  
+  if (!eventData.date) {
+    errors.push('Event date is required');
+  }
+  
+  try {
+    const date = new Date(eventData.date);
+    if (isNaN(date.getTime())) {
+      errors.push('Invalid event date format');
+    }
+  } catch {
+    errors.push('Invalid event date format');
+  }
+  
+  return errors;
+};
+
+const validateImageFile = (file: File): string[] => {
+  const errors: string[] = [];
+  
+  if (!file.type.startsWith('image/')) {
+    errors.push(`${file.name} is not a valid image file`);
+  }
+  
+  // Check file size (max 10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    errors.push(`${file.name} is too large (max 10MB)`);
+  }
+  
+  return errors;
+};
+
 // Get all events with corrected image counts
 export const getEvents = async (): Promise<EventItem[]> => {
   try {
@@ -106,6 +149,10 @@ export const getEvents = async (): Promise<EventItem[]> => {
 // Get a specific event with corrected image count
 export const getEvent = async (id: string): Promise<EventItem | null> => {
   try {
+    if (!id || typeof id !== 'string') {
+      throw new Error('Invalid event ID');
+    }
+
     const { data, error } = await supabase
       .from('events')
       .select('*')
@@ -133,7 +180,7 @@ export const getEvent = async (id: string): Promise<EventItem | null> => {
   }
 };
 
-// Create a new event with better error handling and authentication check
+// Create a new event with comprehensive validation and error handling
 export const createEvent = async (
   eventData: { 
     title: string; 
@@ -144,14 +191,35 @@ export const createEvent = async (
   eventImages: File[]
 ): Promise<EventItem | null> => {
   try {
-    console.log('Creating event:', eventData.title);
-    console.log('Total images to upload:', eventImages.length);
+    console.log('Starting event creation process...');
     
-    // Check authentication first
+    // Validate input data
+    const eventValidationErrors = validateEventData(eventData);
+    if (eventValidationErrors.length > 0) {
+      throw new Error(`Validation errors: ${eventValidationErrors.join(', ')}`);
+    }
+    
+    // Validate cover image
+    const coverImageErrors = validateImageFile(coverImageFile);
+    if (coverImageErrors.length > 0) {
+      throw new Error(`Cover image errors: ${coverImageErrors.join(', ')}`);
+    }
+    
+    // Validate event images
+    for (const file of eventImages) {
+      const imageErrors = validateImageFile(file);
+      if (imageErrors.length > 0) {
+        throw new Error(`Event image errors: ${imageErrors.join(', ')}`);
+      }
+    }
+    
+    console.log('All validations passed');
+    
+    // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       console.error('Authentication error:', authError);
-      throw new Error('User must be authenticated to create events');
+      throw new Error('You must be logged in to create events');
     }
     
     console.log('User authenticated:', user.id);
@@ -160,20 +228,20 @@ export const createEvent = async (
     console.log('Uploading cover image...');
     const coverImageUrl = await uploadImage(coverImageFile, 'events/covers');
     if (!coverImageUrl) {
-      throw new Error('Failed to upload cover image');
+      throw new Error('Failed to upload cover image. Please try again.');
     }
-    console.log('Cover image uploaded:', coverImageUrl);
+    console.log('Cover image uploaded successfully:', coverImageUrl);
     
     // Create event record
     const eventRecord = {
-      title: eventData.title,
-      description: eventData.description || null,
+      title: eventData.title.trim(),
+      description: eventData.description?.trim() || null,
       date: eventData.date,
       cover_image: coverImageUrl,
       image_count: eventImages.length
     };
     
-    console.log('Inserting event record:', eventRecord);
+    console.log('Creating event record:', eventRecord);
     const { data, error } = await supabase
       .from('events')
       .insert([eventRecord])
@@ -182,23 +250,24 @@ export const createEvent = async (
     
     if (error) {
       console.error('Error inserting event:', error);
-      throw error;
+      throw new Error(`Failed to create event: ${error.message}`);
     }
     
     console.log('Event created successfully:', data);
     
-    // Upload event images with better error handling
+    // Upload event images with detailed progress tracking
     if (data && eventImages.length > 0) {
       const eventId = data.id;
       let successfulUploads = 0;
       let failedUploads = 0;
+      const failedFiles: string[] = [];
       
-      console.log(`Starting upload of ${eventImages.length} images...`);
+      console.log(`Starting upload of ${eventImages.length} event images...`);
       
-      // Process images one by one to better track failures
+      // Process images sequentially for better error tracking
       for (let i = 0; i < eventImages.length; i++) {
         const file = eventImages[i];
-        console.log(`Uploading image ${i + 1} of ${eventImages.length}: ${file.name}`);
+        console.log(`Processing image ${i + 1} of ${eventImages.length}: ${file.name}`);
         
         try {
           // Upload the image file
@@ -215,43 +284,49 @@ export const createEvent = async (
               }]);
             
             if (insertError) {
-              console.error(`Failed to insert image ${i + 1} into database:`, insertError);
+              console.error(`Failed to save image ${i + 1} to database:`, insertError);
               failedUploads++;
+              failedFiles.push(file.name);
             } else {
-              console.log(`Successfully uploaded and saved image ${i + 1}`);
+              console.log(`Successfully uploaded and saved image ${i + 1}: ${file.name}`);
               successfulUploads++;
             }
           } else {
             console.error(`Failed to upload image ${i + 1}: ${file.name}`);
             failedUploads++;
+            failedFiles.push(file.name);
           }
         } catch (uploadError) {
           console.error(`Error processing image ${i + 1}:`, uploadError);
           failedUploads++;
+          failedFiles.push(file.name);
         }
       }
       
       console.log(`Upload summary: ${successfulUploads} successful, ${failedUploads} failed`);
       
+      if (failedFiles.length > 0) {
+        console.warn('Failed to upload some images:', failedFiles);
+      }
+      
       // Update the event's image count with actual successful uploads
-      if (successfulUploads !== eventImages.length) {
-        const { error: updateError } = await supabase
-          .from('events')
-          .update({ image_count: successfulUploads })
-          .eq('id', eventId);
-        
-        if (updateError) {
-          console.error('Error updating event image count:', updateError);
-        } else {
-          console.log(`Updated event image count to ${successfulUploads}`);
-        }
+      const { error: updateError } = await supabase
+        .from('events')
+        .update({ image_count: successfulUploads })
+        .eq('id', eventId);
+      
+      if (updateError) {
+        console.error('Error updating event image count:', updateError);
+      } else {
+        console.log(`Updated event image count to ${successfulUploads}`);
+        data.image_count = successfulUploads;
       }
     }
     
     return data ? mapToEventItem(data) : null;
   } catch (error) {
-    console.error('Error creating event:', error);
-    throw error; // Re-throw to let the UI handle the error
+    console.error('Error in createEvent:', error);
+    throw error; // Re-throw to let the UI handle the error with proper message
   }
 };
 

@@ -27,7 +27,7 @@ import {
   AlertDialogTitle 
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Calendar, Image, PlusCircle } from 'lucide-react';
+import { Calendar, Image, PlusCircle, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { createEvent, deleteEvent, getEvents } from '@/services/eventService';
@@ -44,6 +44,7 @@ const Events = () => {
   const [eventImages, setEventImages] = useState<File[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const loadEvents = async () => {
     setIsLoading(true);
@@ -63,14 +64,32 @@ const Events = () => {
     loadEvents();
   }, []);
 
-  const handleCreateEvent = async () => {
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    
     if (!newEvent.title?.trim()) {
-      toast.error('Please enter an event title');
-      return;
+      errors.title = 'Event title is required';
     }
-
+    
     if (!coverImage) {
-      toast.error('Please upload a cover image');
+      errors.coverImage = 'Cover image is required';
+    }
+    
+    if (!newEvent.date) {
+      errors.date = 'Event date is required';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCreateEvent = async () => {
+    console.log('Create event clicked');
+    console.log('Cover image:', coverImage?.name);
+    console.log('Form data:', newEvent);
+    
+    if (!validateForm()) {
+      toast.error('Please fill in all required fields');
       return;
     }
 
@@ -78,18 +97,18 @@ const Events = () => {
     
     try {
       const eventData = {
-        title: newEvent.title.trim(),
+        title: newEvent.title!.trim(),
         description: newEvent.description?.trim(),
         date: newEvent.date || format(new Date(), 'yyyy-MM-dd'),
       };
       
       console.log('Creating event with data:', eventData);
-      console.log('Cover image:', coverImage.name);
+      console.log('Cover image:', coverImage!.name);
       console.log('Event images count:', eventImages.length);
       
       const createdEvent = await createEvent(
         eventData,
-        coverImage,
+        coverImage!,
         eventImages
       );
       
@@ -97,13 +116,7 @@ const Events = () => {
         setEvents(prev => [createdEvent, ...prev]);
         
         // Reset form
-        setNewEvent({
-          title: '',
-          description: '',
-          date: format(new Date(), 'yyyy-MM-dd'),
-        });
-        setCoverImage(null);
-        setEventImages([]);
+        resetForm();
         setIsCreateOpen(false);
         
         toast.success('Event created successfully');
@@ -118,16 +131,30 @@ const Events = () => {
     }
   };
 
+  const resetForm = () => {
+    setNewEvent({
+      title: '',
+      description: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+    });
+    setCoverImage(null);
+    setEventImages([]);
+    setFormErrors({});
+  };
+
   const handleCoverImageUpload = (files: File[]) => {
     if (files.length > 0) {
       setCoverImage(files[0]);
+      setFormErrors(prev => ({ ...prev, coverImage: '' }));
       console.log('Cover image selected:', files[0].name);
+    } else {
+      setCoverImage(null);
     }
   };
 
   const handleEventImagesUpload = (files: File[]) => {
-    setEventImages((prev) => [...prev, ...files]);
-    console.log(`${files.length} images added to event gallery`);
+    setEventImages(files);
+    console.log(`${files.length} images selected for event gallery`);
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -156,6 +183,16 @@ const Events = () => {
       }
     }
   };
+
+  const handleFormFieldChange = (field: string, value: string) => {
+    setNewEvent(prev => ({ ...prev, [field]: value }));
+    // Clear field error when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const isFormValid = newEvent.title?.trim() && coverImage && newEvent.date;
 
   return (
     <AdminLayout>
@@ -206,7 +243,12 @@ const Events = () => {
       </div>
 
       {/* Create Event Sheet */}
-      <Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+      <Sheet open={isCreateOpen} onOpenChange={(open) => {
+        setIsCreateOpen(open);
+        if (!open) {
+          resetForm();
+        }
+      }}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader className="mb-6">
             <SheetTitle>Create New Event</SheetTitle>
@@ -217,14 +259,21 @@ const Events = () => {
           
           <div className="grid gap-6 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Event Title *</Label>
+              <Label htmlFor="title" className="flex items-center gap-2">
+                Event Title *
+                {newEvent.title?.trim() && <CheckCircle size={16} className="text-green-500" />}
+              </Label>
               <Input
                 id="title"
                 value={newEvent.title || ''}
-                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                onChange={(e) => handleFormFieldChange('title', e.target.value)}
                 placeholder="Enter event name"
+                className={formErrors.title ? 'border-red-500' : ''}
                 required
               />
+              {formErrors.title && (
+                <p className="text-sm text-red-500">{formErrors.title}</p>
+              )}
             </div>
             
             <div className="grid gap-2">
@@ -232,26 +281,36 @@ const Events = () => {
               <Textarea
                 id="description"
                 value={newEvent.description || ''}
-                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                onChange={(e) => handleFormFieldChange('description', e.target.value)}
                 placeholder="Briefly describe this event"
                 rows={3}
               />
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="date">Event Date *</Label>
+              <Label htmlFor="date" className="flex items-center gap-2">
+                Event Date *
+                {newEvent.date && <CheckCircle size={16} className="text-green-500" />}
+              </Label>
               <Input
                 id="date"
                 type="date"
                 value={newEvent.date || format(new Date(), 'yyyy-MM-dd')}
-                onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                onChange={(e) => handleFormFieldChange('date', e.target.value)}
+                className={formErrors.date ? 'border-red-500' : ''}
                 required
               />
+              {formErrors.date && (
+                <p className="text-sm text-red-500">{formErrors.date}</p>
+              )}
             </div>
             
             <div className="grid gap-2">
-              <Label>Cover Image *</Label>
-              <div className="border rounded-md p-3">
+              <Label className="flex items-center gap-2">
+                Cover Image *
+                {coverImage && <CheckCircle size={16} className="text-green-500" />}
+              </Label>
+              <div className={`border rounded-md p-3 ${formErrors.coverImage ? 'border-red-500' : ''}`}>
                 {coverImage ? (
                   <div className="relative aspect-[16/9] overflow-hidden rounded-md">
                     <img 
@@ -263,7 +322,10 @@ const Events = () => {
                       variant="outline"
                       size="sm"
                       className="absolute bottom-2 right-2"
-                      onClick={() => setCoverImage(null)}
+                      onClick={() => {
+                        setCoverImage(null);
+                        setFormErrors(prev => ({ ...prev, coverImage: 'Cover image is required' }));
+                      }}
                     >
                       Replace
                     </Button>
@@ -271,10 +333,14 @@ const Events = () => {
                 ) : (
                   <ImageUploader 
                     onImageUpload={handleCoverImageUpload} 
-                    multiple={false} 
+                    multiple={false}
+                    autoUpload={true}
                   />
                 )}
               </div>
+              {formErrors.coverImage && (
+                <p className="text-sm text-red-500">{formErrors.coverImage}</p>
+              )}
             </div>
             
             <div className="grid gap-2">
@@ -283,9 +349,12 @@ const Events = () => {
                 <ImageUploader 
                   onImageUpload={handleEventImagesUpload} 
                   multiple={true}
+                  autoUpload={true}
+                  acceptedFiles={eventImages}
                 />
                 {eventImages.length > 0 && (
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                    <CheckCircle size={16} className="text-green-500" />
                     {eventImages.length} images selected
                   </p>
                 )}
@@ -299,9 +368,13 @@ const Events = () => {
             </SheetClose>
             <Button 
               onClick={handleCreateEvent} 
-              disabled={isLoading || !newEvent.title?.trim() || !coverImage}
+              disabled={isLoading || !isFormValid}
+              className="relative"
             >
               {isLoading ? 'Creating...' : 'Create Event'}
+              {isFormValid && !isLoading && (
+                <CheckCircle size={16} className="ml-2" />
+              )}
             </Button>
           </SheetFooter>
         </SheetContent>
