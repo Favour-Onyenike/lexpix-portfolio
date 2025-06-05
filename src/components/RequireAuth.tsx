@@ -1,24 +1,34 @@
 
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { Loader } from 'lucide-react';
 
-interface RequireAuthProps {
-  children: React.ReactNode;
-}
-
-const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
+const RequireAuth = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  
+  // Log authentication status for debugging
+  useEffect(() => {
+    console.log('Auth status in RequireAuth:', { isAuthenticated, isLoading });
+  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 export default RequireAuth;
