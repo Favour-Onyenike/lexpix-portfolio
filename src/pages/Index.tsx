@@ -19,12 +19,16 @@ const Index = () => {
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
   const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showFullText, setShowFullText] = useState(false);
   
   // Fixed about content
   const aboutContent = {
     title: 'About',
     content: "LexPix is a photography and visual storytelling brand built on passion, purpose, and love. Founded by Volks \"Lucas Uzum\", LexPix was born under the Lexaren Corporation, proudly owned by the Uzum family. This venture was made possible through the unwavering love, support, and initial funding from his parents, whose belief laid the foundation for everything LexPix is becoming.\nWith a sharp eye for detail and a heart for storytelling, LexPix captures life's most meaningful moments, the smiles, glances, and emotions, all in their purest, most vibrant form. Through high-quality photography and visual content, we aim to help others see the color and beauty in their own stories. Every frame we take is a reflection of the love that birthed this vision, and a commitment to preserving the essence of every moment we touch."
   };
+
+  const firstParagraph = aboutContent.content.split('\n')[0];
+  const remainingText = aboutContent.content.split('\n').slice(1).join('\n');
   
   const statsData = [
     { target: 25, label: "Satisfied Clients" },
@@ -186,8 +190,8 @@ const Index = () => {
 
       <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div className="order-1">
               <motion.h2 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -197,7 +201,7 @@ const Index = () => {
               >
                 {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
               </motion.h2>
-              <div className="w-16 h-1 bg-yellow-400 mx-auto lg:mx-0 mb-8"></div>
+              <div className="w-16 h-1 bg-yellow-400 mb-8"></div>
               
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -206,13 +210,30 @@ const Index = () => {
                 viewport={{ once: true }}
                 className="text-md md:text-lg leading-relaxed"
               >
-                {aboutContent.content.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
+                <p className="mb-4">{firstParagraph}</p>
+                {showFullText && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-4"
+                  >
+                    {remainingText.split('\n').map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </motion.div>
+                )}
+                <button
+                  onClick={() => setShowFullText(!showFullText)}
+                  className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200 mt-4 inline-flex items-center gap-2"
+                >
+                  {showFullText ? 'Read less' : 'Read more'}
+                  <ArrowRight className={`h-4 w-4 transition-transform duration-200 ${showFullText ? 'rotate-180' : ''}`} />
+                </button>
               </motion.div>
             </div>
 
-            <div className="relative">
+            <div className="order-2 relative">
               <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
                 {aboutImages.length > 0 ? (
                   aboutImages.map((image, index) => (
