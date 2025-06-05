@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import Layout from '@/components/Layout';
 import ReviewSection from '@/components/ReviewSection';
 import ContactForm from '@/components/ContactForm';
-import PolaroidImage from '@/components/PolaroidImage';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 import { getContentSection, ContentSection } from '@/services/contentService';
 
@@ -176,70 +175,29 @@ const Index = () => {
       </section>
 
       <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto text-center">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mb-12 text-center"
+            className="text-3xl md:text-5xl font-bold mb-6"
           >
             {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
           </motion.h2>
-          <div className="w-16 h-1 bg-yellow-400 mx-auto mb-16"></div>
+          <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Text Content - Left Side */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              {aboutContent.content.split('\n').map((paragraph, index) => (
-                <p key={index} className="text-lg leading-relaxed text-gray-300">
-                  {paragraph}
-                </p>
-              ))}
-            </motion.div>
-
-            {/* Polaroid Images - Right Side */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center space-y-6"
-            >
-              <div className="relative">
-                <PolaroidImage
-                  src="/lovable-uploads/f8361f6e-4625-4ae2-af1c-c08f29a899e4.png"
-                  alt="Behind the lens"
-                  rotation={-8}
-                  delay={0.1}
-                />
-              </div>
-              
-              <div className="relative ml-4">
-                <PolaroidImage
-                  src="/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png"
-                  alt="Capturing moments"
-                  rotation={5}
-                  delay={0.3}
-                />
-              </div>
-              
-              <div className="relative -ml-2">
-                <PolaroidImage
-                  src="/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png"
-                  alt="Our passion"
-                  rotation={-3}
-                  delay={0.5}
-                />
-              </div>
-            </motion.div>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
+          >
+            {aboutContent.content.split('\n').map((paragraph, index) => (
+              <p key={index} className="mb-4">{paragraph}</p>
+            ))}
+          </motion.div>
         </div>
       </section>
 

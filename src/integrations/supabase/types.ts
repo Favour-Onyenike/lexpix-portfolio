@@ -9,33 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      about_images: {
-        Row: {
-          alt_text: string | null
-          created_at: string
-          id: string
-          image_url: string
-          sort_order: number
-          updated_at: string
-        }
-        Insert: {
-          alt_text?: string | null
-          created_at?: string
-          id?: string
-          image_url: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Update: {
-          alt_text?: string | null
-          created_at?: string
-          id?: string
-          image_url?: string
-          sort_order?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
       content_sections: {
         Row: {
           content: string
