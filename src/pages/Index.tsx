@@ -188,14 +188,14 @@ const Index = () => {
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-16"></div>
           
-          <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Text Content - Left Side */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="flex-1 lg:flex-[2] space-y-6"
+              className="space-y-6"
             >
               {aboutContent.content.split('\n').map((paragraph, index) => (
                 <p key={index} className="text-lg leading-relaxed text-gray-300">
@@ -210,7 +210,7 @@ const Index = () => {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              className="flex-1 flex flex-col items-center space-y-6"
+              className="flex flex-col items-center space-y-6"
             >
               <div className="relative">
                 <PolaroidImage
