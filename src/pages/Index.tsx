@@ -188,14 +188,14 @@ const Index = () => {
           </motion.h2>
           <div className="w-16 h-1 bg-yellow-400 mx-auto mb-16"></div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Text Content - Left Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+            {/* Text Content - Left Side (2 columns) */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="space-y-6"
+              className="lg:col-span-2 space-y-6"
             >
               {aboutContent.content.split('\n').map((paragraph, index) => (
                 <p key={index} className="text-lg leading-relaxed text-gray-300">
@@ -204,37 +204,37 @@ const Index = () => {
               ))}
             </motion.div>
 
-            {/* Polaroid Images - Right Side */}
+            {/* Polaroid Images - Right Side (1 column) */}
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              className="relative flex flex-col space-y-8"
+              className="flex flex-col items-center space-y-6"
             >
               <div className="relative">
                 <PolaroidImage
                   src="/lovable-uploads/f8361f6e-4625-4ae2-af1c-c08f29a899e4.png"
                   alt="Behind the lens"
-                  rotation={-5}
+                  rotation={-8}
                   delay={0.1}
                 />
               </div>
               
-              <div className="relative ml-8">
+              <div className="relative ml-4">
                 <PolaroidImage
                   src="/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png"
                   alt="Capturing moments"
-                  rotation={3}
+                  rotation={5}
                   delay={0.3}
                 />
               </div>
               
-              <div className="relative -ml-4">
+              <div className="relative -ml-2">
                 <PolaroidImage
                   src="/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png"
                   alt="Our passion"
-                  rotation={-2}
+                  rotation={-3}
                   delay={0.5}
                 />
               </div>
