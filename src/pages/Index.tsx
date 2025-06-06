@@ -20,7 +20,8 @@ const Index = () => {
   // Fixed about content
   const aboutContent = {
     title: 'About',
-    content: "LexPix is a photography and visual storytelling brand built on passion, purpose, and love. Founded by Volks \"Lucas Uzum\", LexPix was born under the Lexaren Corporation, proudly owned by the Uzum family. This venture was made possible through the unwavering love, support, and initial funding from his parents, whose belief laid the foundation for everything LexPix is becoming.\nWith a sharp eye for detail and a heart for storytelling, LexPix captures life's most meaningful moments, the smiles, glances, and emotions, all in their purest, most vibrant form. Through high-quality photography and visual content, we aim to help others see the color and beauty in their own stories. Every frame we take is a reflection of the love that birthed this vision, and a commitment to preserving the essence of every moment we touch."
+    subtitle: 'Capturing life through our lens',
+    content: "LexPix is a photography and visual storytelling brand built on passion, purpose, and love. Founded by Volks \"Lucas Uzum\", LexPix was born under the Lexaren Corporation, proudly owned by the Uzum family. This venture was made possible through the unwavering love, support, and initial funding from his parents, whose belief laid the foundation for everything LexPix is becoming.\n\nWith a sharp eye for detail and a heart for storytelling, LexPix captures life's most meaningful moments, the smiles, glances, and emotions, all in their purest, most vibrant form. Through high-quality photography and visual content, we aim to help others see the color and beauty in their own stories. Every frame we take is a reflection of the love that birthed this vision, and a commitment to preserving the essence of every moment we touch."
   };
   
   const statsData = [
@@ -175,29 +176,62 @@ const Index = () => {
       </section>
 
       <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mb-6"
-          >
-            {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
-          </motion.h2>
-          <div className="w-16 h-1 bg-yellow-400 mx-auto mb-12"></div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-md md:text-lg max-w-4xl mx-auto leading-relaxed"
-          >
-            {aboutContent.content.split('\n').map((paragraph, index) => (
-              <p key={index} className="mb-4">{paragraph}</p>
-            ))}
-          </motion.div>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            {/* Left Column - Text Content */}
+            <div className="w-full lg:w-1/2">
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="text-3xl md:text-5xl font-bold mb-4"
+              >
+                {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
+              </motion.h2>
+              
+              <motion.h3
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+                className="text-xl md:text-2xl text-yellow-400 mb-8 font-light"
+              >
+                {aboutContent.subtitle}
+              </motion.h3>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="text-md md:text-lg leading-relaxed"
+              >
+                {aboutContent.content.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4">{paragraph}</p>
+                ))}
+              </motion.div>
+            </div>
+            
+            {/* Right Column - Image */}
+            <div className="w-full lg:w-1/2">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="aspect-[4/3] overflow-hidden rounded-lg">
+                  <img 
+                    src="/lovable-uploads/f8361f6e-4625-4ae2-af1c-c08f29a899e4.png" 
+                    alt="About LexPix Photography" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
