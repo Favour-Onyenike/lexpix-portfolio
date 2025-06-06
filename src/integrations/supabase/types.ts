@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      about_images: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          id: string
+          image_url: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       content_sections: {
         Row: {
           content: string
@@ -179,6 +206,45 @@ export type Database = {
           token?: string
           used?: boolean | null
           used_by?: string | null
+        }
+        Relationships: []
+      }
+      pricing_cards: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string
+          features: string[] | null
+          id: string
+          is_featured: boolean | null
+          price: number
+          sort_order: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description: string
+          features?: string[] | null
+          id?: string
+          is_featured?: boolean | null
+          price: number
+          sort_order?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string
+          features?: string[] | null
+          id?: string
+          is_featured?: boolean | null
+          price?: number
+          sort_order?: number | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

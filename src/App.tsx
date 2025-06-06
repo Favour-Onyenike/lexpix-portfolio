@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import Events from "./pages/Events";
 import EventGallery from "./pages/EventGallery";
+import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import InviteSignup from "./pages/InviteSignup";
@@ -25,6 +26,7 @@ import AdminReviews from "./pages/admin/Reviews";
 import TeamManagement from "./pages/admin/TeamManagement";
 import FeaturedProjects from "./pages/admin/FeaturedProjects";
 import ContentManager from "./pages/admin/ContentManager";
+import AdminPricing from "./pages/admin/Pricing";
 
 import NotFound from "./pages/NotFound";
 import RequireAuth from "./components/RequireAuth";
@@ -44,6 +46,7 @@ const App = () => (
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/:eventId" element={<EventGallery />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/invite/:token" element={<InviteSignup />} />
@@ -57,6 +60,7 @@ const App = () => (
                 <Route path="/admin/team" element={<TeamManagement />} />
                 <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
                 <Route path="/admin/content" element={<ContentManager />} />
+                <Route path="/admin/pricing" element={<AdminPricing />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />
