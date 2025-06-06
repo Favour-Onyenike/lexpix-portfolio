@@ -7,14 +7,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import Layout from '@/components/Layout';
 import ReviewSection from '@/components/ReviewSection';
 import ContactForm from '@/components/ContactForm';
+import PolaroidImage from '@/components/PolaroidImage';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 import { getContentSection, ContentSection } from '@/services/contentService';
+import { aboutImageService, AboutImage } from '@/services/aboutImageService';
 
 const Index = () => {
   const statsRef = useRef(null);
   const [statsVisible, setStatsVisible] = useState(false);
   const [counters, setCounters] = useState([0, 0, 0, 0]);
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
+  const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Fixed about content
@@ -42,9 +45,13 @@ const Index = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load projects
-        const projects = await getFeaturedProjects();
+        // Load projects and about images
+        const [projects, images] = await Promise.all([
+          getFeaturedProjects(),
+          aboutImageService.getAboutImages()
+        ]);
         setFeaturedProjects(projects);
+        setAboutImages(images);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -213,7 +220,7 @@ const Index = () => {
               </motion.div>
             </div>
             
-            {/* Right Column - Image */}
+            {/* Right Column - Polaroid Images */}
             <div className="w-full lg:w-1/2">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -222,12 +229,47 @@ const Index = () => {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                  <img 
-                    src="/lovable-uploads/f8361f6e-4625-4ae2-af1c-c08f29a899e4.png" 
-                    alt="About LexPix Photography" 
-                    className="w-full h-full object-cover"
-                  />
+                <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                  {/* Display up to 3 images in a grid */}
+                  {aboutImages.slice(0, 3).map((image, index) => (
+                    <div
+                      key={image.id}
+                      className={index === 2 ? "col-span-2 flex justify-center" : ""}
+                    >
+                      <PolaroidImage
+                        src={image.image_url}
+                        alt={image.alt_text || `About image ${index + 1}`}
+                        rotation={index === 0 ? -5 : index === 1 ? 5 : -2}
+                        className="max-w-[200px]"
+                      />
+                    </div>
+                  ))}
+                  
+                  {/* Fallback if no images */}
+                  {aboutImages.length === 0 && (
+                    <>
+                      <PolaroidImage
+                        src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=400&fit=crop"
+                        alt="Photography workspace"
+                        rotation={-5}
+                        className="max-w-[200px]"
+                      />
+                      <PolaroidImage
+                        src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop"
+                        alt="Camera equipment"
+                        rotation={5}
+                        className="max-w-[200px]"
+                      />
+                      <div className="col-span-2 flex justify-center">
+                        <PolaroidImage
+                          src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop"
+                          alt="Creative process"
+                          rotation={-2}
+                          className="max-w-[200px]"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </motion.div>
             </div>

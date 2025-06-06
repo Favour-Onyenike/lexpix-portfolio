@@ -1,7 +1,6 @@
 
-
-
 @import url('https://fonts.cdnfonts.com/css/summer-fling');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -63,11 +62,11 @@
   }
 }
 
-/* Removing logo-font class as we'll apply the font directly */
+.font-handwriting {
+  font-family: 'Kalam', cursive;
+}
 
 .glass-panel {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
 }
-
-
