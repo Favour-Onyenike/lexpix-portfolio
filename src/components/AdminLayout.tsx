@@ -59,7 +59,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">
-            LexPix<span className="text-yellow-400">.</span> Admin
+            LexPix<span className="text-yellow-400">.</span>
           </h2>
           {isMobile && (
             <button
