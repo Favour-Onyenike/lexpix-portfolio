@@ -14,7 +14,8 @@ import {
   Menu, 
   X, 
   Home,
-  DollarSign
+  DollarSign,
+  ImageIcon
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -38,6 +39,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { icon: Star, label: 'Reviews', path: '/admin/reviews' },
     { icon: Users, label: 'Team', path: '/admin/team' },
     { icon: FileText, label: 'Featured Projects', path: '/admin/featured-projects' },
+    { icon: ImageIcon, label: 'About Images', path: '/admin/about-images' },
     { icon: Edit, label: 'Content', path: '/admin/content' },
   ];
 
