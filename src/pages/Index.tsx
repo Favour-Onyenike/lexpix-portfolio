@@ -220,82 +220,104 @@ const Index = () => {
               </motion.div>
             </div>
             
-            {/* Right Column - Polaroid Images */}
+            {/* Right Column - Scattered Polaroid Images */}
             <div className="w-full lg:w-1/2">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="relative"
+                className="relative h-96 w-full max-w-lg mx-auto"
               >
-                <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
-                  {/* Show loading Polaroids or actual images */}
-                  {isLoading ? (
-                    <>
-                      {/* Loading state - show 3 empty Polaroids */}
+                {/* Scattered layout for Polaroids */}
+                {isLoading ? (
+                  <>
+                    {/* Loading state - show 3 empty Polaroids scattered */}
+                    <div className="absolute top-4 left-8">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={-5}
-                        className="max-w-[200px]"
+                        rotation={-12}
+                        className="max-w-[180px]"
                       />
+                    </div>
+                    <div className="absolute top-16 right-4">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={5}
-                        className="max-w-[200px]"
+                        rotation={15}
+                        className="max-w-[180px]"
                       />
-                      <div className="col-span-2 flex justify-center">
-                        <PolaroidImage
-                          src=""
-                          alt=""
-                          rotation={-2}
-                          className="max-w-[200px]"
-                        />
-                      </div>
-                    </>
-                  ) : aboutImages.length > 0 ? (
-                    /* Display actual images from database */
-                    aboutImages.slice(0, 3).map((image, index) => (
+                    </div>
+                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                      <PolaroidImage
+                        src=""
+                        alt=""
+                        rotation={-6}
+                        className="max-w-[180px]"
+                      />
+                    </div>
+                  </>
+                ) : aboutImages.length > 0 ? (
+                  /* Display actual images from database - scattered */
+                  aboutImages.slice(0, 3).map((image, index) => {
+                    const positions = [
+                      { top: '1rem', left: '2rem', rotation: -12 },
+                      { top: '4rem', right: '1rem', rotation: 15 },
+                      { bottom: '2rem', left: '50%', transform: 'translateX(-50%)', rotation: -6 }
+                    ];
+                    const position = positions[index] || positions[0];
+                    
+                    return (
                       <div
                         key={image.id}
-                        className={index === 2 ? "col-span-2 flex justify-center" : ""}
+                        className="absolute"
+                        style={{
+                          top: position.top,
+                          left: position.left,
+                          right: position.right,
+                          bottom: position.bottom,
+                          transform: position.transform
+                        }}
                       >
                         <PolaroidImage
                           src={image.image_url}
                           alt={image.alt_text || `About image ${index + 1}`}
-                          rotation={index === 0 ? -5 : index === 1 ? 5 : -2}
-                          className="max-w-[200px]"
+                          rotation={position.rotation}
+                          className="max-w-[180px]"
                         />
                       </div>
-                    ))
-                  ) : (
-                    /* No images in database - show empty Polaroids */
-                    <>
+                    );
+                  })
+                ) : (
+                  /* No images in database - show empty Polaroids scattered */
+                  <>
+                    <div className="absolute top-4 left-8">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={-5}
-                        className="max-w-[200px]"
+                        rotation={-12}
+                        className="max-w-[180px]"
                       />
+                    </div>
+                    <div className="absolute top-16 right-4">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={5}
-                        className="max-w-[200px]"
+                        rotation={15}
+                        className="max-w-[180px]"
                       />
-                      <div className="col-span-2 flex justify-center">
-                        <PolaroidImage
-                          src=""
-                          alt=""
-                          rotation={-2}
-                          className="max-w-[200px]"
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                    </div>
+                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                      <PolaroidImage
+                        src=""
+                        alt=""
+                        rotation={-6}
+                        className="max-w-[180px]"
+                      />
+                    </div>
+                  </>
+                )}
               </motion.div>
             </div>
           </div>
