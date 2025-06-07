@@ -230,40 +230,65 @@ const Index = () => {
                 className="relative"
               >
                 <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
-                  {/* Display up to 3 images in a grid */}
-                  {aboutImages.slice(0, 3).map((image, index) => (
-                    <div
-                      key={image.id}
-                      className={index === 2 ? "col-span-2 flex justify-center" : ""}
-                    >
-                      <PolaroidImage
-                        src={image.image_url}
-                        alt={image.alt_text || `About image ${index + 1}`}
-                        rotation={index === 0 ? -5 : index === 1 ? 5 : -2}
-                        className="max-w-[200px]"
-                      />
-                    </div>
-                  ))}
-                  
-                  {/* Fallback if no images */}
-                  {aboutImages.length === 0 && (
+                  {/* Show loading Polaroids or actual images */}
+                  {isLoading ? (
                     <>
+                      {/* Loading state - show 3 empty Polaroids */}
                       <PolaroidImage
-                        src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=400&fit=crop"
-                        alt="Photography workspace"
+                        src=""
+                        alt=""
                         rotation={-5}
                         className="max-w-[200px]"
                       />
                       <PolaroidImage
-                        src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop"
-                        alt="Camera equipment"
+                        src=""
+                        alt=""
                         rotation={5}
                         className="max-w-[200px]"
                       />
                       <div className="col-span-2 flex justify-center">
                         <PolaroidImage
-                          src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop"
-                          alt="Creative process"
+                          src=""
+                          alt=""
+                          rotation={-2}
+                          className="max-w-[200px]"
+                        />
+                      </div>
+                    </>
+                  ) : aboutImages.length > 0 ? (
+                    /* Display actual images from database */
+                    aboutImages.slice(0, 3).map((image, index) => (
+                      <div
+                        key={image.id}
+                        className={index === 2 ? "col-span-2 flex justify-center" : ""}
+                      >
+                        <PolaroidImage
+                          src={image.image_url}
+                          alt={image.alt_text || `About image ${index + 1}`}
+                          rotation={index === 0 ? -5 : index === 1 ? 5 : -2}
+                          className="max-w-[200px]"
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    /* No images in database - show empty Polaroids */
+                    <>
+                      <PolaroidImage
+                        src=""
+                        alt=""
+                        rotation={-5}
+                        className="max-w-[200px]"
+                      />
+                      <PolaroidImage
+                        src=""
+                        alt=""
+                        rotation={5}
+                        className="max-w-[200px]"
+                      />
+                      <div className="col-span-2 flex justify-center">
+                        <PolaroidImage
+                          src=""
+                          alt=""
                           rotation={-2}
                           className="max-w-[200px]"
                         />

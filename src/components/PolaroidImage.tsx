@@ -28,12 +28,16 @@ const PolaroidImage: React.FC<PolaroidImageProps> = ({
       )}
       style={{ transform: `rotate(${rotation}deg)` }}
     >
-      <div className="aspect-square overflow-hidden">
-        <img 
-          src={src} 
-          alt={alt}
-          className="w-full h-full object-cover"
-        />
+      <div className="aspect-square overflow-hidden bg-gray-100">
+        {src ? (
+          <img 
+            src={src} 
+            alt={alt}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-white" />
+        )}
       </div>
       <div className="mt-2 text-center">
         <p className="text-sm text-gray-600 font-handwriting">{alt}</p>
