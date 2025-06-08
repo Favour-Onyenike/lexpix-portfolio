@@ -263,7 +263,7 @@ const Index = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="relative h-96 md:h-[500px] w-full max-w-lg mx-auto"
+                className="relative h-80 md:h-96 w-full max-w-lg mx-auto"
               >
                 {/* Non-overlapping layout for Polaroids */}
                 {isLoading ? (
