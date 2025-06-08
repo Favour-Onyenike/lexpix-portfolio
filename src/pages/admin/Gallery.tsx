@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import ImageUploader from '@/components/ImageUploader';
-import ImageGrid, { ImageItem } from '@/components/ImageGrid';
+import PaginatedImageGrid from '@/components/PaginatedImageGrid';
+import { ImageItem } from '@/components/ImageGrid';
 import { Button } from '@/components/ui/button';
 import { 
   AlertDialog, 
@@ -16,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Image, Download } from 'lucide-react';
+import { PlusCircle, Image } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createGalleryImage, deleteGalleryImage, getGalleryImages, uploadImage } from '@/services/galleryService';
 
@@ -155,33 +156,20 @@ const Gallery = () => {
             >
               {isLoading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                  {[...Array(4)].map((_, index) => (
+                  {[...Array(20)].map((_, index) => (
                     <div 
                       key={index}
                       className="aspect-[3/4] bg-muted animate-pulse rounded-md"
                     />
                   ))}
                 </div>
-              ) : images.length > 0 ? (
-                <ImageGrid 
+              ) : (
+                <PaginatedImageGrid 
                   images={images}
                   onDelete={handleDeleteImage}
                   onDownload={handleDownload}
+                  itemsPerPage={20}
                 />
-              ) : (
-                <div className="text-center py-16 bg-muted/30 rounded-lg border border-dashed">
-                  <Image className="w-12 h-12 mx-auto text-muted-foreground" />
-                  <h3 className="mt-4 text-lg font-medium">No images yet</h3>
-                  <p className="text-muted-foreground">
-                    Upload images to start building your gallery
-                  </p>
-                  <Button 
-                    onClick={() => setActiveTab('upload')} 
-                    className="mt-4"
-                  >
-                    Upload Images
-                  </Button>
-                </div>
               )}
             </motion.div>
           </TabsContent>

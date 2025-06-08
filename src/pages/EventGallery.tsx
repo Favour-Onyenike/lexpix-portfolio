@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import Layout from '@/components/Layout';
-import ImageGrid, { ImageItem } from '@/components/ImageGrid';
+import PaginatedImageGrid from '@/components/PaginatedImageGrid';
+import { ImageItem } from '@/components/ImageGrid';
 import { EventItem } from '@/components/EventCard';
 import { getEvent, getEventImages } from '@/services/eventService';
 
@@ -150,25 +151,19 @@ const EventGallery = () => {
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {[...Array(8)].map((_, index) => (
+              {[...Array(24)].map((_, index) => (
                 <div 
                   key={index} 
                   className="aspect-[3/4] bg-muted animate-pulse rounded-md"
                 />
               ))}
             </div>
-          ) : images.length > 0 ? (
-            <ImageGrid 
+          ) : (
+            <PaginatedImageGrid 
               images={images} 
               onDownload={handleDownload}
+              itemsPerPage={24}
             />
-          ) : (
-            <div className="text-center py-16 bg-muted/30 rounded-lg border border-dashed">
-              <h3 className="text-xl font-medium mb-2">No images available</h3>
-              <p className="text-muted-foreground">
-                This event doesn't have any photos yet
-              </p>
-            </div>
           )}
         </div>
       </div>
