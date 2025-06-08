@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter, MapPin } from 'lucide-react';
+import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter, MapPin, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Layout from '@/components/Layout';
@@ -11,6 +11,7 @@ import PolaroidImage from '@/components/PolaroidImage';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 import { getContentSection, ContentSection } from '@/services/contentService';
 import { aboutImageService, AboutImage } from '@/services/aboutImageService';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const statsRef = useRef(null);
@@ -19,6 +20,8 @@ const Index = () => {
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
   const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showFullAbout, setShowFullAbout] = useState(false);
+  const isMobile = useIsMobile();
   
   // Fixed about content
   const aboutContent = {
@@ -130,6 +133,11 @@ const Index = () => {
 
   const displayProjects = featuredProjects.length > 0 ? featuredProjects : defaultProjects;
 
+  // Split content into paragraphs
+  const contentParagraphs = aboutContent.content.split('\n\n');
+  const firstParagraph = contentParagraphs[0];
+  const remainingParagraphs = contentParagraphs.slice(1);
+
   return (
     <Layout>
       <section id="hero" className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
@@ -214,57 +222,85 @@ const Index = () => {
                 viewport={{ once: true }}
                 className="text-md md:text-lg leading-relaxed"
               >
-                {aboutContent.content.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
+                <p className="mb-4">{firstParagraph}</p>
+                
+                {/* Mobile: Show/Hide additional content */}
+                {isMobile ? (
+                  <>
+                    {showFullAbout && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {remainingParagraphs.map((paragraph, index) => (
+                          <p key={index} className="mb-4">{paragraph}</p>
+                        ))}
+                      </motion.div>
+                    )}
+                    <button
+                      onClick={() => setShowFullAbout(!showFullAbout)}
+                      className="flex items-center gap-2 text-yellow-400 hover:text-yellow-300 transition-colors mt-4"
+                    >
+                      {showFullAbout ? 'Show Less' : 'Read More'}
+                      <ChevronDown className={`h-4 w-4 transition-transform ${showFullAbout ? 'rotate-180' : ''}`} />
+                    </button>
+                  </>
+                ) : (
+                  /* Desktop: Show all content */
+                  remainingParagraphs.map((paragraph, index) => (
+                    <p key={index} className="mb-4">{paragraph}</p>
+                  ))
+                )}
               </motion.div>
             </div>
             
-            {/* Right Column - Scattered Polaroid Images */}
+            {/* Right Column - Non-overlapping Polaroid Images */}
             <div className="w-full lg:w-1/2">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="relative h-96 w-full max-w-lg mx-auto"
+                className="relative h-96 md:h-[500px] w-full max-w-lg mx-auto"
               >
-                {/* Scattered layout for Polaroids */}
+                {/* Non-overlapping layout for Polaroids */}
                 {isLoading ? (
                   <>
-                    {/* Loading state - show 3 empty Polaroids scattered */}
-                    <div className="absolute top-4 left-8">
+                    {/* Loading state - show 3 empty Polaroids in grid */}
+                    <div className="absolute top-0 left-0">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={-12}
-                        className="max-w-[180px]"
+                        rotation={-8}
+                        className="max-w-[140px] md:max-w-[160px]"
                       />
                     </div>
-                    <div className="absolute top-16 right-4">
+                    <div className="absolute top-0 right-0">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={15}
-                        className="max-w-[180px]"
+                        rotation={12}
+                        className="max-w-[140px] md:max-w-[160px]"
                       />
                     </div>
-                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={-6}
-                        className="max-w-[180px]"
+                        rotation={-4}
+                        className="max-w-[140px] md:max-w-[160px]"
                       />
                     </div>
                   </>
                 ) : aboutImages.length > 0 ? (
-                  /* Display actual images from database - scattered */
+                  /* Display actual images from database - non-overlapping grid */
                   aboutImages.slice(0, 3).map((image, index) => {
                     const positions = [
-                      { top: '1rem', left: '2rem', rotation: -12 },
-                      { top: '4rem', right: '1rem', rotation: 15 },
-                      { bottom: '2rem', left: '50%', transform: 'translateX(-50%)', rotation: -6 }
+                      { top: '0', left: '0', rotation: -8 },
+                      { top: '0', right: '0', rotation: 12 },
+                      { bottom: '0', left: '50%', transform: 'translateX(-50%)', rotation: -4 }
                     ];
                     const position = positions[index] || positions[0];
                     
@@ -284,36 +320,36 @@ const Index = () => {
                           src={image.image_url}
                           alt={image.alt_text || `About image ${index + 1}`}
                           rotation={position.rotation}
-                          className="max-w-[180px]"
+                          className="max-w-[140px] md:max-w-[160px]"
                         />
                       </div>
                     );
                   })
                 ) : (
-                  /* No images in database - show empty Polaroids scattered */
+                  /* No images in database - show empty Polaroids in grid */
                   <>
-                    <div className="absolute top-4 left-8">
+                    <div className="absolute top-0 left-0">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={-12}
-                        className="max-w-[180px]"
+                        rotation={-8}
+                        className="max-w-[140px] md:max-w-[160px]"
                       />
                     </div>
-                    <div className="absolute top-16 right-4">
+                    <div className="absolute top-0 right-0">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={15}
-                        className="max-w-[180px]"
+                        rotation={12}
+                        className="max-w-[140px] md:max-w-[160px]"
                       />
                     </div>
-                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
                       <PolaroidImage
                         src=""
                         alt=""
-                        rotation={-6}
-                        className="max-w-[180px]"
+                        rotation={-4}
+                        className="max-w-[140px] md:max-w-[160px]"
                       />
                     </div>
                   </>
