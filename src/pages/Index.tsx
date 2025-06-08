@@ -275,6 +275,7 @@ const Index = () => {
                         alt=""
                         rotation={-8}
                         className="max-w-[140px] md:max-w-[160px]"
+                        showCaption={false}
                       />
                     </div>
                     <div className="absolute top-0 right-0">
@@ -283,6 +284,7 @@ const Index = () => {
                         alt=""
                         rotation={12}
                         className="max-w-[140px] md:max-w-[160px]"
+                        showCaption={false}
                       />
                     </div>
                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
@@ -291,6 +293,7 @@ const Index = () => {
                         alt=""
                         rotation={-4}
                         className="max-w-[140px] md:max-w-[160px]"
+                        showCaption={false}
                       />
                     </div>
                   </>
@@ -321,6 +324,7 @@ const Index = () => {
                           alt={image.alt_text || `About image ${index + 1}`}
                           rotation={position.rotation}
                           className="max-w-[140px] md:max-w-[160px]"
+                          showCaption={false}
                         />
                       </div>
                     );
@@ -334,6 +338,7 @@ const Index = () => {
                         alt=""
                         rotation={-8}
                         className="max-w-[140px] md:max-w-[160px]"
+                        showCaption={false}
                       />
                     </div>
                     <div className="absolute top-0 right-0">
@@ -342,6 +347,7 @@ const Index = () => {
                         alt=""
                         rotation={12}
                         className="max-w-[140px] md:max-w-[160px]"
+                        showCaption={false}
                       />
                     </div>
                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
@@ -350,6 +356,7 @@ const Index = () => {
                         alt=""
                         rotation={-4}
                         className="max-w-[140px] md:max-w-[160px]"
+                        showCaption={false}
                       />
                     </div>
                   </>

@@ -8,13 +8,15 @@ interface PolaroidImageProps {
   alt: string;
   className?: string;
   rotation?: number;
+  showCaption?: boolean;
 }
 
 const PolaroidImage: React.FC<PolaroidImageProps> = ({ 
   src, 
   alt, 
   className,
-  rotation = 0 
+  rotation = 0,
+  showCaption = true
 }) => {
   return (
     <motion.div
@@ -39,9 +41,11 @@ const PolaroidImage: React.FC<PolaroidImageProps> = ({
           <div className="w-full h-full bg-white" />
         )}
       </div>
-      <div className="mt-2 text-center">
-        <p className="text-sm text-gray-600 font-handwriting">{alt}</p>
-      </div>
+      {showCaption && (
+        <div className="mt-2 text-center">
+          <p className="text-sm text-gray-600 font-handwriting">{alt}</p>
+        </div>
+      )}
     </motion.div>
   );
 };
