@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -47,16 +48,16 @@ function App() {
                 <Route path="/invite/:token" element={<InviteSignup />} />
                 <Route path="*" element={<NotFound />} />
 
-                <Route path="/admin" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                <Route path="/admin/gallery" element={<RequireAuth><AdminGallery /></RequireAuth>} />
-                <Route path="/admin/events" element={<RequireAuth><AdminEvents /></RequireAuth>} />
-                <Route path="/admin/pricing" element={<RequireAuth><AdminPricing /></RequireAuth>} />
-                <Route path="/admin/reviews" element={<RequireAuth><AdminReviews /></RequireAuth>} />
-                <Route path="/admin/team" element={<RequireAuth><TeamManagement /></RequireAuth>} />
-                <Route path="/admin/featured-projects" element={<RequireAuth><FeaturedProjects /></RequireAuth>} />
-                <Route path="/admin/project-gallery/:projectId" element={<RequireAuth><ProjectGallery /></RequireAuth>} />
-                <Route path="/admin/about-images" element={<RequireAuth><AboutImages /></RequireAuth>} />
-                <Route path="/admin/content" element={<RequireAuth><ContentManager /></RequireAuth>} />
+                <Route path="/admin" element={<RequireAuth component={Dashboard} />} />
+                <Route path="/admin/gallery" element={<RequireAuth component={AdminGallery} />} />
+                <Route path="/admin/events" element={<RequireAuth component={AdminEvents} />} />
+                <Route path="/admin/pricing" element={<RequireAuth component={AdminPricing} />} />
+                <Route path="/admin/reviews" element={<RequireAuth component={AdminReviews} />} />
+                <Route path="/admin/team" element={<RequireAuth component={TeamManagement} />} />
+                <Route path="/admin/featured-projects" element={<RequireAuth component={FeaturedProjects} />} />
+                <Route path="/admin/project-gallery/:projectId" element={<RequireAuth component={ProjectGallery} />} />
+                <Route path="/admin/about-images" element={<RequireAuth component={AboutImages} />} />
+                <Route path="/admin/content" element={<RequireAuth component={ContentManager} />} />
               </Routes>
             </BrowserRouter>
             <Toaster />
