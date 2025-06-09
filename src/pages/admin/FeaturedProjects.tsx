@@ -252,13 +252,13 @@ const FeaturedProjects = () => {
                       />
                     </div>
                     
-                    <div className="col-span-6 p-4">
+                    <div className="col-span-5 p-4">
                       <h3 className="text-lg font-medium">{project.title}</h3>
                       <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
                       <p className="text-xs text-blue-500 mt-2">{project.link}</p>
                     </div>
                     
-                    <div className="col-span-3 flex gap-2 justify-end p-4">
+                    <div className="col-span-4 flex gap-2 justify-end p-4">
                       <Button 
                         variant="outline" 
                         size="icon"
@@ -274,6 +274,14 @@ const FeaturedProjects = () => {
                         onClick={() => moveProject(index, 'down')}
                       >
                         <MoveDown size={16} />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        onClick={() => window.open(`/admin/project-gallery/${project.id}`, '_blank')}
+                        title="Manage Gallery"
+                      >
+                        <ImagePlus size={16} />
                       </Button>
                       <Button 
                         variant="outline" 
