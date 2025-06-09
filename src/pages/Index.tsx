@@ -263,9 +263,9 @@ const Index = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="relative h-80 md:h-96 w-full max-w-lg mx-auto"
+                className="relative h-64 sm:h-80 md:h-96 w-full max-w-lg mx-auto"
               >
-                {/* Non-overlapping layout for Polaroids */}
+                {/* Non-overlapping layout for Polaroids - consistent across mobile and desktop */}
                 {isLoading ? (
                   <>
                     {/* Loading state - show 3 empty Polaroids in grid */}
@@ -274,7 +274,7 @@ const Index = () => {
                         src=""
                         alt=""
                         rotation={-8}
-                        className="max-w-[140px] md:max-w-[160px]"
+                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                         showCaption={false}
                       />
                     </div>
@@ -283,7 +283,7 @@ const Index = () => {
                         src=""
                         alt=""
                         rotation={12}
-                        className="max-w-[140px] md:max-w-[160px]"
+                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                         showCaption={false}
                       />
                     </div>
@@ -292,7 +292,7 @@ const Index = () => {
                         src=""
                         alt=""
                         rotation={-4}
-                        className="max-w-[140px] md:max-w-[160px]"
+                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                         showCaption={false}
                       />
                     </div>
@@ -323,7 +323,7 @@ const Index = () => {
                           src={image.image_url}
                           alt={image.alt_text || `About image ${index + 1}`}
                           rotation={position.rotation}
-                          className="max-w-[140px] md:max-w-[160px]"
+                          className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                           showCaption={false}
                         />
                       </div>
@@ -337,7 +337,7 @@ const Index = () => {
                         src=""
                         alt=""
                         rotation={-8}
-                        className="max-w-[140px] md:max-w-[160px]"
+                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                         showCaption={false}
                       />
                     </div>
@@ -346,7 +346,7 @@ const Index = () => {
                         src=""
                         alt=""
                         rotation={12}
-                        className="max-w-[140px] md:max-w-[160px]"
+                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                         showCaption={false}
                       />
                     </div>
@@ -355,7 +355,7 @@ const Index = () => {
                         src=""
                         alt=""
                         rotation={-4}
-                        className="max-w-[140px] md:max-w-[160px]"
+                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
                         showCaption={false}
                       />
                     </div>
