@@ -48,16 +48,18 @@ function App() {
                 <Route path="/invite/:token" element={<InviteSignup />} />
                 <Route path="*" element={<NotFound />} />
 
-                <Route path="/admin" element={<RequireAuth component={Dashboard} />} />
-                <Route path="/admin/gallery" element={<RequireAuth component={AdminGallery} />} />
-                <Route path="/admin/events" element={<RequireAuth component={AdminEvents} />} />
-                <Route path="/admin/pricing" element={<RequireAuth component={AdminPricing} />} />
-                <Route path="/admin/reviews" element={<RequireAuth component={AdminReviews} />} />
-                <Route path="/admin/team" element={<RequireAuth component={TeamManagement} />} />
-                <Route path="/admin/featured-projects" element={<RequireAuth component={FeaturedProjects} />} />
-                <Route path="/admin/project-gallery/:projectId" element={<RequireAuth component={ProjectGallery} />} />
-                <Route path="/admin/about-images" element={<RequireAuth component={AboutImages} />} />
-                <Route path="/admin/content" element={<RequireAuth component={ContentManager} />} />
+                <Route path="/admin" element={<RequireAuth />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="gallery" element={<AdminGallery />} />
+                  <Route path="events" element={<AdminEvents />} />
+                  <Route path="pricing" element={<AdminPricing />} />
+                  <Route path="reviews" element={<AdminReviews />} />
+                  <Route path="team" element={<TeamManagement />} />
+                  <Route path="featured-projects" element={<FeaturedProjects />} />
+                  <Route path="project-gallery/:projectId" element={<ProjectGallery />} />
+                  <Route path="about-images" element={<AboutImages />} />
+                  <Route path="content" element={<ContentManager />} />
+                </Route>
               </Routes>
             </BrowserRouter>
             <Toaster />
