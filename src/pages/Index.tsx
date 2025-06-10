@@ -256,110 +256,69 @@ const Index = () => {
               </motion.div>
             </div>
             
-            {/* Right Column - Non-overlapping Polaroid Images */}
+            {/* Right Column - Modern Image Grid */}
             <div className="w-full lg:w-1/2">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="relative h-64 sm:h-80 md:h-96 w-full max-w-lg mx-auto"
+                className="relative"
               >
-                {/* Non-overlapping layout for Polaroids - consistent across mobile and desktop */}
                 {isLoading ? (
-                  <>
-                    {/* Loading state - show 3 empty Polaroids in grid */}
-                    <div className="absolute top-0 left-0">
-                      <PolaroidImage
-                        src=""
-                        alt=""
-                        rotation={-8}
-                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                        showCaption={false}
-                      />
-                    </div>
-                    <div className="absolute top-0 right-0">
-                      <PolaroidImage
-                        src=""
-                        alt=""
-                        rotation={12}
-                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                        showCaption={false}
-                      />
-                    </div>
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                      <PolaroidImage
-                        src=""
-                        alt=""
-                        rotation={-4}
-                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                        showCaption={false}
-                      />
-                    </div>
-                  </>
-                ) : aboutImages.length > 0 ? (
-                  /* Display actual images from database - non-overlapping grid */
-                  aboutImages.slice(0, 3).map((image, index) => {
-                    const positions = [
-                      { top: '0', left: '0', rotation: -8 },
-                      { top: '0', right: '0', rotation: 12 },
-                      { bottom: '0', left: '50%', transform: 'translateX(-50%)', rotation: -4 }
-                    ];
-                    const position = positions[index] || positions[0];
-                    
-                    return (
+                  <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                    {[...Array(4)].map((_, index) => (
                       <div
+                        key={index}
+                        className={`bg-gray-800 rounded-lg overflow-hidden ${
+                          index === 0 ? 'aspect-[4/5]' : 
+                          index === 1 ? 'aspect-square' : 
+                          index === 2 ? 'aspect-square' : 
+                          'aspect-[4/3]'
+                        } animate-pulse`}
+                      />
+                    ))}
+                  </div>
+                ) : aboutImages.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                    {aboutImages.slice(0, 4).map((image, index) => (
+                      <motion.div
                         key={image.id}
-                        className="absolute"
-                        style={{
-                          top: position.top,
-                          left: position.left,
-                          right: position.right,
-                          bottom: position.bottom,
-                          transform: position.transform
-                        }}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        viewport={{ once: true }}
+                        className={`rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 ${
+                          index === 0 ? 'aspect-[4/5]' : 
+                          index === 1 ? 'aspect-square' : 
+                          index === 2 ? 'aspect-square' : 
+                          'aspect-[4/3]'
+                        }`}
                       >
-                        <PolaroidImage
+                        <img
                           src={image.image_url}
                           alt={image.alt_text || `About image ${index + 1}`}
-                          rotation={position.rotation}
-                          className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                          showCaption={false}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
-                      </div>
-                    );
-                  })
+                      </motion.div>
+                    ))}
+                  </div>
                 ) : (
-                  /* No images in database - show empty Polaroids in grid */
-                  <>
-                    <div className="absolute top-0 left-0">
-                      <PolaroidImage
-                        src=""
-                        alt=""
-                        rotation={-8}
-                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                        showCaption={false}
-                      />
-                    </div>
-                    <div className="absolute top-0 right-0">
-                      <PolaroidImage
-                        src=""
-                        alt=""
-                        rotation={12}
-                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                        showCaption={false}
-                      />
-                    </div>
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                      <PolaroidImage
-                        src=""
-                        alt=""
-                        rotation={-4}
-                        className="max-w-[120px] sm:max-w-[140px] md:max-w-[160px]"
-                        showCaption={false}
-                      />
-                    </div>
-                  </>
+                  <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                    {[...Array(4)].map((_, index) => (
+                      <div
+                        key={index}
+                        className={`bg-gray-800 rounded-lg overflow-hidden ${
+                          index === 0 ? 'aspect-[4/5]' : 
+                          index === 1 ? 'aspect-square' : 
+                          index === 2 ? 'aspect-square' : 
+                          'aspect-[4/3]'
+                        } flex items-center justify-center`}
+                      >
+                        <Camera className="h-8 w-8 text-gray-600" />
+                      </div>
+                    ))}
+                  </div>
                 )}
               </motion.div>
             </div>
