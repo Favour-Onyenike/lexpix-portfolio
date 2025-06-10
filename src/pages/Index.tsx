@@ -225,14 +225,15 @@ const Index = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto"
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
             >
               {aboutImages.map((image, index) => (
-                <div key={image.id} className={`
-                  relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300
-                  ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}
-                  ${index === 1 && aboutImages.length === 3 ? 'lg:col-span-2' : ''}
-                `}>
+                <div 
+                  key={image.id} 
+                  className={`relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+                    index === 0 ? 'md:col-span-2' : ''
+                  }`}
+                >
                   <OptimizedImage
                     src={image.image_url}
                     alt={image.alt_text || `About image ${index + 1}`}
@@ -241,7 +242,7 @@ const Index = () => {
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
                 </div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
