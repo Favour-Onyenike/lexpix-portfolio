@@ -278,7 +278,7 @@ const Index = () => {
                     </div>
                     {/* Desktop: Grid layout */}
                     <div className="hidden md:grid grid-cols-2 gap-4">
-                      <div className="aspect-[4/5] bg-gray-800 rounded-lg animate-pulse" />
+                      <div className="aspect-[3/4] bg-gray-800 rounded-lg animate-pulse" />
                       <div className="space-y-4">
                         <div className="aspect-square bg-gray-800 rounded-lg animate-pulse" />
                         <div className="aspect-[4/3] bg-gray-800 rounded-lg animate-pulse" />
@@ -309,14 +309,14 @@ const Index = () => {
                     
                     {/* Desktop: Grid layout optimized for 3 images */}
                     <div className="hidden md:grid grid-cols-2 gap-4">
-                      {/* First image - larger, spans full height */}
+                      {/* First image - taller, spans full height */}
                       {aboutImages[0] && (
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5 }}
                           viewport={{ once: true }}
-                          className="aspect-[4/5] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+                          className="aspect-[3/4] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                         >
                           <img
                             src={aboutImages[0].image_url}
@@ -378,7 +378,7 @@ const Index = () => {
                     
                     {/* Desktop fallback: Grid layout */}
                     <div className="hidden md:grid grid-cols-2 gap-4">
-                      <div className="aspect-[4/5] bg-gray-800 rounded-lg flex items-center justify-center">
+                      <div className="aspect-[3/4] bg-gray-800 rounded-lg flex items-center justify-center">
                         <Camera className="h-8 w-8 text-gray-600" />
                       </div>
                       <div className="space-y-4">
