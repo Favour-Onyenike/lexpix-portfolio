@@ -9,7 +9,7 @@ import ContactForm from '@/components/ContactForm';
 import ReviewSection from '@/components/ReviewSection';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUpcomingEvents } from '@/services/eventService';
+import { getEvents } from '@/services/eventService';
 import { getFeaturedProjects } from '@/services/projectService';
 import { getContentSection } from '@/services/contentService';
 import { aboutImageService } from '@/services/aboutImageService';
@@ -28,14 +28,18 @@ const Index = () => {
     const loadData = async () => {
       try {
         const [events, projects, hero, about, images] = await Promise.all([
-          getUpcomingEvents(),
+          getEvents(),
           getFeaturedProjects(),
           getContentSection('hero'),
           getContentSection('about'),
           aboutImageService.getAboutImages()
         ]);
         
-        setUpcomingEvents(events);
+        // Filter events to show only upcoming ones
+        const now = new Date();
+        const upcomingOnly = events.filter(event => new Date(event.date) >= now);
+        
+        setUpcomingEvents(upcomingOnly);
         setFeaturedProjects(projects);
         setHeroContent(hero);
         setAboutContent(about);
