@@ -1,592 +1,389 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Video, Palette, ArrowRight, Mail, Phone, Building2, Clock, Instagram, Facebook, Twitter, MapPin, ChevronDown } from 'lucide-react';
+import { ChevronDown, Phone, Mail, MapPin, Star, Calendar, Camera, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import Layout from '@/components/Layout';
-import ReviewSection from '@/components/ReviewSection';
-import ContactForm from '@/components/ContactForm';
 import PolaroidImage from '@/components/PolaroidImage';
-import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
-import { getContentSection, ContentSection } from '@/services/contentService';
-import { aboutImageService, AboutImage } from '@/services/aboutImageService';
-import { useIsMobile } from '@/hooks/use-mobile';
+import ContactForm from '@/components/ContactForm';
+import ReviewSection from '@/components/ReviewSection';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { eventService } from '@/services/eventService';
+import { projectService } from '@/services/projectService';
+import { contentService } from '@/services/contentService';
+import { aboutImageService } from '@/services/aboutImageService';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const Index = () => {
-  const statsRef = useRef(null);
-  const [statsVisible, setStatsVisible] = useState(false);
-  const [counters, setCounters] = useState([0, 0, 0, 0]);
-  const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
-  const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showFullAbout, setShowFullAbout] = useState(false);
-  const isMobile = useIsMobile();
-  
-  // Fixed about content
-  const aboutContent = {
-    title: 'About',
-    subtitle: 'Capturing life through our lens',
-    content: "LexPix is a photography and visual storytelling brand built on passion, purpose, and love. Founded by Volks \"Lucas Uzum\", LexPix was born under the Lexaren Corporation, proudly owned by the Uzum family. This venture was made possible through the unwavering love, support, and initial funding from his parents, whose belief laid the foundation for everything LexPix is becoming.\n\nWith a sharp eye for detail and a heart for storytelling, LexPix captures life's most meaningful moments, the smiles, glances, and emotions, all in their purest, most vibrant form. Through high-quality photography and visual content, we aim to help others see the color and beauty in their own stories. Every frame we take is a reflection of the love that birthed this vision, and a commitment to preserving the essence of every moment we touch."
-  };
-  
-  const statsData = [
-    { target: 25, label: "Satisfied Clients" },
-    { target: 20, label: "Projects Completed" },
-    { target: 3, label: "Years Experience" },
-    { target: 200, label: "Photos Delivered" }
-  ];
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [featuredProjects, setFeaturedProjects] = useState([]);
+  const [heroContent, setHeroContent] = useState(null);
+  const [aboutContent, setAboutContent] = useState(null);
+  const [aboutImages, setAboutImages] = useState([]);
 
-  const handleGetInTouchClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-  
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load projects and about images
-        const [projects, images] = await Promise.all([
-          getFeaturedProjects(),
+        const [events, projects, hero, about, images] = await Promise.all([
+          eventService.getUpcomingEvents(),
+          projectService.getFeaturedProjects(),
+          contentService.getHeroContent(),
+          contentService.getAboutContent(),
           aboutImageService.getAboutImages()
         ]);
+        
+        setUpcomingEvents(events);
         setFeaturedProjects(projects);
+        setHeroContent(hero);
+        setAboutContent(about);
         setAboutImages(images);
       } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setIsLoading(false);
+        console.error('Error loading page data:', error);
       }
     };
-    
+
     loadData();
   }, []);
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !statsVisible) {
-          setStatsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    
-    if (statsRef.current) {
-      observer.observe(statsRef.current);
-    }
-    
-    return () => {
-      if (statsRef.current) {
-        observer.unobserve(statsRef.current);
-      }
-    };
-  }, [statsVisible]);
-  
-  useEffect(() => {
-    if (statsVisible) {
-      const duration = 2000;
-      const interval = 50;
-      let startTimestamp = null;
-      
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        
-        setCounters(statsData.map(stat => Math.floor(progress * stat.target)));
-        
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        }
-      };
-      
-      window.requestAnimationFrame(step);
-    }
-  }, [statsVisible]);
 
-  const defaultProjects = [
-    {
-      id: '1',
-      title: "Events",
-      description: "Capturing memorable moments from special events and celebrations.",
-      image_url: "/lovable-uploads/9542efdc-b4b2-4089-9182-5656382dc13b.png",
-      link: "/events"
-    },
-    {
-      id: '2',
-      title: "Places",
-      description: "Stunning photography of landscapes, architecture, and beautiful locations.",
-      image_url: "/lovable-uploads/69dafa5b-aeba-4a0a-9c92-889afc34f97b.png",
-      link: "/gallery"
-    },
-    {
-      id: '3',
-      title: "Portrait Series",
-      description: "Professional portraits that capture personality and character in every shot.",
-      image_url: "/lovable-uploads/cd67a18b-69d7-4832-a636-436e6e50d793.png",
-      link: "/gallery"
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
-  ];
-
-  const displayProjects = featuredProjects.length > 0 ? featuredProjects : defaultProjects;
-
-  // Split content into paragraphs
-  const contentParagraphs = aboutContent.content.split('\n\n');
-  const firstParagraph = contentParagraphs[0];
-  const remainingParagraphs = contentParagraphs.slice(1);
+  };
 
   return (
     <Layout>
-      <section id="hero" className="flex flex-col md:flex-row items-center py-16 md:py-24 px-6 md:px-10 bg-white">
-        <div className="w-full md:w-1/2 pl-0 md:pl-20 pr-0 md:pr-8 mb-10 md:mb-0">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-5xl md:text-7xl font-bold mb-6"
-          >
-            less is more<span className="text-yellow-400">.</span>
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-600 text-lg mb-8"
-          >
-            Capturing moments with minimalist elegance. Professional photography that focuses on what matters most.
-          </motion.p>
+      {/* Header */}
+      <header className="bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-2xl font-bold"
           >
-            <Button 
-              size="lg" 
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-8 transition-colors duration-300 hover:bg-yellow-400 hover:text-black"
-              onClick={handleGetInTouchClick}
-            >
-              Get in touch
+            LexPix<span className="text-yellow-400">.</span>
+          </motion.div>
+          
+          <nav className="hidden md:flex space-x-8">
+            <button onClick={() => scrollToSection('gallery')} className="text-foreground hover:text-yellow-400 transition-colors">
+              Gallery
+            </button>
+            <button onClick={() => navigate('/events')} className="text-foreground hover:text-yellow-400 transition-colors">
+              Events
+            </button>
+            <button onClick={() => scrollToSection('about')} className="text-foreground hover:text-yellow-400 transition-colors">
+              About
+            </button>
+            <button onClick={() => navigate('/pricing')} className="text-foreground hover:text-yellow-400 transition-colors">
+              Pricing
+            </button>
+            <button onClick={() => scrollToSection('contact')} className="text-foreground hover:text-yellow-400 transition-colors">
+              Contact
+            </button>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/admin')}
+                className="text-foreground hover:text-yellow-400"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            )}
+            <Button onClick={() => scrollToSection('contact')}>
+              Get Quote
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-secondary/20"></div>
+        
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+          >
+            {heroContent?.title || "Capturing Life's Most Precious Moments"}
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed"
+          >
+            {heroContent?.subtitle || "Professional photography that tells your unique story with artistry, passion, and timeless elegance."}
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="space-x-4"
+          >
+            <Button size="lg" onClick={() => scrollToSection('gallery')}>
+              <Camera className="mr-2 h-5 w-5" />
+              View Portfolio
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => scrollToSection('contact')}>
+              Book Session
             </Button>
           </motion.div>
         </div>
-        <div className="w-full md:w-1/2">
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <ChevronDown className="h-6 w-6 animate-bounce text-muted-foreground" />
+        </motion.div>
+      </section>
+
+      {/* Featured Gallery Preview */}
+      <section id="gallery" className="py-20 bg-secondary/30">
+        <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="relative"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
           >
-            <div className="max-w-xl mx-auto">
-              <img 
-                src="/lovable-uploads/f8361f6e-4625-4ae2-af1c-c08f29a899e4.png" 
-                alt="Photographer" 
-                className="w-full h-full object-contain"
-              />
-            </div>
+            <h2 className="text-4xl font-bold mb-4">
+              Featured Gallery
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Explore some of our favorite moments
+            </p>
           </motion.div>
-        </div>
-      </section>
 
-      <section id="about" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            {/* Left Column - Text Content */}
-            <div className="w-full lg:w-1/2">
-              <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="text-3xl md:text-5xl font-bold mb-4"
-              >
-                {aboutContent.title} <span className="font-normal">LexPix<span className="text-yellow-400">.</span></span>
-              </motion.h2>
-              
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                viewport={{ once: true }}
-                className="text-xl md:text-2xl text-yellow-400 mb-8 font-light"
-              >
-                {aboutContent.subtitle}
-              </motion.h3>
-              
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-                className="text-md md:text-lg leading-relaxed"
-              >
-                <p className="mb-4">{firstParagraph}</p>
-                
-                {/* Mobile: Show/Hide additional content */}
-                {isMobile ? (
-                  <>
-                    {showFullAbout && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        {remainingParagraphs.map((paragraph, index) => (
-                          <p key={index} className="mb-4">{paragraph}</p>
-                        ))}
-                      </motion.div>
-                    )}
-                    <button
-                      onClick={() => setShowFullAbout(!showFullAbout)}
-                      className="flex items-center gap-2 text-yellow-400 hover:text-yellow-300 transition-colors mt-4"
-                    >
-                      {showFullAbout ? 'Show Less' : 'Read More'}
-                      <ChevronDown className={`h-4 w-4 transition-transform ${showFullAbout ? 'rotate-180' : ''}`} />
-                    </button>
-                  </>
-                ) : (
-                  /* Desktop: Show all content */
-                  remainingParagraphs.map((paragraph, index) => (
-                    <p key={index} className="mb-4">{paragraph}</p>
-                  ))
-                )}
-              </motion.div>
-            </div>
-            
-            {/* Right Column - Responsive Image Grid for 3 images */}
-            <div className="w-full lg:w-1/2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredProjects.map(project => (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                {isLoading ? (
-                  <div className="flex flex-col gap-4 max-w-md mx-auto">
-                    {/* Mobile: Stacked layout */}
-                    <div className="block md:hidden space-y-4">
-                      {[...Array(3)].map((_, index) => (
-                        <div
-                          key={index}
-                          className="aspect-[4/3] bg-gray-800 rounded-lg animate-pulse"
-                        />
-                      ))}
-                    </div>
-                    {/* Desktop: Grid layout */}
-                    <div className="hidden md:grid grid-cols-2 gap-4">
-                      <div className="aspect-[4/5] bg-gray-800 rounded-lg animate-pulse" />
-                      <div className="space-y-4">
-                        <div className="aspect-square bg-gray-800 rounded-lg animate-pulse" />
-                        <div className="aspect-[4/3] bg-gray-800 rounded-lg animate-pulse" />
-                      </div>
-                    </div>
-                  </div>
-                ) : aboutImages.length > 0 ? (
-                  <div className="max-w-md mx-auto">
-                    {/* Mobile: Stacked layout */}
-                    <div className="block md:hidden space-y-4">
-                      {aboutImages.slice(0, 3).map((image, index) => (
-                        <motion.div
-                          key={image.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: index * 0.1 }}
-                          viewport={{ once: true }}
-                          className="aspect-[4/3] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        >
-                          <img
-                            src={image.image_url}
-                            alt={image.alt_text || `About image ${index + 1}`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </motion.div>
-                      ))}
-                    </div>
-                    
-                    {/* Desktop: Grid layout optimized for 3 images */}
-                    <div className="hidden md:grid grid-cols-2 gap-4">
-                      {/* First image - larger, spans full height */}
-                      {aboutImages[0] && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                          viewport={{ once: true }}
-                          className="aspect-[4/5] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        >
-                          <img
-                            src={aboutImages[0].image_url}
-                            alt={aboutImages[0].alt_text || "About image 1"}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </motion.div>
-                      )}
-                      
-                      {/* Second column - two smaller images stacked */}
-                      <div className="space-y-4">
-                        {aboutImages[1] && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                          >
-                            <img
-                              src={aboutImages[1].image_url}
-                              alt={aboutImages[1].alt_text || "About image 2"}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </motion.div>
-                        )}
-                        
-                        {aboutImages[2] && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            viewport={{ once: true }}
-                            className="aspect-[4/3] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                          >
-                            <img
-                              src={aboutImages[2].image_url}
-                              alt={aboutImages[2].alt_text || "About image 3"}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </motion.div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="max-w-md mx-auto">
-                    {/* Mobile fallback: Stacked layout */}
-                    <div className="block md:hidden space-y-4">
-                      {[...Array(3)].map((_, index) => (
-                        <div
-                          key={index}
-                          className="aspect-[4/3] bg-gray-800 rounded-lg flex items-center justify-center"
-                        >
-                          <Camera className="h-8 w-8 text-gray-600" />
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Desktop fallback: Grid layout */}
-                    <div className="hidden md:grid grid-cols-2 gap-4">
-                      <div className="aspect-[4/5] bg-gray-800 rounded-lg flex items-center justify-center">
-                        <Camera className="h-8 w-8 text-gray-600" />
-                      </div>
-                      <div className="space-y-4">
-                        <div className="aspect-square bg-gray-800 rounded-lg flex items-center justify-center">
-                          <Camera className="h-8 w-8 text-gray-600" />
-                        </div>
-                        <div className="aspect-[4/3] bg-gray-800 rounded-lg flex items-center justify-center">
-                          <Camera className="h-8 w-8 text-gray-600" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="stats" ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {statsData.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
+                key={project.id}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
+                className="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <h3 className="text-4xl md:text-5xl font-bold mb-2">
-                  {statsVisible ? counters[index] : 0}{index === 3 ? "+" : index === 2 ? "+" : "+"}
-                </h3>
-                <p className="text-sm md:text-base">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="services" className="py-16 md:py-24 px-6 md:px-10 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold mb-16 text-center"
-          >
-            Our Services
-          </motion.h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-            {[
-              {
-                icon: Camera,
-                title: "Photography",
-                description: "Professional photography services for all your needs"
-              },
-              {
-                icon: Video,
-                title: "Video Editing",
-                description: "Professional video editing and post-production services"
-              },
-              {
-                icon: Palette,
-                title: "Graphic Design",
-                description: "Creative design solutions for your brand and marketing needs"
-              }
-            ].map((service, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="flex flex-col items-center text-center group"
-              >
-                <div className="w-20 h-20 bg-black rounded-md flex items-center justify-center mb-4 transition-colors duration-300 group-hover:bg-yellow-400">
-                  <service.icon className="h-10 w-10 text-white group-hover:text-black transition-colors duration-300" />
+                <OptimizedImage
+                  src={project.image_url}
+                  alt={project.title}
+                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
+                <div className="absolute bottom-0 left-0 p-6 w-full">
+                  <h3 className="text-2xl font-semibold text-white mb-2">
+                    {project.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {project.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                <p className="text-gray-600">{service.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="projects" className="py-16 md:py-24 px-6 md:px-10 bg-black text-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
+      {/* About Section */}
+      <section id="about" className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold mb-12 text-center"
+            className="text-center mb-16"
           >
-            Featured Projects
-          </motion.h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {isLoading ? (
-              [...Array(3)].map((_, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
-                >
-                  <div className="aspect-video bg-gray-700 animate-pulse" />
-                  <div className="p-6 space-y-3">
-                    <div className="h-6 bg-gray-700 rounded animate-pulse" />
-                    <div className="h-4 bg-gray-700 rounded animate-pulse w-3/4" />
-                    <div className="h-10 bg-gray-700 rounded animate-pulse w-1/3 mt-4" />
-                  </div>
-                </motion.div>
-              ))
-            ) : (
-              displayProjects.map((project, index) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-black border border-gray-800 rounded-lg overflow-hidden w-full md:max-w-[95%] mx-auto"
-                >
-                  <div className="aspect-video overflow-hidden">
-                    <img 
-                      src={project.image_url} 
-                      alt={project.title} 
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                    <p className="text-gray-400 mb-4">{project.description}</p>
-                    <Button 
-                      variant="outline" 
-                      className="bg-yellow-400 hover:bg-yellow-500 text-black border-none" 
-                      asChild
-                    >
-                      <Link to={project.link}>
-                        Explore →
-                      </Link>
-                    </Button>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              {aboutContent?.title || "About LexPix"}
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              {aboutContent?.content || "We believe every moment deserves to be captured with artistry and passion. Our approach combines technical excellence with creative vision to create timeless memories that you'll treasure forever."}
+            </p>
+          </motion.div>
 
-      <section id="contact" className="py-16 md:py-24 px-6 md:px-10 bg-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
+          {/* About Images Grid */}
+          {aboutImages.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold mb-2"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto"
             >
-              Contact Us
-            </motion.h2>
-            <div className="w-16 h-1 bg-yellow-400 mx-auto mb-6"></div>
-            <p className="text-gray-600">Feel free to contact us any time. We will get back to you as soon as we can!</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <ContactForm />
+              {aboutImages.map((image, index) => (
+                <div key={image.id} className={`
+                  relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300
+                  ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}
+                  ${index === 1 && aboutImages.length === 3 ? 'lg:col-span-2' : ''}
+                `}>
+                  <OptimizedImage
+                    src={image.image_url}
+                    alt={image.alt_text || `About image ${index + 1}`}
+                    className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                </div>
+              ))}
             </div>
-            
-            <div className="bg-black text-white p-8 rounded-lg">
-              <h3 className="text-2xl font-bold mb-8">Info</h3>
-              
-              <div className="space-y-6">
-                <div className="flex items-center">
-                  <Mail className="h-5 w-5 mr-4 text-yellow-400" />
-                  <span>lexarenlogistics@gmail.com</span>
+          )}
+        </div>
+      </section>
+
+      {/* Upcoming Events */}
+      {upcomingEvents.length > 0 && (
+        <section className="py-20 bg-secondary/30">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl font-bold mb-4">
+                Upcoming Events
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Don't miss out on these exciting events
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {upcomingEvents.map(event => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true }}
+                  className="relative group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <OptimizedImage
+                    src={event.image_url}
+                    alt={event.title}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
+                  <div className="absolute bottom-0 left-0 p-6 w-full">
+                    <h3 className="text-2xl font-semibold text-white mb-2">
+                      {event.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      {new Date(event.date).toLocaleDateString()} - {event.location}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Reviews Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-4">
+              What Our Clients Say
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Kind words from happy clients
+            </p>
+          </motion.div>
+          <ReviewSection />
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 bg-secondary/30">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-4">
+              Contact Us
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Let's capture your story together
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="space-y-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <span>(123) 456-7890</span>
                 </div>
-                <div className="flex items-center">
-                  <Phone className="h-5 w-5 mr-4 text-yellow-400" />
-                  <span>+1 (825) 461-0429</span>
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                  <span>info@lexpix.com</span>
                 </div>
-                <div className="flex items-center">
-                  <MapPin className="h-5 w-5 mr-4 text-yellow-400" />
-                  <span>Edmonton, AB</span>
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-5 w-5 text-muted-foreground" />
+                  <span>123 Photography Lane, Cityville</span>
                 </div>
-              </div>
-              
-              <div className="mt-12">
-                <a href="https://www.instagram.com/lexarenpictures?igsh=MWoyZDg2dXQxOGp6cQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-900 hover:bg-yellow-400 transition-colors duration-300">
-                  <Instagram className="h-5 w-5 text-white" />
-                </a>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <Star className="h-5 w-5 text-yellow-400" />
+                  <span>5.0 (125 Reviews)</span>
+                </div>
+              </motion.div>
+            </div>
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <ContactForm />
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="reviews">
-        <ReviewSection />
-      </section>
+      {/* Footer */}
+      <footer className="bg-card border-t border-border py-12">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} LexPix. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </Layout>
   );
 };
