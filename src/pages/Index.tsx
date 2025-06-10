@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Phone, Mail, MapPin, Star, Calendar, Camera, Settings } from 'lucide-react';
@@ -8,9 +9,9 @@ import ContactForm from '@/components/ContactForm';
 import ReviewSection from '@/components/ReviewSection';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventService } from '@/services/eventService';
-import { projectService } from '@/services/projectService';
-import { contentService } from '@/services/contentService';
+import { getUpcomingEvents } from '@/services/eventService';
+import { getFeaturedProjects } from '@/services/projectService';
+import { getContentSection } from '@/services/contentService';
 import { aboutImageService } from '@/services/aboutImageService';
 import OptimizedImage from '@/components/OptimizedImage';
 
@@ -27,10 +28,10 @@ const Index = () => {
     const loadData = async () => {
       try {
         const [events, projects, hero, about, images] = await Promise.all([
-          eventService.getUpcomingEvents(),
-          projectService.getFeaturedProjects(),
-          contentService.getHeroContent(),
-          contentService.getAboutContent(),
+          getUpcomingEvents(),
+          getFeaturedProjects(),
+          getContentSection('hero'),
+          getContentSection('about'),
           aboutImageService.getAboutImages()
         ]);
         
