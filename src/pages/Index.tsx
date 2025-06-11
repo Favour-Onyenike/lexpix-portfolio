@@ -267,27 +267,19 @@ const Index = () => {
               >
                 {isLoading ? (
                   <div className="flex flex-col gap-4 max-w-md mx-auto">
-                    {/* Mobile: Grid layout matching desktop */}
+                    {/* Loading state grid layout */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="aspect-[2/3] bg-gray-800 rounded-lg animate-pulse" />
                       <div className="space-y-4">
-                        <div className="aspect-square bg-gray-800 rounded-lg animate-pulse" />
-                        <div className="aspect-[4/3] bg-gray-800 rounded-lg animate-pulse" />
-                      </div>
-                    </div>
-                    {/* Desktop: Grid layout */}
-                    <div className="hidden md:grid grid-cols-2 gap-4">
-                      <div className="aspect-[2/3] bg-gray-800 rounded-lg animate-pulse" />
-                      <div className="space-y-4">
-                        <div className="aspect-square bg-gray-800 rounded-lg animate-pulse" />
-                        <div className="aspect-[4/3] bg-gray-800 rounded-lg animate-pulse" />
+                        <div className="aspect-[3/2] bg-gray-800 rounded-lg animate-pulse" />
+                        <div className="aspect-[3/2] bg-gray-800 rounded-lg animate-pulse" />
                       </div>
                     </div>
                   </div>
                 ) : aboutImages.length > 0 ? (
                   <div className="max-w-md mx-auto">
-                    {/* Mobile: Grid layout matching desktop */}
-                    <div className="grid grid-cols-2 gap-4 md:hidden">
+                    {/* Grid layout for all screen sizes */}
+                    <div className="grid grid-cols-2 gap-4">
                       {/* First image - taller, spans full height */}
                       {aboutImages[0] && (
                         <motion.div
@@ -305,7 +297,7 @@ const Index = () => {
                         </motion.div>
                       )}
                       
-                      {/* Second column - two smaller images stacked */}
+                      {/* Second column - two images stacked with matching proportions */}
                       <div className="space-y-4">
                         {aboutImages[1] && (
                           <motion.div
@@ -313,7 +305,7 @@ const Index = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.1 }}
                             viewport={{ once: true }}
-                            className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+                            className="aspect-[3/2] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                           >
                             <img
                               src={aboutImages[1].image_url}
@@ -329,62 +321,7 @@ const Index = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
                             viewport={{ once: true }}
-                            className="aspect-[4/3] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                          >
-                            <img
-                              src={aboutImages[2].image_url}
-                              alt={aboutImages[2].alt_text || "About image 3"}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </motion.div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Desktop: Grid layout optimized for 3 images */}
-                    <div className="hidden md:grid grid-cols-2 gap-4">
-                      {/* First image - taller, spans full height */}
-                      {aboutImages[0] && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                          viewport={{ once: true }}
-                          className="aspect-[2/3] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        >
-                          <img
-                            src={aboutImages[0].image_url}
-                            alt={aboutImages[0].alt_text || "About image 1"}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </motion.div>
-                      )}
-                      
-                      {/* Second column - two smaller images stacked */}
-                      <div className="space-y-4">
-                        {aboutImages[1] && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                          >
-                            <img
-                              src={aboutImages[1].image_url}
-                              alt={aboutImages[1].alt_text || "About image 2"}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </motion.div>
-                        )}
-                        
-                        {aboutImages[2] && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            viewport={{ once: true }}
-                            className="aspect-[4/3] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+                            className="aspect-[3/2] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                           >
                             <img
                               src={aboutImages[2].image_url}
@@ -398,31 +335,16 @@ const Index = () => {
                   </div>
                 ) : (
                   <div className="max-w-md mx-auto">
-                    {/* Mobile fallback: Grid layout */}
-                    <div className="grid grid-cols-2 gap-4 md:hidden">
+                    {/* Fallback: Grid layout */}
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="aspect-[2/3] bg-gray-800 rounded-lg flex items-center justify-center">
                         <Camera className="h-8 w-8 text-gray-600" />
                       </div>
                       <div className="space-y-4">
-                        <div className="aspect-square bg-gray-800 rounded-lg flex items-center justify-center">
+                        <div className="aspect-[3/2] bg-gray-800 rounded-lg flex items-center justify-center">
                           <Camera className="h-8 w-8 text-gray-600" />
                         </div>
-                        <div className="aspect-[4/3] bg-gray-800 rounded-lg flex items-center justify-center">
-                          <Camera className="h-8 w-8 text-gray-600" />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Desktop fallback: Grid layout */}
-                    <div className="hidden md:grid grid-cols-2 gap-4">
-                      <div className="aspect-[2/3] bg-gray-800 rounded-lg flex items-center justify-center">
-                        <Camera className="h-8 w-8 text-gray-600" />
-                      </div>
-                      <div className="space-y-4">
-                        <div className="aspect-square bg-gray-800 rounded-lg flex items-center justify-center">
-                          <Camera className="h-8 w-8 text-gray-600" />
-                        </div>
-                        <div className="aspect-[4/3] bg-gray-800 rounded-lg flex items-center justify-center">
+                        <div className="aspect-[3/2] bg-gray-800 rounded-lg flex items-center justify-center">
                           <Camera className="h-8 w-8 text-gray-600" />
                         </div>
                       </div>
