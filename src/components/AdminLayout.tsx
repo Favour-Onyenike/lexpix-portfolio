@@ -15,7 +15,8 @@ import {
   X, 
   Home,
   DollarSign,
-  ImageIcon
+  ImageIcon,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -105,11 +106,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="space-y-2">
           <Button
             onClick={goToHome}
-            variant="outline"
-            className="w-full justify-start"
+            variant="ghost"
+            size="icon"
+            className="w-full h-10 bg-yellow-400 hover:bg-yellow-500 text-black"
           >
-            <Home className="h-4 w-4 mr-2" />
-            View Site
+            <Settings className="h-5 w-5" />
           </Button>
           <Button
             onClick={handleLogout}
