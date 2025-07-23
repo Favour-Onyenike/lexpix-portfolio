@@ -15,7 +15,8 @@ import {
   X, 
   Home,
   DollarSign,
-  ImageIcon
+  ImageIcon,
+  HardDrive
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -41,6 +42,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { icon: FileText, label: 'Featured Projects', path: '/admin/featured-projects' },
     { icon: ImageIcon, label: 'About Images', path: '/admin/about-images' },
     { icon: Edit, label: 'Content', path: '/admin/content' },
+    { icon: HardDrive, label: 'Storage', path: '/admin/storage' },
   ];
 
   const handleLogout = async () => {
