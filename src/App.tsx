@@ -28,6 +28,7 @@ import FeaturedProjects from "./pages/admin/FeaturedProjects";
 import ContentManager from "./pages/admin/ContentManager";
 import AdminPricing from "./pages/admin/Pricing";
 import AdminAboutImages from "./pages/admin/AboutImages";
+import StorageManager from "./pages/admin/StorageManager";
 
 import NotFound from "./pages/NotFound";
 import RequireAuth from "./components/RequireAuth";
@@ -63,6 +64,7 @@ const App = () => (
                 <Route path="/admin/content" element={<ContentManager />} />
                 <Route path="/admin/pricing" element={<AdminPricing />} />
                 <Route path="/admin/about-images" element={<AdminAboutImages />} />
+                <Route path="/admin/storage" element={<StorageManager />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />
