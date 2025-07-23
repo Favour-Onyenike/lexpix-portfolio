@@ -42,31 +42,60 @@ const Gallery = () => {
   }, []);
 
   const handleImageUpload = async (files: File[]) => {
+    if (!files || files.length === 0) return;
+    
     setIsLoading(true);
+    let successCount = 0;
+    let failCount = 0;
     
     try {
       for (const file of files) {
-        // Upload image to storage
-        const imageUrl = await uploadImage(file);
-        
-        if (imageUrl) {
-          // Create gallery image record
-          await createGalleryImage({
+        try {
+          console.log('Uploading file:', file.name, 'Size:', file.size);
+          
+          const imageUrl = await uploadImage(file);
+          if (!imageUrl) {
+            throw new Error('Failed to get image URL');
+          }
+          
+          const galleryImage = await createGalleryImage({
             title: file.name.split('.')[0],
             url: imageUrl
           });
-        } else {
-          toast.error(`Failed to upload ${file.name}`);
+          
+          if (galleryImage) {
+            successCount++;
+            console.log('Successfully uploaded:', file.name);
+          } else {
+            failCount++;
+            console.error('Failed to create gallery image for:', file.name);
+          }
+        } catch (error) {
+          failCount++;
+          console.error('Error uploading file:', file.name, error);
+          
+          // Show specific error message for storage limit
+          if (error instanceof Error && error.message.includes('Storage limit exceeded')) {
+            toast.error(error.message);
+            break; // Stop processing remaining files
+          }
         }
       }
       
-      // Reload gallery images
-      await loadGalleryImages();
-      setActiveTab('manage');
-      toast.success(`${files.length} images added to gallery`);
+      if (successCount > 0) {
+        await loadGalleryImages();
+        setActiveTab('manage');
+        if (failCount === 0) {
+          toast.success(`Successfully uploaded ${successCount} image${successCount > 1 ? 's' : ''}`);
+        } else {
+          toast.success(`Uploaded ${successCount} image${successCount > 1 ? 's' : ''}, ${failCount} failed`);
+        }
+      } else if (failCount > 0) {
+        toast.error(`Failed to upload ${failCount} image${failCount > 1 ? 's' : ''}`);
+      }
     } catch (error) {
-      console.error('Error uploading images:', error);
-      toast.error('Failed to upload images');
+      console.error('Upload process error:', error);
+      toast.error('Upload failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

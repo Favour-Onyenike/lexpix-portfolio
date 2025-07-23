@@ -45,7 +45,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     }
   };
 
-  const validateFiles = (files: FileList): File[] => {
+  const validateFiles = async (files: FileList): Promise<File[]> => {
     const validFiles: File[] = [];
     
     for (let i = 0; i < files.length; i++) {
@@ -60,23 +60,38 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     return validFiles;
   };
 
-  const processFiles = (files: FileList) => {
-    const validFiles = validateFiles(files);
-    
-    if (validFiles.length === 0) return;
-    
-    // Create preview URLs
-    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
-    
-    const updatedFiles = multiple ? [...selectedFiles, ...validFiles] : validFiles;
-    const updatedPreviews = multiple ? [...previews, ...newPreviews] : newPreviews;
-    
-    setSelectedFiles(updatedFiles);
-    setPreviews(updatedPreviews);
-    
-    // Auto-upload if enabled
-    if (autoUpload) {
-      onImageUpload(updatedFiles);
+  const processFiles = async (files: FileList) => {
+    try {
+      const validFiles = await validateFiles(files);
+      
+      if (validFiles.length === 0) return;
+      
+      // Check storage limit before processing
+      const { checkStorageLimit, getFileSizes } = await import('@/services/storageService');
+      const totalSize = getFileSizes(validFiles);
+      const storageCheck = await checkStorageLimit(totalSize);
+      
+      if (!storageCheck.canUpload) {
+        toast.error(`Storage limit exceeded. You're using ${storageCheck.percentUsed.toFixed(1)}% of your 1GB limit. Please delete some images or compress existing ones to free up space.`);
+        return;
+      }
+      
+      // Create preview URLs
+      const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+      
+      const updatedFiles = multiple ? [...selectedFiles, ...validFiles] : validFiles;
+      const updatedPreviews = multiple ? [...previews, ...newPreviews] : newPreviews;
+      
+      setSelectedFiles(updatedFiles);
+      setPreviews(updatedPreviews);
+      
+      // Auto-upload if enabled
+      if (autoUpload) {
+        onImageUpload(updatedFiles);
+      }
+    } catch (error) {
+      console.error('Error processing files:', error);
+      toast.error('Failed to process files. Please try again.');
     }
   };
 

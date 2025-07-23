@@ -50,6 +50,14 @@ export const checkImageUrlValidity = async (url: string): Promise<boolean> => {
 // Upload an image to storage
 export const uploadImage = async (file: File, folder: string = 'gallery'): Promise<string | null> => {
   try {
+    // Check storage limit before upload
+    const { checkStorageLimit } = await import('./storageService');
+    const storageCheck = await checkStorageLimit(file.size);
+    
+    if (!storageCheck.canUpload) {
+      throw new Error(`Storage limit exceeded. You're using ${storageCheck.percentUsed.toFixed(1)}% of your 1GB limit. Please delete some images or compress existing ones to free up space.`);
+    }
+    
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
@@ -83,7 +91,7 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
     return publicUrl;
   } catch (error) {
     console.error('Error uploading image:', error);
-    return null;
+    throw error; // Re-throw to let the calling component handle the error message
   }
 };
 
