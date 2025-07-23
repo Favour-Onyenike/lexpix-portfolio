@@ -28,33 +28,52 @@ export default function StorageManager() {
     try {
       setLoading(true);
       
-      // Get files from both buckets
-      const [imagesResponse, projectsResponse] = await Promise.all([
-        supabase.storage.from('images').list(),
-        supabase.storage.from('featured-projects').list()
-      ]);
-      
       const allFiles: StorageFile[] = [];
       
-      // Process images bucket
-      if (imagesResponse.data) {
-        for (const file of imagesResponse.data) {
-          if (file.metadata?.size) {
-            allFiles.push({
-              name: file.name,
-              size: file.metadata.size,
-              bucket_id: 'images',
-              created_at: file.created_at || '',
-              mimetype: file.metadata.mimetype || 'unknown'
-            });
+      // Get files from images bucket - need to list files in subdirectories
+      const { data: imagesFolders, error: imagesError } = await supabase.storage
+        .from('images')
+        .list();
+      
+      if (imagesError) {
+        console.error('Error listing images folders:', imagesError);
+      } else if (imagesFolders) {
+        // For each folder in images bucket, list the files inside
+        for (const folder of imagesFolders) {
+          if (folder.name && folder.name !== '.emptyFolderPlaceholder') {
+            const { data: folderFiles, error: folderError } = await supabase.storage
+              .from('images')
+              .list(folder.name);
+            
+            if (folderError) {
+              console.error(`Error listing files in ${folder.name}:`, folderError);
+            } else if (folderFiles) {
+              for (const file of folderFiles) {
+                if (file.metadata?.size && file.name !== '.emptyFolderPlaceholder') {
+                  allFiles.push({
+                    name: `${folder.name}/${file.name}`,
+                    size: file.metadata.size,
+                    bucket_id: 'images',
+                    created_at: file.created_at || '',
+                    mimetype: file.metadata.mimetype || 'unknown'
+                  });
+                }
+              }
+            }
           }
         }
       }
       
-      // Process featured-projects bucket
-      if (projectsResponse.data) {
-        for (const file of projectsResponse.data) {
-          if (file.metadata?.size) {
+      // Get files from featured-projects bucket
+      const { data: projectFiles, error: projectsError } = await supabase.storage
+        .from('featured-projects')
+        .list();
+      
+      if (projectsError) {
+        console.error('Error listing featured-projects:', projectsError);
+      } else if (projectFiles) {
+        for (const file of projectFiles) {
+          if (file.metadata?.size && file.name !== '.emptyFolderPlaceholder') {
             allFiles.push({
               name: file.name,
               size: file.metadata.size,
@@ -66,6 +85,7 @@ export default function StorageManager() {
         }
       }
       
+      console.log('Loaded files:', allFiles);
       setFiles(allFiles);
       setTotalSize(allFiles.reduce((acc, file) => acc + file.size, 0));
     } catch (error) {
