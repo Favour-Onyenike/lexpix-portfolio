@@ -148,44 +148,86 @@ export default function StorageManager() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {largeFiles.map((file) => (
-                    <div key={file.name} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Image className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium text-sm">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {file.bucket_id} • {formatBytes(file.size)} • {new Date(file.created_at).toLocaleDateString()}
-                          </p>
+                  {largeFiles.map((file) => {
+                    const imageUrl = `${supabase.storage.from(file.bucket_id).getPublicUrl(file.name).data.publicUrl}`;
+                    
+                    return (
+                      <div key={file.name} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+                        <div className="flex items-center gap-4">
+                          {/* Image Preview */}
+                          <div className="flex-shrink-0">
+                            <img 
+                              src={imageUrl} 
+                              alt={file.name}
+                              className="w-16 h-16 object-cover rounded-lg border"
+                              onError={(e) => {
+                                const img = e.currentTarget;
+                                const fallback = img.nextElementSibling as HTMLElement;
+                                img.style.display = 'none';
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
+                            />
+                            <div className="w-16 h-16 bg-gray-100 rounded-lg border flex items-center justify-center hidden">
+                              <Image className="h-6 w-6 text-gray-400" />
+                            </div>
+                          </div>
+                          
+                          {/* File Info */}
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate" title={file.name}>{file.name}</p>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                              <span className="font-semibold text-red-600">{formatBytes(file.size)}</span>
+                              <span>•</span>
+                              <span>{file.bucket_id}</span>
+                              <span>•</span>
+                              <span>{new Date(file.created_at).toLocaleDateString()}</span>
+                            </div>
+                          </div>
                         </div>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              disabled={deleting === file.name}
+                              className="flex-shrink-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="max-w-md">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Large File</AlertDialogTitle>
+                              <AlertDialogDescription className="space-y-3">
+                                <div className="text-center">
+                                  <img 
+                                    src={imageUrl} 
+                                    alt={file.name}
+                                    className="w-32 h-32 object-cover rounded-lg border mx-auto"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                </div>
+                                <p>Are you sure you want to delete "{file.name}"?</p>
+                                <p className="font-medium text-green-600">This will free up {formatBytes(file.size)} of storage space.</p>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => deleteFile(file.name, file.bucket_id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Delete File
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            disabled={deleting === file.name}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete File</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{file.name}"? This will free up {formatBytes(file.size)} of storage.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteFile(file.name, file.bucket_id)}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {largeFiles.length === 0 && (
                     <p className="text-center text-muted-foreground py-8">No files over 10MB found</p>
                   )}
