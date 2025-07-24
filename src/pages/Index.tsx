@@ -9,7 +9,6 @@ import ReviewSection from '@/components/ReviewSection';
 import ContactForm from '@/components/ContactForm';
 import PolaroidImage from '@/components/PolaroidImage';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
-import { getContentSection, ContentSection } from '@/services/contentService';
 import { aboutImageService, AboutImage } from '@/services/aboutImageService';
 import { useIsMobile } from '@/hooks/use-mobile';
 

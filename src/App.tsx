@@ -23,9 +23,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminGallery from "./pages/admin/Gallery";
 import AdminEvents from "./pages/admin/Events";
 import AdminReviews from "./pages/admin/Reviews";
-import TeamManagement from "./pages/admin/TeamManagement";
 import FeaturedProjects from "./pages/admin/FeaturedProjects";
-import ContentManager from "./pages/admin/ContentManager";
 import AdminPricing from "./pages/admin/Pricing";
 import AdminAboutImages from "./pages/admin/AboutImages";
 import StorageManager from "./pages/admin/StorageManager";
@@ -59,9 +57,7 @@ const App = () => (
                 <Route path="/admin/gallery" element={<AdminGallery />} />
                 <Route path="/admin/events" element={<AdminEvents />} />
                 <Route path="/admin/reviews" element={<AdminReviews />} />
-                <Route path="/admin/team" element={<TeamManagement />} />
                 <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
-                <Route path="/admin/content" element={<ContentManager />} />
                 <Route path="/admin/pricing" element={<AdminPricing />} />
                 <Route path="/admin/about-images" element={<AdminAboutImages />} />
                 <Route path="/admin/storage" element={<StorageManager />} />
