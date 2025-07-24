@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-const STORAGE_LIMIT_BYTES = 1024 * 1024 * 1024; // 1GB in bytes
+const STORAGE_LIMIT_BYTES = 600 * 1024 * 1024; // 600MB in bytes
 
 export interface StorageFile {
   name: string;

@@ -81,7 +81,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       const storageCheck = await checkStorageLimit(totalSize);
       
       if (!storageCheck.canUpload) {
-        toast.error(`Storage limit exceeded. You're using ${storageCheck.percentUsed.toFixed(1)}% of your 1GB limit. Please delete some images or compress existing ones to free up space.`);
+        toast.error(`Storage limit exceeded. You're using ${storageCheck.percentUsed.toFixed(1)}% of your 600MB limit. Please delete some images or compress existing ones to free up space.`);
         return;
       }
       

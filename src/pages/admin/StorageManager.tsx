@@ -104,7 +104,7 @@ export default function StorageManager() {
   };
 
   const getUsagePercentage = () => {
-    const limitBytes = 1024 * 1024 * 1024; // 1GB
+    const limitBytes = 600 * 1024 * 1024; // 600MB
     return (totalSize / limitBytes) * 100;
   };
 
@@ -143,13 +143,13 @@ export default function StorageManager() {
             <div className="flex items-center justify-between">
               <span>Total Used: {formatBytes(totalSize)}</span>
               <Badge variant={getUsagePercentage() > 100 ? "destructive" : "secondary"}>
-                {getUsagePercentage().toFixed(1)}% of 1GB
+                {getUsagePercentage().toFixed(1)}% of 600MB
               </Badge>
             </div>
             <Progress value={Math.min(getUsagePercentage(), 100)} />
             {getUsagePercentage() > 100 && (
               <p className="text-sm text-destructive">
-                You're over the 1GB limit by {formatBytes(totalSize - (1024 * 1024 * 1024))}
+                You're over the 600MB limit by {formatBytes(totalSize - (600 * 1024 * 1024))}
               </p>
             )}
           </CardContent>

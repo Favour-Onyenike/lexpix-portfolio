@@ -55,7 +55,7 @@ export const uploadImage = async (file: File, folder: string = 'gallery'): Promi
     const storageCheck = await checkStorageLimit(file.size);
     
     if (!storageCheck.canUpload) {
-      throw new Error(`Storage limit exceeded. You're using ${storageCheck.percentUsed.toFixed(1)}% of your 1GB limit. Please delete some images or compress existing ones to free up space.`);
+      throw new Error(`Storage limit exceeded. You're using ${storageCheck.percentUsed.toFixed(1)}% of your 600MB limit. Please delete some images or compress existing ones to free up space.`);
     }
     
     const fileExt = file.name.split('.').pop();
