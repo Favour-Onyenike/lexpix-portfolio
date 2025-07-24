@@ -47,14 +47,23 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   const validateFiles = async (files: FileList): Promise<File[]> => {
     const validFiles: File[] = [];
+    const maxSizeBytes = 10 * 1024 * 1024; // 10MB in bytes
     
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.type.startsWith('image/')) {
-        validFiles.push(file);
-      } else {
+      
+      if (!file.type.startsWith('image/')) {
         toast.error(`${file.name} is not an image file`);
+        continue;
       }
+      
+      if (file.size > maxSizeBytes) {
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        toast.error(`${file.name} is too large (${fileSizeMB}MB). Maximum size allowed is 10MB.`);
+        continue;
+      }
+      
+      validFiles.push(file);
     }
     
     return validFiles;
@@ -188,7 +197,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             {selectedFiles.length > 0 ? 'Add more images' : 'Drag images here'}
           </h3>
           <p className="text-sm text-muted-foreground mb-2">
-            Upload JPG, PNG or GIF files {multiple ? '(multiple allowed)' : '(single file)'}
+            Upload JPG, PNG or GIF files {multiple ? '(multiple allowed)' : '(single file)'}<br />
+            Maximum file size: 10MB per image
           </p>
           <Button 
             type="button" 
