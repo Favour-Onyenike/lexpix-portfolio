@@ -47,22 +47,79 @@ export default function StorageManager() {
     try {
       setDeleting(fileName);
       
-      const { error } = await supabase.storage
+      // Delete from Supabase storage first
+      const { error: storageError } = await supabase.storage
         .from(bucketId)
         .remove([fileName]);
       
-      if (error) throw error;
+      if (storageError) throw storageError;
       
-      // Remove from gallery_images if it's a gallery file
+      // Remove from database tables if it's a gallery file
       if (bucketId === 'images') {
-        const fileUrl = `${supabase.storage.from('images').getPublicUrl(fileName).data.publicUrl}`;
-        await supabase
+        // Try to find and delete matching database records by URL pattern
+        const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(fileName);
+        const fileUrl = publicUrlData.publicUrl;
+        
+        // Delete from gallery_images table
+        const { error: dbError } = await supabase
           .from('gallery_images')
           .delete()
           .eq('url', fileUrl);
+        
+        if (dbError) {
+          console.warn('Could not delete from gallery_images:', dbError);
+          // Don't throw error as storage deletion succeeded
+        }
+        
+        // Also delete from event_images if it matches
+        const { error: eventDbError } = await supabase
+          .from('event_images')
+          .delete()
+          .eq('url', fileUrl);
+        
+        if (eventDbError) {
+          console.warn('Could not delete from event_images:', eventDbError);
+          // Don't throw error as storage deletion succeeded
+        }
+        
+        // Clean up any about_images records
+        const { error: aboutDbError } = await supabase
+          .from('about_images')
+          .delete()
+          .eq('image_url', fileUrl);
+        
+        if (aboutDbError) {
+          console.warn('Could not delete from about_images:', aboutDbError);
+        }
       }
       
-      toast.success('File deleted successfully');
+      // Handle featured-projects bucket
+      if (bucketId === 'featured-projects') {
+        const { data: publicUrlData } = supabase.storage.from('featured-projects').getPublicUrl(fileName);
+        const fileUrl = publicUrlData.publicUrl;
+        
+        // Delete from featured_projects table
+        const { error: dbError } = await supabase
+          .from('featured_projects')
+          .delete()
+          .eq('image_url', fileUrl);
+        
+        if (dbError) {
+          console.warn('Could not delete from featured_projects:', dbError);
+        }
+        
+        // Delete from featured_project_images table
+        const { error: projectImagesError } = await supabase
+          .from('featured_project_images')
+          .delete()
+          .eq('url', fileUrl);
+        
+        if (projectImagesError) {
+          console.warn('Could not delete from featured_project_images:', projectImagesError);
+        }
+      }
+      
+      toast.success('File deleted successfully from storage and database');
       loadStorageFiles();
     } catch (error) {
       console.error('Error deleting file:', error);
