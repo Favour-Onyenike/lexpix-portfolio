@@ -101,3 +101,43 @@ export const formatBytes = (bytes: number): string => {
 export const getFileSizes = (files: File[]): number => {
   return files.reduce((total, file) => total + file.size, 0);
 };
+
+export const getLargeFiles = async (sizeThresholdMB: number = 10): Promise<StorageFile[]> => {
+  const { files } = await getCurrentStorageUsage();
+  const thresholdBytes = sizeThresholdMB * 1024 * 1024;
+  return files.filter(file => file.size > thresholdBytes);
+};
+
+export const deleteLargeFiles = async (sizeThresholdMB: number = 10): Promise<{ deletedCount: number; failedFiles: string[] }> => {
+  try {
+    const largeFiles = await getLargeFiles(sizeThresholdMB);
+    console.log(`Found ${largeFiles.length} files larger than ${sizeThresholdMB}MB`);
+    
+    let deletedCount = 0;
+    const failedFiles: string[] = [];
+    
+    for (const file of largeFiles) {
+      try {
+        const { error } = await supabase.storage
+          .from(file.bucket_id)
+          .remove([file.name]);
+        
+        if (error) {
+          console.error(`Failed to delete ${file.name}:`, error);
+          failedFiles.push(file.name);
+        } else {
+          console.log(`Deleted large file: ${file.name} (${formatBytes(file.size)})`);
+          deletedCount++;
+        }
+      } catch (error) {
+        console.error(`Error deleting ${file.name}:`, error);
+        failedFiles.push(file.name);
+      }
+    }
+    
+    return { deletedCount, failedFiles };
+  } catch (error) {
+    console.error('Error deleting large files:', error);
+    return { deletedCount: 0, failedFiles: [] };
+  }
+};

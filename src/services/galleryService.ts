@@ -222,3 +222,105 @@ export const deleteGalleryImage = async (id: string): Promise<boolean> => {
     return false;
   }
 };
+
+// Clean up orphaned gallery images (database records that point to deleted storage files)
+export const cleanupOrphanedGalleryImages = async (): Promise<{ deletedCount: number; failedIds: string[] }> => {
+  try {
+    console.log('Starting cleanup of orphaned gallery images...');
+    
+    const { data: galleryImages, error: fetchError } = await supabase
+      .from('gallery_images')
+      .select('id, url');
+    
+    if (fetchError) {
+      console.error('Error fetching gallery images:', fetchError);
+      return { deletedCount: 0, failedIds: [] };
+    }
+    
+    if (!galleryImages) {
+      return { deletedCount: 0, failedIds: [] };
+    }
+    
+    let deletedCount = 0;
+    const failedIds: string[] = [];
+    
+    for (const image of galleryImages) {
+      try {
+        // Check if this is a Supabase storage URL
+        if (image.url && image.url.includes('/storage/v1/object/public/images/')) {
+          // Extract file path from URL
+          const url = new URL(image.url);
+          const filePath = url.pathname.split('/storage/v1/object/public/images/')[1];
+          
+          if (filePath) {
+            // Check if file exists in storage
+            const { data: fileData, error: fileError } = await supabase.storage
+              .from('images')
+              .list(filePath.split('/')[0], {
+                search: filePath.split('/')[1]
+              });
+            
+            // If file doesn't exist in storage, delete the database record
+            if (fileError || !fileData || fileData.length === 0) {
+              const { error: deleteError } = await supabase
+                .from('gallery_images')
+                .delete()
+                .eq('id', image.id);
+              
+              if (deleteError) {
+                console.error(`Failed to delete orphaned record ${image.id}:`, deleteError);
+                failedIds.push(image.id);
+              } else {
+                console.log(`Deleted orphaned gallery image record: ${image.id}`);
+                deletedCount++;
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`Error processing image ${image.id}:`, error);
+        failedIds.push(image.id);
+      }
+    }
+    
+    console.log(`Cleanup completed. Deleted ${deletedCount} orphaned records.`);
+    return { deletedCount, failedIds };
+  } catch (error) {
+    console.error('Error during cleanup:', error);
+    return { deletedCount: 0, failedIds: [] };
+  }
+};
+
+// Delete all images larger than specified size from both storage and database
+export const deleteLargeImagesFromGallery = async (sizeThresholdMB: number = 10): Promise<{ storageDeleted: number; databaseDeleted: number; errors: string[] }> => {
+  try {
+    console.log(`Starting deletion of images larger than ${sizeThresholdMB}MB...`);
+    
+    // First, delete large files from storage
+    const { deleteLargeFiles } = await import('./storageService');
+    const { deletedCount: storageDeleted, failedFiles } = await deleteLargeFiles(sizeThresholdMB);
+    
+    // Then, clean up orphaned database records
+    const { deletedCount: databaseDeleted, failedIds } = await cleanupOrphanedGalleryImages();
+    
+    const errors = [
+      ...failedFiles.map(file => `Failed to delete file: ${file}`),
+      ...failedIds.map(id => `Failed to delete database record: ${id}`)
+    ];
+    
+    console.log(`Deletion completed. Storage: ${storageDeleted}, Database: ${databaseDeleted}`);
+    
+    return {
+      storageDeleted,
+      databaseDeleted,
+      errors
+    };
+  } catch (error) {
+    console.error('Error deleting large images:', error);
+    return {
+      storageDeleted: 0,
+      databaseDeleted: 0,
+      errors: [`General error: ${error}`]
+    };
+  }
+};

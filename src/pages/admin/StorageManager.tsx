@@ -23,6 +23,7 @@ export default function StorageManager() {
   const [totalSize, setTotalSize] = useState(0);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const loadStorageFiles = async () => {
     try {
@@ -68,6 +69,29 @@ export default function StorageManager() {
       toast.error('Failed to delete file');
     } finally {
       setDeleting(null);
+    }
+  };
+
+  const bulkDeleteLargeFiles = async () => {
+    try {
+      setBulkDeleting(true);
+      
+      const { deleteLargeImagesFromGallery } = await import('@/services/galleryService');
+      const result = await deleteLargeImagesFromGallery(10);
+      
+      if (result.errors.length > 0) {
+        console.error('Some files failed to delete:', result.errors);
+        toast.error(`Deleted ${result.storageDeleted} files, but ${result.errors.length} failed`);
+      } else {
+        toast.success(`Successfully deleted ${result.storageDeleted} large files and cleaned up ${result.databaseDeleted} database records`);
+      }
+      
+      loadStorageFiles();
+    } catch (error) {
+      console.error('Error during bulk delete:', error);
+      toast.error('Failed to delete large files');
+    } finally {
+      setBulkDeleting(false);
     }
   };
 
@@ -141,10 +165,51 @@ export default function StorageManager() {
           <TabsContent value="large-files" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Files Over 10MB</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  These are your largest files. Consider compressing or removing them.
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Files Over 10MB</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      These are your largest files. Consider compressing or removing them.
+                    </p>
+                  </div>
+                  {largeFiles.length > 0 && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          disabled={bulkDeleting}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete All Large Files
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete All Files Over 10MB</AlertDialogTitle>
+                          <AlertDialogDescription className="space-y-3">
+                            <p>Are you sure you want to delete all {largeFiles.length} files larger than 10MB?</p>
+                            <p className="font-medium text-green-600">
+                              This will free up {formatBytes(largeFiles.reduce((acc, f) => acc + f.size, 0))} of storage space.
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              This action will remove files from both storage and database records. This cannot be undone.
+                            </p>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={bulkDeleteLargeFiles}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Delete All Large Files
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
