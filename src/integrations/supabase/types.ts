@@ -292,14 +292,7 @@ export type Database = {
       }
     }
     Functions: {
-      mark_invite_token_used: {
-        Args: { p_token: string; p_used_by: string }
-        Returns: undefined
-      }
-      validate_invite_token: {
-        Args: { p_token: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
