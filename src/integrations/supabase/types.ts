@@ -263,7 +263,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      reviews_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          name: string | null
+          published: boolean | null
+          rating: number | null
+          text: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          published?: boolean | null
+          rating?: number | null
+          text?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          name?: string | null
+          published?: boolean | null
+          rating?: number | null
+          text?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       mark_invite_token_used: {
