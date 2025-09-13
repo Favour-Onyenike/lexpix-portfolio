@@ -5,7 +5,6 @@ import { Button } from './ui/button';
 import { 
   LayoutDashboard, 
   Image, 
-  Calendar, 
   Star, 
   Users, 
   FileText, 
@@ -36,7 +35,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Image, label: 'Gallery', path: '/admin/gallery' },
-    { icon: Calendar, label: 'Events', path: '/admin/events' },
     { icon: DollarSign, label: 'Pricing', path: '/admin/pricing' },
     { icon: Star, label: 'Reviews', path: '/admin/reviews' },
     { icon: Users, label: 'Team', path: '/admin/team' },

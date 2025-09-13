@@ -11,8 +11,6 @@ import DatabaseInitializer from "@/components/DatabaseInitializer";
 // Client Pages
 import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
-import Events from "./pages/Events";
-import EventGallery from "./pages/EventGallery";
 import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -21,7 +19,6 @@ import InviteSignup from "./pages/InviteSignup";
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
 import AdminGallery from "./pages/admin/Gallery";
-import AdminEvents from "./pages/admin/Events";
 import AdminReviews from "./pages/admin/Reviews";
 import FeaturedProjects from "./pages/admin/FeaturedProjects";
 import AdminPricing from "./pages/admin/Pricing";
@@ -45,8 +42,6 @@ const App = () => (
               {/* Client Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/gallery" element={<Gallery />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/events/:eventId" element={<EventGallery />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -56,7 +51,6 @@ const App = () => (
               <Route element={<RequireAuth />}>
                 <Route path="/admin" element={<Dashboard />} />
                 <Route path="/admin/gallery" element={<AdminGallery />} />
-                <Route path="/admin/events" element={<AdminEvents />} />
                 <Route path="/admin/reviews" element={<AdminReviews />} />
                 <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
                 <Route path="/admin/pricing" element={<AdminPricing />} />

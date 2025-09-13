@@ -104,9 +104,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path === '/gallery' && currentPath === '/gallery') {
       return true;
     }
-    if (path === '/events' && currentPath === '/events') {
-      return true;
-    }
     if (path === '/pricing' && currentPath === '/pricing') {
       return true;
     }
@@ -157,14 +154,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 }`}
               >
                 Gallery
-              </button>
-              <button 
-                onClick={() => navigateTo('/events')}
-                className={`text-sm hover:text-primary/80 transition-colors relative ${
-                  isActive('/events') ? 'after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-yellow-400' : ''
-                }`}
-              >
-                Events
               </button>
               <button 
                 onClick={() => navigateTo('/pricing')}
@@ -256,15 +245,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
               <button 
                 className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
-                onClick={() => navigateTo('/events')}
-              >
-                Events
-                {currentPath === '/events' && (
-                  <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-yellow-400 rounded-full" />
-                )}
-              </button>
-              <button 
-                className="text-2xl font-medium text-black hover:text-yellow-400 transition-colors py-4 relative"
                 onClick={() => navigateTo('/pricing')}
               >
                 Pricing
@@ -333,7 +313,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="flex flex-col space-y-4">
                 <button onClick={handleHomeClick} className="text-gray-400 hover:text-white transition-colors text-left">Home</button>
                 <button onClick={() => navigateTo('/gallery')} className="text-gray-400 hover:text-white transition-colors text-left">Gallery</button>
-                <button onClick={() => navigateTo('/events')} className="text-gray-400 hover:text-white transition-colors text-left">Events</button>
                 <button onClick={() => navigateTo('/pricing')} className="text-gray-400 hover:text-white transition-colors text-left">Pricing</button>
                 <button onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors text-left">Contact</button>
               </div>
