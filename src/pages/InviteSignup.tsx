@@ -28,17 +28,8 @@ const InviteSignup = () => {
       }
 
       try {
-        // Check if the token exists and has not expired using RPC function
-        const { data, error } = await supabase.rpc('validate_invite_token', {
-          p_token: token
-        } as any); // Use type assertion to bypass the type checking
-
-        if (error || !data) {
-          toast.error('Invalid or expired invitation link');
-          setIsValid(false);
-        } else {
-          setIsValid(true);
-        }
+        // Invite token validation is disabled - proceed with regular signup
+        setIsValid(true);
       } catch (error) {
         console.error('Error validating token:', error);
         toast.error('Could not validate invitation link');
@@ -83,17 +74,10 @@ const InviteSignup = () => {
         return;
       }
       
-      // Mark the token as used
-      if (token && userData.user) {
-        const { error: updateError } = await supabase.rpc('mark_invite_token_used', {
-          p_token: token,
-          p_used_by: userData.user.id
-        } as any); // Use type assertion to bypass the type checking
-          
-        if (updateError) {
-          console.error('Error updating token:', updateError);
-        }
-      }
+      // Invite token functionality is disabled
+      // if (token && userData.user) {
+      //   // Token marking functionality removed
+      // }
       
       toast.success('Account created successfully! Please check your email for verification.');
       navigate('/login');

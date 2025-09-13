@@ -389,22 +389,17 @@ const Index = () => {
             Our Services
           </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 max-w-4xl mx-auto">
             {[
               {
                 icon: Camera,
                 title: "Photography",
-                description: "Professional photography services for all your needs"
+                description: "Professional photography services capturing life's most meaningful moments with artistic vision and technical excellence"
               },
               {
                 icon: Video,
                 title: "Video Editing",
-                description: "Professional video editing and post-production services"
-              },
-              {
-                icon: Palette,
-                title: "Graphic Design",
-                description: "Creative design solutions for your brand and marketing needs"
+                description: "Expert video editing and post-production services that bring your visual stories to life with cinematic quality"
               }
             ].map((service, index) => (
               <motion.div

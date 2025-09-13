@@ -108,16 +108,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return null;
       }
       
-      const { error } = await supabase.rpc('insert_invite_token', {
-        p_token: token,
-        p_expires_at: expiresAt.toISOString(),
-        p_created_by: currentUser?.id || null
-      } as any);
+      // Invite token functionality is disabled
+      // const { error } = await supabase.rpc('insert_invite_token', {
+      //   p_token: token,
+      //   p_expires_at: expiresAt.toISOString(),
+      //   p_created_by: currentUser?.id || null
+      // } as any);
         
-      if (error) {
-        toast.error('Could not generate invite link');
-        return null;
-      }
+      // if (error) {
+      //   toast.error('Could not generate invite link');
+      //   return null;
+      // }
       
       const baseUrl = window.location.origin;
       return `${baseUrl}/invite/${token}`;
