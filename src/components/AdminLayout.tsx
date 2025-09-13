@@ -16,7 +16,8 @@ import {
   Home,
   DollarSign,
   ImageIcon,
-  HardDrive
+  HardDrive,
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -41,6 +42,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { icon: Users, label: 'Team', path: '/admin/team' },
     { icon: FileText, label: 'Featured Projects', path: '/admin/featured-projects' },
     { icon: ImageIcon, label: 'About Images', path: '/admin/about-images' },
+    { icon: BarChart3, label: 'Counters', path: '/admin/counters' },
     { icon: Edit, label: 'Content', path: '/admin/content' },
     { icon: HardDrive, label: 'Storage', path: '/admin/storage' },
   ];

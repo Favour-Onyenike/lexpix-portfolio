@@ -10,12 +10,14 @@ import ContactForm from '@/components/ContactForm';
 import PolaroidImage from '@/components/PolaroidImage';
 import { getFeaturedProjects, FeaturedProject } from '@/services/projectService';
 import { aboutImageService, AboutImage } from '@/services/aboutImageService';
+import { counterService, Counter } from '@/services/counterService';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const statsRef = useRef(null);
   const [statsVisible, setStatsVisible] = useState(false);
   const [counters, setCounters] = useState([0, 0, 0, 0]);
+  const [counterData, setCounterData] = useState<Counter[]>([]);
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
   const [aboutImages, setAboutImages] = useState<AboutImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,12 +31,7 @@ const Index = () => {
     content: "LexPix is a photography and visual storytelling brand built on passion, purpose, and love. Founded by Volks \"Lucas Uzum\", LexPix was born under the Lexaren Corporation, proudly owned by the Uzum family. This venture was made possible through the unwavering love, support, and initial funding from his parents, whose belief laid the foundation for everything LexPix is becoming.\n\nWith a sharp eye for detail and a heart for storytelling, LexPix captures life's most meaningful moments, the smiles, glances, and emotions, all in their purest, most vibrant form. Through high-quality photography and visual content, we aim to help others see the color and beauty in their own stories. Every frame we take is a reflection of the love that birthed this vision, and a commitment to preserving the essence of every moment we touch."
   };
   
-  const statsData = [
-    { target: 25, label: "Satisfied Clients" },
-    { target: 20, label: "Projects Completed" },
-    { target: 3, label: "Years Experience" },
-    { target: 200, label: "Photos Delivered" }
-  ];
+  // Remove hardcoded stats data - now using database values
 
   const handleGetInTouchClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -47,13 +44,15 @@ const Index = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load projects and about images
-        const [projects, images] = await Promise.all([
+        // Load projects, about images, and counters
+        const [projects, images, countersData] = await Promise.all([
           getFeaturedProjects(),
-          aboutImageService.getAboutImages()
+          aboutImageService.getAboutImages(),
+          counterService.getCounters()
         ]);
         setFeaturedProjects(projects);
         setAboutImages(images);
+        setCounterData(countersData);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -95,7 +94,7 @@ const Index = () => {
         if (!startTimestamp) startTimestamp = timestamp;
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
         
-        setCounters(statsData.map(stat => Math.floor(progress * stat.target)));
+        setCounters(counterData.map(counter => Math.floor(progress * counter.value)));
         
         if (progress < 1) {
           window.requestAnimationFrame(step);
@@ -359,18 +358,18 @@ const Index = () => {
       <section id="stats" ref={statsRef} className="py-16 md:py-20 px-6 md:px-10 bg-yellow-400 text-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {statsData.map((stat, index) => (
+            {counterData.map((counter, index) => (
               <motion.div
-                key={index}
+                key={counter.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
                 <h3 className="text-4xl md:text-5xl font-bold mb-2">
-                  {statsVisible ? counters[index] : 0}{index === 3 ? "+" : index === 2 ? "+" : "+"}
+                  {statsVisible ? counters[index] : 0}+
                 </h3>
-                <p className="text-sm md:text-base">{stat.label}</p>
+                <p className="text-sm md:text-base">{counter.label}</p>
               </motion.div>
             ))}
           </div>

@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      counters: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          name: string
+          sort_order: number
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
       event_images: {
         Row: {
           created_at: string | null

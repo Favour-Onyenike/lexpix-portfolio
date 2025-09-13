@@ -26,6 +26,7 @@ import AdminReviews from "./pages/admin/Reviews";
 import FeaturedProjects from "./pages/admin/FeaturedProjects";
 import AdminPricing from "./pages/admin/Pricing";
 import AdminAboutImages from "./pages/admin/AboutImages";
+import AdminCounters from "./pages/admin/Counters";
 import StorageManager from "./pages/admin/StorageManager";
 
 import NotFound from "./pages/NotFound";
@@ -60,6 +61,7 @@ const App = () => (
                 <Route path="/admin/featured-projects" element={<FeaturedProjects />} />
                 <Route path="/admin/pricing" element={<AdminPricing />} />
                 <Route path="/admin/about-images" element={<AdminAboutImages />} />
+                <Route path="/admin/counters" element={<AdminCounters />} />
                 <Route path="/admin/storage" element={<StorageManager />} />
               </Route>
               
