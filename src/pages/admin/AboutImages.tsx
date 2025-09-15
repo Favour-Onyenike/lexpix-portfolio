@@ -147,21 +147,23 @@ const AdminAboutImages = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">About Section Images</h1>
-            <p className="text-gray-600 mt-2">Manage the Polaroid-style images displayed in the about section (maximum 3 images recommended)</p>
+            <h1 className="text-3xl font-bold">About Section Image</h1>
+            <p className="text-gray-600 mt-2">Manage the circular image displayed in the about section (only one image will be shown)</p>
           </div>
-          <Button onClick={handleCreate} className="bg-yellow-400 hover:bg-yellow-500 text-black">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Image
-          </Button>
+          {aboutImages.length === 0 && (
+            <Button onClick={handleCreate} className="bg-yellow-400 hover:bg-yellow-500 text-black">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Image
+            </Button>
+          )}
         </div>
 
         {(isCreating || editingImage) && (
           <Card>
             <CardHeader>
-              <CardTitle>{isCreating ? 'Add New About Image' : 'Edit About Image'}</CardTitle>
+              <CardTitle>{isCreating ? 'Add About Section Image' : 'Edit About Section Image'}</CardTitle>
               <CardDescription>
-                Upload or provide URL for an image to display in the about section
+                Upload or provide URL for the circular image displayed in the about section
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -228,9 +230,9 @@ const AdminAboutImages = () => {
               animate={{ opacity: 1, y: 0 }}
               className="relative"
             >
-              <Card>
+                <Card>
                 <CardContent className="p-4">
-                  <div className="aspect-square overflow-hidden rounded-lg mb-4">
+                  <div className="aspect-square overflow-hidden rounded-full mb-4 mx-auto w-48 h-48">
                     <img 
                       src={image.image_url} 
                       alt={image.alt_text || 'About image'} 
@@ -270,10 +272,10 @@ const AdminAboutImages = () => {
           </div>
         )}
 
-        {aboutImages.length > 3 && (
+        {aboutImages.length > 1 && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-yellow-800">
-              <strong>Note:</strong> You have more than 3 images. Only the first 3 (by sort order) will be displayed on the website.
+              <strong>Note:</strong> You have multiple images. Only the first one (by sort order) will be displayed as the circular about image.
             </p>
           </div>
         )}

@@ -275,61 +275,20 @@ const Index = () => {
                     </div>
                   </div>
                 ) : aboutImages.length > 0 ? (
-                  <div className="max-w-md mx-auto">
-                    {/* Grid layout for all screen sizes */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* First image - taller, spans full height */}
-                      {aboutImages[0] && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                          viewport={{ once: true }}
-                          className="aspect-[2/3] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                        >
-                          <img
-                            src={aboutImages[0].image_url}
-                            alt={aboutImages[0].alt_text || "About image 1"}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </motion.div>
-                      )}
-                      
-                      {/* Second column - two images stacked with matching proportions */}
-                      <div className="space-y-4">
-                        {aboutImages[1] && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            viewport={{ once: true }}
-                            className="aspect-[3/2] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                          >
-                            <img
-                              src={aboutImages[1].image_url}
-                              alt={aboutImages[1].alt_text || "About image 2"}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </motion.div>
-                        )}
-                        
-                        {aboutImages[2] && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            viewport={{ once: true }}
-                            className="aspect-[3/2] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                          >
-                            <img
-                              src={aboutImages[2].image_url}
-                              alt={aboutImages[2].alt_text || "About image 3"}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </motion.div>
-                        )}
-                      </div>
-                    </div>
+                  <div className="flex justify-center">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      viewport={{ once: true }}
+                      className="w-80 h-80 rounded-full overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+                    >
+                      <img
+                        src={aboutImages[0].image_url}
+                        alt={aboutImages[0].alt_text || "About us"}
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
                   </div>
                 ) : (
                   <div className="max-w-md mx-auto">
